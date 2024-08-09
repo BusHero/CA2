@@ -10,6 +10,14 @@ public class UnitTest1
         { [0, 1], 1 },
         { [1, 0], 2 },
         { [1, 1], 3 },
+        { [0, 0, 0], 0 },
+        { [0, 0, 1], 1 },
+        { [0, 1, 0], 2 },
+        { [0, 1, 1], 3 },
+        { [1, 0, 0], 4 },
+        { [1, 0, 1], 5 },
+        { [1, 1, 0], 6 },
+        { [1, 1, 1], 7 },
     };
 
     [Theory]
@@ -28,22 +36,15 @@ public sealed class Generator
 {
     public long Generate(int[] values)
     {
-        if (values[0] == 1 && values[1] == 1)
+        var result = 0;
+        
+        for (var i = 0; i < values.Length - 1; i++)
         {
-            return 3;
+            result *= 2;
+            result += values[i] * 2;
         }
 
-        if (values[1] == 1)
-        {
-            return 1;
-        }
-
-        if (values[0] == 1)
-        {
-            return 2;
-        }
-
-        return 0;
+        return result + values[^1];
     }
 }
 /*

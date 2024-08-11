@@ -1,4 +1,3 @@
-using System.Dynamic;
 using System.Numerics;
 using FluentAssertions;
 using FsCheck;
@@ -166,18 +165,20 @@ public class UnitTest1
     {
         var sample = Gen.Sample(size.Item, 1, Foo.Generate().Generator)[0];
 
-        return (sample.Item1 == size.Item).ToProperty();
+        var expectedSize = size.Item <= 2 ? 2 : size.Item;
+
+        return (sample.Item1 == expectedSize).ToProperty();
     }
 
     [Property]
     public Property SizeIsNeverZero()
     {
         var sample = Gen
-            .Sample(0, 10, Foo.Generate().Generator);
+            .Sample(0, 1, Foo.Generate().Generator);
 
         return sample
             .Select(x => x.Item1)
-            .All(x => x != 0)
+            .All(x => x == 2)
             .ToProperty();
     }
 
@@ -225,10 +226,14 @@ public interface IGenerator<T>
 public sealed class Foo : IGenerator<(int, int[])>
 {
     public static Arbitrary<(int, int[])> Generate() => Gen
-        .Sized(size => Gen
-            .Choose(0, size == 0 ? 2 : size - 1)
-            .ArrayOf(1_000_000)
-            .Select(arr => (size == 0 ? 2 : size - 1, arr)))
+        .Sized(size =>
+        {
+            size = size < 2 ? 2 : size;
+            return Gen
+                .Choose(0, size - 1)
+                .ArrayOf(1_000_000)
+                .Select(arr => (size, arr));
+        })
         .ToArbitrary();
 }
 

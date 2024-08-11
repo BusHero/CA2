@@ -142,7 +142,7 @@ public class UnitTest1
             .ToProperty();
     }
 
-    [Property(Arbitrary = [typeof(Foo)])]
+    [Property(Arbitrary = [typeof(GenerateStuff)])]
     public Property AllElementsAreSmallerOrEqualThanSize((int, int[]) tuple)
     {
         return tuple
@@ -151,7 +151,7 @@ public class UnitTest1
             .ToProperty();
     }
 
-    [Property(Arbitrary = [typeof(Foo)])]
+    [Property(Arbitrary = [typeof(GenerateStuff)])]
     public Property AllElementsAreBiggerOrEqualToZero((int, int[]) tuple)
     {
         return tuple
@@ -163,7 +163,7 @@ public class UnitTest1
     [Property]
     public Property SizeOfTheGeneratorComesFromTheSizedProperty(PositiveInt size)
     {
-        var sample = Gen.Sample(size.Item, 1, Foo.Generate().Generator)[0];
+        var sample = Gen.Sample(size.Item, 1, GenerateStuff.Generate().Generator)[0];
 
         var expectedSize = size.Item <= 2 ? 2 : size.Item;
 
@@ -174,7 +174,7 @@ public class UnitTest1
     public Property SizeIsNeverZero()
     {
         var sample = Gen
-            .Sample(0, 1, Foo.Generate().Generator);
+            .Sample(0, 1, GenerateStuff.Generate().Generator);
 
         return sample
             .Select(x => x.Item1)
@@ -185,7 +185,7 @@ public class UnitTest1
     [Property(StartSize = 3, EndSize = 10)]
     public Property ElementsInListAreUniformlyDistributed(PositiveInt size)
     {
-        var sample = Gen.Sample(size.Item, 1, Foo.Generate().Generator)[0];
+        var sample = Gen.Sample(size.Item, 1, GenerateStuff.Generate().Generator)[0];
 
         var result = new int[size.Item];
 
@@ -211,6 +211,18 @@ public class UnitTest1
     }
 }
 
+public class Generators
+{
+    public static Arbitrary<(int, int)> Generate()
+    {
+        return Gen
+            .Sized(size => Gen
+                .Elements(0, size < 2 ? 1 : (size - 1))
+                .Select(x => (x, size < 2 ? 2 : size)))
+            .ToArbitrary();
+    }
+}
+
 public class Combination
 {
     public required int[] Item { get; init; }
@@ -223,7 +235,7 @@ public interface IGenerator<T>
     static abstract Arbitrary<T> Generate();
 }
 
-public sealed class Foo : IGenerator<(int, int[])>
+public sealed class GenerateStuff : IGenerator<(int, int[])>
 {
     public static Arbitrary<(int, int[])> Generate() => Gen
         .Sized(size =>

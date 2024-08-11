@@ -2,5 +2,6 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=bad4b858_002D143e_002D48bc_002D80a6_002Dd2d234e5e7d8/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="UnitTest1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.UnitTest1&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.GeneratorTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

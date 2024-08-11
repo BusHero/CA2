@@ -217,7 +217,7 @@ public class Generators
     {
         return Gen
             .Sized(size => Gen
-                .Elements(0, size < 2 ? 1 : (size - 1))
+                .Choose(0, size < 2 ? 1 : size - 1)
                 .Select(x => (x, size < 2 ? 2 : size)))
             .ToArbitrary();
     }

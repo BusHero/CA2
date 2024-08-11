@@ -117,15 +117,32 @@ public class UnitTest1
     }
 }
 
-public static class BigArraysOfOnes
+public class Combination
 {
+    public required int[] Item { get; init; }
+
+    public required int[] Sizes { get; init; }
+}
+
+public interface IGenerator<T>
+{
+    static abstract Arbitrary<T> Generate();
+}
+
+public sealed class BigArraysOfOnes : IGenerator<int[]>
+{
+    private BigArraysOfOnes() { }
+    
     public static Arbitrary<int[]> Generate()
     {
-        return Gen.Elements(1).ArrayOf().ToArbitrary();
+        return Gen
+            .Elements(1)
+            .ArrayOf()
+            .ToArbitrary();
     }
 }
 
-public static class BigArraysOfZeros
+public class BigArraysOfZeros : IGenerator<int[]>
 {
     public static Arbitrary<int[]> Generate()
     {
@@ -133,7 +150,7 @@ public static class BigArraysOfZeros
     }
 }
 
-public static class BigArraysOfZerosAndOnes
+public class BigArraysOfZerosAndOnes : IGenerator<int[]>
 {
     public static Arbitrary<int[]> Generate()
     {
@@ -141,25 +158,5 @@ public static class BigArraysOfZerosAndOnes
             .Elements(0, 1)
             .ArrayOf()
             .ToArbitrary();
-    }
-}
-
-public sealed class Generator
-{
-    public static BigInteger Generate(int[] values, int[] sizes)
-    {
-        if (values.Length == 0)
-        {
-            return 0;
-        }
-
-        var result = BigInteger.Zero;
-
-        for (var i = 0; i < values.Length - 1; i++)
-        {
-            result = result * sizes[i] + values[i] * sizes[i + 1];
-        }
-
-        return result + values[^1];
     }
 }

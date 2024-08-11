@@ -143,35 +143,62 @@ public class UnitTest1
             .ToProperty();
     }
 
-    [Property]
-    public Property Generator2()
+    [Property(Arbitrary = [typeof(Foo)])]
+    public Property AllElementsAreSmallerOrEqualThanSize((int, int[]) tuple)
     {
-        var foo = Gen
-            .Choose(0, 9)
-            .ArrayOf(1_000_000)
-            .ToArbitrary();
-        
-        return Prop.ForAll(foo, numbers =>
+        return tuple
+            .Item2
+            .All(x => x < tuple.Item1)
+            .ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(Foo)])]
+    public Property AllElementsAreBiggerOrEqualToZero((int, int[]) tuple)
+    {
+        return tuple
+            .Item2
+            .All(x => 0 <= x)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property SizeOfTheGeneratorComesFromTheSizedProperty(PositiveInt size)
+    {
+        var sample = Gen.Sample(size.Item, 1, Foo.Generate().Generator)[0];
+
+        return (sample.Item1 == size.Item).ToProperty();
+    }
+
+    [Property]
+    public Property SizeIsNeverZero()
+    {
+        var sample = Gen
+            .Sample(0, 10, Foo.Generate().Generator);
+
+        return sample
+            .Select(x => x.Item1)
+            .All(x => x != 0)
+            .ToProperty();
+    }
+
+    [Property(StartSize = 3, EndSize = 10)]
+    public Property ElementsInListAreUniformlyDistributed(PositiveInt size)
+    {
+        var sample = Gen.Sample(size.Item, 1, Foo.Generate().Generator)[0];
+
+        var result = new int[size.Item];
+
+        foreach (var i in sample.Item2)
         {
-            var result = new Dictionary<int, int>();
-            
-            foreach (var i in numbers)
-            {
-                if (!result.TryGetValue(i, out var value))
-                {
-                    value = 0;
-                    result[i] = value;
-                }
-                result[i] = ++value;
-            }
+            result[i]++;
+        }
 
-            const double probability = 100.0 / 10.0;
+        var probability = 100.0 / size.Item;
 
-            return result
-                .Values
-                .Select(x => x * 100.0 / 1_000_000)
-                .All(x => Math.Abs(x - probability) < 0.1);
-        });
+        return result
+            .Select(x => x * 100.0 / 1_000_000)
+            .All(x => Math.Abs(x - probability) < 0.5)
+            .ToProperty();
     }
 
     private static int[] GetSizes(int numbersLength)
@@ -193,6 +220,16 @@ public class Combination
 public interface IGenerator<T>
 {
     static abstract Arbitrary<T> Generate();
+}
+
+public sealed class Foo : IGenerator<(int, int[])>
+{
+    public static Arbitrary<(int, int[])> Generate() => Gen
+        .Sized(size => Gen
+            .Choose(0, size == 0 ? 2 : size - 1)
+            .ArrayOf(1_000_000)
+            .Select(arr => (size == 0 ? 2 : size - 1, arr)))
+        .ToArbitrary();
 }
 
 public sealed class TupleGenerator : IGenerator<(int[], int[])>

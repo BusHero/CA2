@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Numerics;
 using FluentAssertions;
 using FsCheck;
@@ -119,11 +120,51 @@ public class UnitTest1
     {
         return (tuple.Item1 != tuple.Item2).ToProperty();
     }
-    
+
     [Property(Arbitrary = [typeof(TupleGenerator)])]
     public Property SizesAreBiggerThan2((int[], int[]) tuple)
     {
-        return (tuple.Item2.All(x => 2 <= x)).ToProperty();
+        return tuple.Item2.All(x => 2 <= x).ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(TupleGenerator)])]
+    public Property ValuesAreBiggerOrEqualTo0((int[], int[]) tuple)
+    {
+        return tuple.Item1.All(x => 0 <= x).ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(TupleGenerator)])]
+    public Property ValuesAreSmallerThanSizes((int[], int[]) tuple)
+    {
+        return tuple
+            .Item1
+            .Zip(tuple.Item2)
+            .All(t => t.First < t.Second)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property Generator2()
+    {
+        var foo = Gen
+            .Choose(0, 9)
+            .ArrayOf(1_000_000)
+            .ToArbitrary();
+        
+        return Prop.ForAll(foo, numbers =>
+        {
+            int[] result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            foreach (var i in numbers)
+            {
+                result[i]++;
+            }
+
+            const double probability = 100.0 / 10.0;
+
+            return result
+                .Select(x => x * 100.0 / 1_000_000)
+                .All(x => Math.Abs(x - probability) < 0.1);
+        });
     }
 
     private static int[] GetSizes(int numbersLength)
@@ -155,9 +196,11 @@ public sealed class TupleGenerator : IGenerator<(int[], int[])>
             .Int32()
             .Generator
             .Where(x => 2 <= x)
+            .Select(x => (x - 1, x))
             .ArrayOf(size)
-            .Two()
-            .Select(x => (x.Item1, x.Item2)))
+            .Select(x => (
+                x.Select(y => y.Item1).ToArray(),
+                x.Select(y => y.Item2).ToArray())))
         .ToArbitrary();
 }
 

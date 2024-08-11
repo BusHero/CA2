@@ -153,7 +153,8 @@ public class UnitTest1
         
         return Prop.ForAll(foo, numbers =>
         {
-            int[] result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var result = Enumerable.Range(0, 10).ToDictionary(x => x, x => 0);
+            
             foreach (var i in numbers)
             {
                 result[i]++;
@@ -162,6 +163,7 @@ public class UnitTest1
             const double probability = 100.0 / 10.0;
 
             return result
+                .Values
                 .Select(x => x * 100.0 / 1_000_000)
                 .All(x => Math.Abs(x - probability) < 0.1);
         });

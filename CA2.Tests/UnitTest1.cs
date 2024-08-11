@@ -13,21 +13,21 @@ public class UnitTest1
         { [0, 1], [2, 2], 1 },
         { [1, 0], [2, 2], 2 },
         { [1, 1], [2, 2], 3 },
-        
+
         { [0, 0], [3, 2], 0 },
         { [0, 1], [3, 2], 1 },
         { [1, 0], [3, 2], 2 },
         { [1, 1], [3, 2], 3 },
         { [2, 0], [3, 2], 4 },
         { [2, 1], [3, 2], 5 },
-        
+
         { [0, 0], [2, 3], 0 },
         { [0, 1], [2, 3], 1 },
         { [0, 2], [2, 3], 2 },
         { [1, 0], [2, 3], 3 },
         { [1, 1], [2, 3], 4 },
         { [1, 2], [2, 3], 5 },
-        
+
         { [0, 0], [3, 3], 0 },
         { [0, 1], [3, 3], 1 },
         { [0, 2], [3, 3], 2 },
@@ -37,7 +37,7 @@ public class UnitTest1
         { [2, 0], [3, 3], 6 },
         { [2, 1], [3, 3], 7 },
         { [2, 2], [3, 3], 8 },
-        
+
         { [0, 0, 0], [2, 2, 2], 0 },
         { [0, 0, 1], [2, 2, 2], 1 },
         { [0, 1, 0], [2, 2, 2], 2 },
@@ -57,7 +57,7 @@ public class UnitTest1
     {
         var generator = new Generator();
 
-        var number = generator.Generate(values, sizes);
+        var number = Generator.Generate(values, sizes);
 
         number.Should().Be(expectedResult);
     }
@@ -69,7 +69,7 @@ public class UnitTest1
         var generator = new Generator();
 
         var sizes = GetSizes(numbers.Length);
-        var number = generator.Generate(numbers, sizes);
+        var number = Generator.Generate(numbers, sizes);
 
         return (0 <= number).ToProperty();
     }
@@ -81,7 +81,7 @@ public class UnitTest1
         var generator = new Generator();
 
         var sizes = GetSizes(numbers.Length);
-        var number = generator.Generate(numbers, sizes);
+        var number = Generator.Generate(numbers, sizes);
 
         return (number < BigInteger.Pow(2, numbers.Length)).ToProperty();
     }
@@ -92,7 +92,7 @@ public class UnitTest1
         var generator = new Generator();
 
         var sizes = GetSizes(numbers.Length);
-        var number = generator.Generate(numbers, sizes);
+        var number = Generator.Generate(numbers, sizes);
 
         return (number == 0).ToProperty();
     }
@@ -103,7 +103,7 @@ public class UnitTest1
         var generator = new Generator();
 
         var sizes = GetSizes(numbers.Length);
-        var number = generator.Generate(numbers, sizes);
+        var number = Generator.Generate(numbers, sizes);
 
         return (number == BigInteger.Pow(2, numbers.Length) - 1).ToProperty();
     }
@@ -146,8 +146,13 @@ public static class BigArraysOfZerosAndOnes
 
 public sealed class Generator
 {
-    public BigInteger Generate(int[] values, int[] sizes)
+    public static BigInteger Generate(int[] values, int[] sizes)
     {
+        if (values.Length == 0)
+        {
+            return 0;
+        }
+
         var result = BigInteger.Zero;
 
         for (var i = 0; i < values.Length - 1; i++)
@@ -155,15 +160,6 @@ public sealed class Generator
             result = result * sizes[i] + values[i] * sizes[i + 1];
         }
 
-        if (values.Length != 0)
-        {
-            return result + values[^1];
-        }
-
-        return result;
+        return result + values[^1];
     }
 }
-/*
- * Given I have the following
- *
- */

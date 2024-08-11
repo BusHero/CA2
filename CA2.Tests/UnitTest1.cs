@@ -109,15 +109,21 @@ public class UnitTest1
     }
 
     [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property Foo((int[], int[]) tuple)
+    public Property LengthOfValuesAndLengthOfSizesIsEqual((int[], int[]) tuple)
     {
         return (tuple.Item1.Length == tuple.Item2.Length).ToProperty();
     }
 
     [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property Bar((int[], int[]) tuple)
+    public Property ItemsAndSizesAreDifferentArrays((int[], int[]) tuple)
     {
         return (tuple.Item1 != tuple.Item2).ToProperty();
+    }
+    
+    [Property(Arbitrary = [typeof(TupleGenerator)])]
+    public Property SizesAreBiggerThan2((int[], int[]) tuple)
+    {
+        return (tuple.Item2.All(x => 2 <= x)).ToProperty();
     }
 
     private static int[] GetSizes(int numbersLength)
@@ -148,6 +154,7 @@ public sealed class TupleGenerator : IGenerator<(int[], int[])>
             .Default
             .Int32()
             .Generator
+            .Where(x => 2 <= x)
             .ArrayOf(size)
             .Two()
             .Select(x => (x.Item1, x.Item2)))

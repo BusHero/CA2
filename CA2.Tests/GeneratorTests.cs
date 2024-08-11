@@ -12,7 +12,7 @@ public sealed class GeneratorTests
     {
         return (x.Item1 < x.Item2).ToProperty();
     }
-    
+
     [Property(Arbitrary = [typeof(Generators)])]
     public Property FirstItemIsBiggerThanZero(
         (int, int) x)
@@ -38,20 +38,24 @@ public sealed class GeneratorTests
     [Property]
     public void SecondItemIsEqualToSize(PositiveInt size)
     {
-        var expectedSize = size.Item < 2 ? 2 : size.Item;
-        
-        var items = Generators
+        var expectedSize = size.Item < 2 
+            ? 2 
+            : size.Item;
+
+        var gen = Generators
             .Generate()
             .Generator
-            .ArrayOf(1000)
-            .Sample(size.Item, 10);
+            .ArrayOf(10)
+            .Resize(size.Item)
+            .ToArbitrary();
         
-        foreach (var item in items)
-        {
-            item.Select(x => x.Item2)
-                .All(x => x == expectedSize)
-                .Should()
-                .BeTrue();
-        }
+        Prop
+            .ForAll(gen, items =>
+            {
+                return items
+                    .Select(x => x.Item2)
+                    .All(x => x == expectedSize);
+            })
+            .QuickCheckThrowOnFailure();
     }
 }

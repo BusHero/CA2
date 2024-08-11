@@ -153,11 +153,16 @@ public class UnitTest1
         
         return Prop.ForAll(foo, numbers =>
         {
-            var result = Enumerable.Range(0, 10).ToDictionary(x => x, x => 0);
+            var result = new Dictionary<int, int>();
             
             foreach (var i in numbers)
             {
-                result[i]++;
+                if (!result.TryGetValue(i, out var value))
+                {
+                    value = 0;
+                    result[i] = value;
+                }
+                result[i] = ++value;
             }
 
             const double probability = 100.0 / 10.0;

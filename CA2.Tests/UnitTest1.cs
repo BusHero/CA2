@@ -143,50 +143,40 @@ public interface IGenerator<T>
 
 public sealed class TupleGenerator : IGenerator<(int[], int[])>
 {
-    public static Arbitrary<(int[], int[])> Generate()
-    {
-        return Gen
-            .Sized(size => Arb
-                .Default
-                .Int32()
-                .Generator
-                .ArrayOf(size)
-                .Two()
-                .Select(x => (x.Item1, x.Item2)))
-            .ToArbitrary();
-    }
+    public static Arbitrary<(int[], int[])> Generate() => Gen
+        .Sized(size => Arb
+            .Default
+            .Int32()
+            .Generator
+            .ArrayOf(size)
+            .Two()
+            .Select(x => (x.Item1, x.Item2)))
+        .ToArbitrary();
 }
 
 public sealed class BigArraysOfOnes : IGenerator<int[]>
 {
-    private BigArraysOfOnes()
-    {
-    }
-
-    public static Arbitrary<int[]> Generate()
-    {
-        return Gen
+    public static Arbitrary<int[]> Generate() => Gen
+        .Sized(size => Gen
             .Elements(1)
-            .ArrayOf()
-            .ToArbitrary();
-    }
+            .ArrayOf(size))
+        .ToArbitrary();
 }
 
 public class BigArraysOfZeros : IGenerator<int[]>
 {
-    public static Arbitrary<int[]> Generate()
-    {
-        return Gen.Elements(0).ArrayOf().ToArbitrary();
-    }
+    public static Arbitrary<int[]> Generate() => Gen
+        .Sized(size => Gen
+            .Elements(0)
+            .ArrayOf(size))
+        .ToArbitrary();
 }
 
 public class BigArraysOfZerosAndOnes : IGenerator<int[]>
 {
-    public static Arbitrary<int[]> Generate()
-    {
-        return Gen
+    public static Arbitrary<int[]> Generate() => Gen
+        .Sized(size => Gen
             .Elements(0, 1)
-            .ArrayOf()
-            .ToArbitrary();
-    }
+            .ArrayOf(size))
+        .ToArbitrary();
 }

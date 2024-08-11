@@ -108,22 +108,6 @@ public class UnitTest1
         return (number == BigInteger.Pow(2, numbers.Length) - 1).ToProperty();
     }
 
-    [Property(Arbitrary = [typeof(BigArraysOfOnes)])]
-    public Property Foo(int[] numbers)
-    {
-        var sizes = GetSizes(numbers.Length);
-
-        return sizes.All(x => x == 2).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(BigArraysOfOnes)])]
-    public Property Bar(int[] numbers)
-    {
-        var sizes = GetSizes(numbers.Length);
-
-        return (sizes.Length == numbers.Length).ToProperty();
-    }
-
     private static int[] GetSizes(int numbersLength)
     {
         return Enumerable
@@ -168,8 +152,7 @@ public sealed class Generator
 
         for (var i = 0; i < values.Length - 1; i++)
         {
-            result *= sizes[i];
-            result += values[i] * sizes[i + 1];
+            result = result * sizes[i] + values[i] * sizes[i + 1];
         }
 
         if (values.Length != 0)

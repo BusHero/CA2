@@ -80,17 +80,25 @@ public sealed class GeneratorTests
             .QuickCheckThrowOnFailure();
     }
 
-    [Fact]
-    public void Generator2()
+    [Property]
+    public Property Generator2()
     {
-        // Arbitrary<(int[], int[])> arb;
-        //
-        // Prop.ForAll(arb, x =>
-        // {
-        //     return x.Item1
-        //         .Zip(x.Item2, (fst, snd) => fst < snd)
-        //         .All(y => y);
-        // });
+        var arb= Generators
+            .Generate()
+            .Generator
+            .ArrayOf()
+            .Select(items => (
+                items.Select(x => x.Item1).ToArray(), 
+                items.Select(x => x.Item2).ToArray()))
+            .ToArbitrary();
+
+        var prop1 = Prop.ForAll(arb, items => items
+            .Item1
+            .Zip(items.Item2)
+            .All(t => t.First < t.Second));
+        var prop2 = Prop.ForAll(arb, _ => true);
+
+        return prop1.And(prop2);
     }
     
     // [Fact]

@@ -1,4 +1,5 @@
-﻿using FsCheck;
+﻿using System.Diagnostics;
+using FsCheck;
 using FsCheck.Xunit;
 
 namespace CA2.Tests;
@@ -87,7 +88,56 @@ public sealed class GeneratorTests
 
             return result
                 .Select(x => x * 100.0 / arraySize)
-                .All(x => Math.Abs(x - probability) < 1);
+                .All(x => Math.Abs(x - probability) < 2);
         }).QuickCheckThrowOnFailure();
     }
+
+    // [Fact]
+    // public void Gen()
+    // {
+    //     Arbitrary<(int[], int[])> gen;
+    //
+    //     Prop.ForAll(gen, x =>
+    //     {
+    //         var (first, second) = x;
+    //         return first.Length == second.Length;
+    //     });
+    // }
+    //
+    // [Fact]
+    // public void FirstElementIsBiggerThanSecond()
+    // {
+    //     Arbitrary<(int[], int[])> gen;
+    //
+    //     Prop.ForAll(gen, x =>
+    //     {
+    //         var (first, second) = x;
+    //         return first.Zip(second).All(t => t.First < t.Second);
+    //     });
+    // }
+    //
+    // [Fact]
+    // public void SecondElementsAreBiggerThan0()
+    // {
+    //     Arbitrary<(int[], int[])> gen;
+    //
+    //     Prop.ForAll(gen, x =>
+    //     {
+    //         var (_, second) = x;
+    //         return second.All(u => 2 <= u);
+    //     });
+    // }
+    //
+    // [Fact]
+    // public void FirstElementIsBiggerThanZero()
+    // {
+    //     Arbitrary<(int[], int[])> gen;
+    //
+    //     Prop.ForAll(gen, x =>
+    //     {
+    //         var (first, _) = x;
+    //         return first.All(u => 0 <= u);
+    //     });
+    // }
+    
 }

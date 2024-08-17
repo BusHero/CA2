@@ -80,6 +80,7 @@ public sealed class GeneratorTests
     [Property(Arbitrary = [typeof(Generators)])]
     public Property Generator2(Combination combination)
     {
+        var lenghtOfItemsIsSameAsLengthOfSizes = combination.Item.Length == combination.Sizes.Length;
         var itemIsSmallerThanSize = combination
             .Item
             .Zip(combination.Sizes)
@@ -94,6 +95,8 @@ public sealed class GeneratorTests
 
         return itemIsSmallerThanSize
             .And(sizeIsGreaterOrEqualToTwo)
-            .And(itemsIsGreaterOrEqualToZero);
+            .And(itemsIsGreaterOrEqualToZero)
+            .And(lenghtOfItemsIsSameAsLengthOfSizes)
+            ;
     }
 }

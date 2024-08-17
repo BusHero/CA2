@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Reflection.Emit;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
@@ -63,144 +62,80 @@ public class UnitTest1
         number.Should().Be(expectedResult);
     }
 
-    [Property(Arbitrary = [typeof(BigArraysOfZerosAndOnes)])]
-    public Property ResultIsBiggerOrEqualToZero(
-        int[] numbers)
+    [Property]
+    public Property ResultIsBiggerOrEqualToZero()
     {
-        var generator = new Generator();
+        var arb = Gen
+            .Sized(size => Gen
+                .Elements(0, 1)
+                .ArrayOf(size))
+            .ToArbitrary();
 
-        var sizes = GetSizes(numbers.Length);
-        var number = Generator.Generate(numbers, sizes);
+        return Prop
+            .ForAll(arb, numbers =>
+            {
+                var sizes = GetSizes(numbers.Length);
 
-        return (0 <= number).ToProperty();
-    }
+                var number = Generator.Generate(numbers, sizes);
 
-    [Property(Arbitrary = [typeof(BigArraysOfZerosAndOnes)])]
-    public Property ResultIsSmallerOrEqualToTheCount(
-        int[] numbers)
-    {
-        var generator = new Generator();
-
-        var sizes = GetSizes(numbers.Length);
-        var number = Generator.Generate(numbers, sizes);
-
-        return (number < BigInteger.Pow(2, numbers.Length)).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(BigArraysOfZeros)])]
-    public Property ArraysOfZerosHaveZero(int[] numbers)
-    {
-        var generator = new Generator();
-
-        var sizes = GetSizes(numbers.Length);
-        var number = Generator.Generate(numbers, sizes);
-
-        return (number == 0).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(BigArraysOfOnes)])]
-    public Property ArraysOfOnesHaveMaxPower(int[] numbers)
-    {
-        var generator = new Generator();
-
-        var sizes = GetSizes(numbers.Length);
-        var number = Generator.Generate(numbers, sizes);
-
-        return (number == BigInteger.Pow(2, numbers.Length) - 1).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property LengthOfValuesAndLengthOfSizesIsEqual((int[], int[]) tuple)
-    {
-        return (tuple.Item1.Length == tuple.Item2.Length).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property ItemsAndSizesAreDifferentArrays((int[], int[]) tuple)
-    {
-        return (tuple.Item1 != tuple.Item2).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property SizesAreBiggerThan2((int[], int[]) tuple)
-    {
-        return tuple.Item2.All(x => 2 <= x).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property ValuesAreBiggerOrEqualTo0((int[], int[]) tuple)
-    {
-        return tuple.Item1.All(x => 0 <= x).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(TupleGenerator)])]
-    public Property ValuesAreSmallerThanSizes((int[], int[]) tuple)
-    {
-        return tuple
-            .Item1
-            .Zip(tuple.Item2)
-            .All(t => t.First < t.Second)
-            .ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(GenerateStuff)])]
-    public Property AllElementsAreSmallerOrEqualThanSize((int, int[]) tuple)
-    {
-        return tuple
-            .Item2
-            .All(x => x < tuple.Item1)
-            .ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(GenerateStuff)])]
-    public Property AllElementsAreBiggerOrEqualToZero((int, int[]) tuple)
-    {
-        return tuple
-            .Item2
-            .All(x => 0 <= x)
-            .ToProperty();
+                return (0 <= number).ToProperty();
+            });
     }
 
     [Property]
-    public Property SizeOfTheGeneratorComesFromTheSizedProperty(PositiveInt size)
+    public Property ResultIsSmallerOrEqualToTheCount()
     {
-        var sample = Gen.Sample(size.Item, 1, GenerateStuff.Generate().Generator)[0];
+        var arb = Gen
+            .Sized(size => Gen
+                .Elements(0, 1)
+                .ArrayOf(size))
+            .ToArbitrary();
 
-        var expectedSize = size.Item <= 2 ? 2 : size.Item;
+        return Prop
+            .ForAll(arb, numbers =>
+            {
+                var sizes = GetSizes(numbers.Length);
 
-        return (sample.Item1 == expectedSize).ToProperty();
+                var number = Generator.Generate(numbers, sizes);
+
+                return (number < BigInteger.Pow(2, numbers.Length)).ToProperty();
+            });
     }
 
     [Property]
-    public Property SizeIsNeverZero()
+    public Property ArraysOfZerosHaveZero()
     {
-        var sample = Gen
-            .Sample(0, 1, GenerateStuff.Generate().Generator);
+        var arb = Gen
+            .Sized(size => Gen
+                .Elements(0)
+                .ArrayOf(size))
+            .ToArbitrary();
 
-        return sample
-            .Select(x => x.Item1)
-            .All(x => x == 2)
-            .ToProperty();
-    }
-
-    [Property(StartSize = 3, EndSize = 10)]
-    public Property ElementsInListAreUniformlyDistributed(PositiveInt size)
-    {
-        var sample = Gen.Sample(size.Item, 1, GenerateStuff.Generate().Generator)[0];
-
-        var result = new int[size.Item];
-
-        foreach (var i in sample.Item2)
+        return Prop.ForAll(arb, numbers =>
         {
-            result[i]++;
-        }
+            var sizes = GetSizes(numbers.Length);
+            var number = Generator.Generate(numbers, sizes);
 
-        var probability = 100.0 / size.Item;
+            return (number == 0).ToProperty();
+        });
+    }
 
-        return result
-            .Select(x => x * 100.0 / 1_000_000)
-            .All(x => Math.Abs(x - probability) < 0.5)
-            .ToProperty();
+    [Property]
+    public Property ArraysOfOnesHaveMaxPower()
+    {
+        var arb = Gen
+            .Sized(size => Gen
+                .Elements(1)
+                .ArrayOf(size))
+            .ToArbitrary();
+
+        return Prop.ForAll(arb, numbers =>
+        {
+            var sizes = GetSizes(numbers.Length);
+            var number = Generator.Generate(numbers, sizes);
+
+            return (number == BigInteger.Pow(2, numbers.Length) - 1).ToProperty();
+        });
     }
 
     private static int[] GetSizes(int numbersLength)
@@ -210,99 +145,4 @@ public class UnitTest1
             .Select(_ => 2)
             .ToArray();
     }
-}
-
-public class Generators
-{
-    public static Gen<(int, int)> Generator3 { get; } = Gen
-        .Sized(size => Gen
-            .Choose(0, size < 2 ? 1 : size - 1)
-            .Select(x => (x, size < 2 ? 2 : size)));
-
-    public static Arbitrary<(int, int)> TupleArbitrary()
-    {
-        return Generator3
-            .ToArbitrary();
-    }
-
-    public static Arbitrary<Combination> CombinationArbitrary()
-    {
-        return Generator3
-            .ArrayOf()
-            .Select(items => new Combination
-            {
-                Item = items.Select(x => x.Item1).ToArray(),
-                Sizes = items.Select(x => x.Item2).ToArray()
-            })
-            .ToArbitrary();
-    }
-}
-
-public class Combination
-{
-    public required int[] Item { get; init; }
-
-    public required int[] Sizes { get; init; }
-}
-
-public interface IGenerator<T>
-{
-    static abstract Arbitrary<T> Generate();
-}
-
-public sealed class GenerateStuff : IGenerator<(int, int[])>
-{
-    public static Arbitrary<(int, int[])> Generate() => Gen
-        .Sized(size =>
-        {
-            size = size < 2 ? 2 : size;
-            return Gen
-                .Choose(0, size - 1)
-                .ArrayOf(1_000_000)
-                .Select(arr => (size, arr));
-        })
-        .ToArbitrary();
-}
-
-public sealed class TupleGenerator : IGenerator<(int[], int[])>
-{
-    public static Arbitrary<(int[], int[])> Generate() => Gen
-        .Sized(size => Arb
-            .Default
-            .Int32()
-            .Generator
-            .Where(x => 2 <= x)
-            .Select(x => (x - 1, x))
-            .ArrayOf(size)
-            .Select(x => (
-                x.Select(y => y.Item1).ToArray(),
-                x.Select(y => y.Item2).ToArray())))
-        .ToArbitrary();
-}
-
-public sealed class BigArraysOfOnes : IGenerator<int[]>
-{
-    public static Arbitrary<int[]> Generate() => Gen
-        .Sized(size => Gen
-            .Elements(1)
-            .ArrayOf(size))
-        .ToArbitrary();
-}
-
-public class BigArraysOfZeros : IGenerator<int[]>
-{
-    public static Arbitrary<int[]> Generate() => Gen
-        .Sized(size => Gen
-            .Elements(0)
-            .ArrayOf(size))
-        .ToArbitrary();
-}
-
-public class BigArraysOfZerosAndOnes : IGenerator<int[]>
-{
-    public static Arbitrary<int[]> Generate() => Gen
-        .Sized(size => Gen
-            .Elements(0, 1)
-            .ArrayOf(size))
-        .ToArbitrary();
 }

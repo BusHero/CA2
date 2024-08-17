@@ -27,8 +27,7 @@ public sealed class GeneratorTests
     public Property SizesAreDifferent()
     {
         var gen = Generators
-            .Generate()
-            .Generator
+            .Generator3
             .ArrayOf(1000)
             .ToArbitrary();
 
@@ -45,8 +44,7 @@ public sealed class GeneratorTests
             : size.Item;
 
         var gen = Generators
-            .Generate()
-            .Generator
+            .Generator3
             .ArrayOf(10)
             .Resize(size.Item)
             .ToArbitrary();
@@ -67,8 +65,7 @@ public sealed class GeneratorTests
         const int arraySize = 10_000;
 
         var gen = Generators
-            .Generate()
-            .Generator
+            .Generator3
             .ArrayOf(arraySize)
             .Resize(size)
             .ToArbitrary();
@@ -80,73 +77,23 @@ public sealed class GeneratorTests
             .QuickCheckThrowOnFailure();
     }
 
-    [Property]
-    public Property Generator2()
+    [Property(Arbitrary = [typeof(Generators)])]
+    public Property Generator2(Combination combination)
     {
-        var arb= Generators
-            .Generate()
-            .Generator
-            .ArrayOf()
-            .Select(items => (
-                items.Select(x => x.Item1).ToArray(), 
-                items.Select(x => x.Item2).ToArray()))
-            .ToArbitrary();
+        var itemIsSmallerThanSize = combination
+            .Item
+            .Zip(combination.Sizes)
+            .All(t => t.First < t.Second);
+        var sizeIsGreaterOrEqualToTwo = combination
+            .Sizes
+            .All(x => 2 <= x);
+        var itemsIsGreaterOrEqualToZero = combination
+            .Item
+            .All(x => 0 <= x)
+            .Label("Items is greater or equal to zero");
 
-        var prop1 = Prop.ForAll(arb, items => items
-            .Item1
-            .Zip(items.Item2)
-            .All(t => t.First < t.Second));
-        var prop2 = Prop.ForAll(arb, _ => true);
-
-        return prop1.And(prop2);
+        return itemIsSmallerThanSize
+            .And(sizeIsGreaterOrEqualToTwo)
+            .And(itemsIsGreaterOrEqualToZero);
     }
-    
-    // [Fact]
-    // public void Gen()
-    // {
-    //     Arbitrary<(int[], int[])> gen;
-    //
-    //     Prop.ForAll(gen, x =>
-    //     {
-    //         var (first, second) = x;
-    //         return first.Length == second.Length;
-    //     });
-    // }
-    //
-    // [Fact]
-    // public void FirstElementIsBiggerThanSecond()
-    // {
-    //     Arbitrary<(int[], int[])> gen;
-    //
-    //     Prop.ForAll(gen, x =>
-    //     {
-    //         var (first, second) = x;
-    //         return first.Zip(second).All(t => t.First < t.Second);
-    //     });
-    // }
-    //
-    // [Fact]
-    // public void SecondElementsAreBiggerThan0()
-    // {
-    //     Arbitrary<(int[], int[])> gen;
-    //
-    //     Prop.ForAll(gen, x =>
-    //     {
-    //         var (_, second) = x;
-    //         return second.All(u => 2 <= u);
-    //     });
-    // }
-    //
-    // [Fact]
-    // public void FirstElementIsBiggerThanZero()
-    // {
-    //     Arbitrary<(int[], int[])> gen;
-    //
-    //     Prop.ForAll(gen, x =>
-    //     {
-    //         var (first, _) = x;
-    //         return first.All(u => 0 <= u);
-    //     });
-    // }
 }
-

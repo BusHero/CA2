@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FsCheck;
+﻿using FsCheck;
 using FsCheck.Xunit;
 
 namespace CA2.Tests;
@@ -10,18 +9,22 @@ public sealed class GeneratorTests
     public Property FirstItemIsSmallerThanSecondItem(
         (int, int) x)
     {
-        return (x.Item1 < x.Item2).ToProperty();
+        return (x.Item1 < x.Item2).Label("First item is smaller than Second item")
+            .And(0 <= x.Item1).Label("First item is bigger than 0")
+            .And(2 <= x.Item2).Label("Second item is at least 2");
     }
-
+    
     [Property(Arbitrary = [typeof(Generators)])]
-    public Property FirstItemIsBiggerThanZero(
-        (int, int) x)
+    public Property LetsTryThis(
+        (int, int)[] items)
     {
-        return (0 <= x.Item1).ToProperty();
+        return items.All(x => x.Item1 < x.Item2).Label("First item is smaller than Second item")
+            .And(items.All(x => 0 <= x.Item1)).Label("First item is bigger than 0")
+            .And(items.All(x => 2 <= x.Item2)).Label("Second item is at least 2");
     }
 
-    [Fact]
-    public void SizesAreDifferent()
+    [Property]
+    public Property SizesAreDifferent()
     {
         var gen = Generators
             .Generate()
@@ -29,14 +32,13 @@ public sealed class GeneratorTests
             .ArrayOf(1000)
             .ToArbitrary();
 
-        Prop.ForAll(gen, items => items
-                .Select(x => x.Item1)
-                .All(x => x == items[0].Item1) == false)
-            .VerboseCheckThrowOnFailure();
+        return Prop.ForAll(gen, items => items
+            .Select(x => x.Item1)
+            .All(x => x == items[0].Item1) == false);
     }
 
     [Property]
-    public void SecondItemIsEqualToSize(PositiveInt size)
+    public Property SecondItemIsEqualToSize(PositiveInt size)
     {
         var expectedSize = size.Item < 2
             ? 2
@@ -49,14 +51,10 @@ public sealed class GeneratorTests
             .Resize(size.Item)
             .ToArbitrary();
 
-        Prop
-            .ForAll(gen, items =>
-            {
-                return items
-                    .Select(x => x.Item2)
-                    .All(x => x == expectedSize);
-            })
-            .QuickCheckThrowOnFailure();
+        return Prop
+            .ForAll(gen, items => items
+                .Select(x => x.Item2)
+                .All(x => x == expectedSize));
     }
 
     [Theory]
@@ -64,10 +62,8 @@ public sealed class GeneratorTests
     [InlineData(6)]
     [InlineData(7)]
     [InlineData(8)]
-    public void FirstItemIsUniformlyDistributed(int size)
+    public void FirstItemIsEvenlySpread(int size)
     {
-        var expectedSize = size < 2 ? 2 : size;
-        var probability = 100.0 / expectedSize;
         const int arraySize = 10_000;
 
         var gen = Generators
@@ -77,21 +73,26 @@ public sealed class GeneratorTests
             .Resize(size)
             .ToArbitrary();
 
-        Prop.ForAll(gen, list =>
-        {
-            var result = new int[expectedSize];
-
-            foreach (var (first, _) in list)
-            {
-                result[first]++;
-            }
-
-            return result
-                .Select(x => x * 100.0 / arraySize)
-                .All(x => Math.Abs(x - probability) < 2);
-        }).QuickCheckThrowOnFailure();
+        Prop
+            .ForAll(gen, list => list
+                .Select(x => x.Item1)
+                .IsEvenlySpread(size, 0.05))
+            .QuickCheckThrowOnFailure();
     }
 
+    [Fact]
+    public void Generator2()
+    {
+        // Arbitrary<(int[], int[])> arb;
+        //
+        // Prop.ForAll(arb, x =>
+        // {
+        //     return x.Item1
+        //         .Zip(x.Item2, (fst, snd) => fst < snd)
+        //         .All(y => y);
+        // });
+    }
+    
     // [Fact]
     // public void Gen()
     // {
@@ -139,5 +140,5 @@ public sealed class GeneratorTests
     //         return first.All(u => 0 <= u);
     //     });
     // }
-    
 }
+

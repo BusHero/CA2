@@ -277,7 +277,12 @@ public class UnitTest1
 
     private BigInteger[] CalculateSizes(int[] sizes)
     {
-        if (sizes.Length <= 1)
+        if (sizes.Length == 0)
+        {
+            return [];
+        }
+        
+        if (sizes.Length == 1)
         {
             return [1];
         }

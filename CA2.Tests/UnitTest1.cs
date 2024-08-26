@@ -1,69 +1,68 @@
 using System.Numerics;
-using System.Reflection;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
-using Microsoft.FSharp.Core;
-using Xunit.Sdk;
 
 namespace CA2.Tests;
 
 public class UnitTest1
 {
-    public static TheoryData<int[], int[], int> Data => new()
+    public static TheoryData<Combination, int> Data => new()
     {
-        { [0, 0], [2, 2], 0 },
-        { [0, 1], [2, 2], 1 },
-        { [1, 0], [2, 2], 2 },
-        { [1, 1], [2, 2], 3 },
+        { new Combination { Item = [0, 0], Sizes = [2, 2] }, 0 },
+        { new Combination { Item = [0, 1], Sizes = [2, 2] }, 1 },
+        { new Combination { Item = [1, 0], Sizes = [2, 2] }, 2 },
+        { new Combination { Item = [1, 1], Sizes = [2, 2] }, 3 },
 
-        { [0, 0], [3, 2], 0 },
-        { [0, 1], [3, 2], 1 },
-        { [1, 0], [3, 2], 2 },
-        { [1, 1], [3, 2], 3 },
-        { [2, 0], [3, 2], 4 },
-        { [2, 1], [3, 2], 5 },
+        { new Combination { Item = [0, 0], Sizes = [3, 2] }, 0 },
+        { new Combination { Item = [0, 1], Sizes = [3, 2] }, 1 },
+        { new Combination { Item = [1, 0], Sizes = [3, 2] }, 2 },
+        { new Combination { Item = [1, 1], Sizes = [3, 2] }, 3 },
+        { new Combination { Item = [2, 0], Sizes = [3, 2] }, 4 },
+        { new Combination { Item = [2, 1], Sizes = [3, 2] }, 5 },
 
-        { [0, 0], [2, 3], 0 },
-        { [0, 1], [2, 3], 1 },
-        { [0, 2], [2, 3], 2 },
-        { [1, 0], [2, 3], 3 },
-        { [1, 1], [2, 3], 4 },
-        { [1, 2], [2, 3], 5 },
+        { new Combination { Item = [0, 0], Sizes = [2, 3] }, 0 },
+        { new Combination { Item = [0, 1], Sizes = [2, 3] }, 1 },
+        { new Combination { Item = [0, 2], Sizes = [2, 3] }, 2 },
+        { new Combination { Item = [1, 0], Sizes = [2, 3] }, 3 },
+        { new Combination { Item = [1, 1], Sizes = [2, 3] }, 4 },
+        { new Combination { Item = [1, 2], Sizes = [2, 3] }, 5 },
 
-        { [0, 0], [3, 3], 0 },
-        { [0, 1], [3, 3], 1 },
-        { [0, 2], [3, 3], 2 },
-        { [1, 0], [3, 3], 3 },
-        { [1, 1], [3, 3], 4 },
-        { [1, 2], [3, 3], 5 },
-        { [2, 0], [3, 3], 6 },
-        { [2, 1], [3, 3], 7 },
-        { [2, 2], [3, 3], 8 },
+        { new Combination { Item = [0, 0], Sizes = [3, 3] }, 0 },
+        { new Combination { Item = [0, 1], Sizes = [3, 3] }, 1 },
+        { new Combination { Item = [0, 2], Sizes = [3, 3] }, 2 },
+        { new Combination { Item = [1, 0], Sizes = [3, 3] }, 3 },
+        { new Combination { Item = [1, 1], Sizes = [3, 3] }, 4 },
+        { new Combination { Item = [1, 2], Sizes = [3, 3] }, 5 },
+        { new Combination { Item = [2, 0], Sizes = [3, 3] }, 6 },
+        { new Combination { Item = [2, 1], Sizes = [3, 3] }, 7 },
+        { new Combination { Item = [2, 2], Sizes = [3, 3] }, 8 },
 
-        { [0, 0, 0], [2, 2, 2], 0 },
-        { [0, 0, 1], [2, 2, 2], 1 },
-        { [0, 1, 0], [2, 2, 2], 2 },
-        { [0, 1, 1], [2, 2, 2], 3 },
-        { [1, 0, 0], [2, 2, 2], 4 },
-        { [1, 0, 1], [2, 2, 2], 5 },
-        { [1, 1, 0], [2, 2, 2], 6 },
-        { [1, 1, 1], [2, 2, 2], 7 },
-        { [1, 1, 0, 0], [2, 2, 2, 2], 12 },
-        { [1, 2, 1, 1, 1, 0, 0], [2, 7, 3, 2, 2, 2, 2], 33_771 },
-        { [1, 0, 0, 1, 0, 0, 1, 4, 1], [2, 2, 2, 2, 2, 2, 2, 7, 2], 321 }
+        { new Combination { Item = [0, 0, 0], Sizes = [2, 2, 2] }, 0 },
+        { new Combination { Item = [0, 0, 1], Sizes = [2, 2, 2] }, 1 },
+        { new Combination { Item = [0, 1, 0], Sizes = [2, 2, 2] }, 2 },
+        { new Combination { Item = [0, 1, 1], Sizes = [2, 2, 2] }, 3 },
+        { new Combination { Item = [1, 0, 0], Sizes = [2, 2, 2] }, 4 },
+        { new Combination { Item = [1, 0, 1], Sizes = [2, 2, 2] }, 5 },
+        { new Combination { Item = [1, 1, 0], Sizes = [2, 2, 2] }, 6 },
+        { new Combination { Item = [1, 1, 1], Sizes = [2, 2, 2] }, 7 },
+        { new Combination { Item = [1, 1, 0, 0], Sizes = [2, 2, 2, 2] }, 12 },
+        { new Combination { Item = [1, 2, 1, 1, 1, 0, 0], Sizes = [2, 7, 3, 2, 2, 2, 2] }, 460 },
+        { new Combination { Item = [1, 0, 0, 1, 0, 0, 1, 4, 1], Sizes = [2, 2, 2, 2, 2, 2, 2, 7, 2] }, 1_031 },
+        { new Combination { Item = [1, 2, 1], Sizes = [2, 3, 2] }, 11 }
     };
 
     [Theory]
     [MemberData(nameof(Data))]
     public void GenerateNumber(
-        int[] values,
-        int[] sizes,
+        Combination combination,
         int expectedResult)
     {
         var generator = new Generator();
 
-        var number = Generator.Generate(values, sizes);
+        var number = Generator.Generate(
+            combination.Item,
+            combination.Sizes);
 
         number.Should().Be(expectedResult);
     }
@@ -84,7 +83,7 @@ public class UnitTest1
 
                 var number = Generator.Generate(numbers, sizes);
 
-                return (0 <= number).ToProperty();
+                return (0 <= number).ToProperty().Label($"{number} should be bigger than 0");
             });
     }
 
@@ -126,7 +125,7 @@ public class UnitTest1
         });
     }
 
-    [Property]
+    [Property(Replay = "505531136,297372731")]
     public Property ArraysOfOnesHaveMaxPower()
     {
         var arb = Gen
@@ -144,8 +143,8 @@ public class UnitTest1
         });
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
-    public Property Foo(Combination combination)
+    [Property(Arbitrary = [typeof(Generators)], EndSize = 1_000)]
+    public Property NumberIsSmallerThanMaximumPosibileSize(Combination combination)
     {
         var result = Generator.Generate(
             combination.Item,
@@ -153,7 +152,9 @@ public class UnitTest1
 
         var foo = CalculateMaximumNumber(combination.Sizes);
 
-        return (result <= foo).ToProperty().Label($"{result} is smaller than {foo}");
+        return (result <= foo)
+            .ToProperty()
+            .Label($"{result} is smaller than {foo}");
     }
 
     [Theory, MemberData(nameof(Sizes))]
@@ -164,7 +165,7 @@ public class UnitTest1
         result.Should().Be(expectedResult);
     }
 
-    public static TheoryData<int[], BigInteger> Sizes => new TheoryData<int[], BigInteger>()
+    public static TheoryData<int[], BigInteger> Sizes => new()
     {
         { [2], 2 },
         { [3], 3 },
@@ -281,7 +282,7 @@ public class UnitTest1
         {
             return [];
         }
-        
+
         if (sizes.Length == 1)
         {
             return [1];

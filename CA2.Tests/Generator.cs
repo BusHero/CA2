@@ -10,14 +10,17 @@ public sealed class Generator
         {
             return 0;
         }
-        
-        var result = BigInteger.Zero;
-        
-        for (var i = 0; i < values.Length - 1; i++)
+
+        sizes = sizes.Reverse().ToArray();
+        values = values.Reverse().ToArray();
+        BigInteger result = values[0];
+
+        for (var i = 1; i < sizes.Length; i++)
         {
-            result = result * sizes[i] + values[i] * sizes[i + 1];
+            var foo = sizes.Take(i).Aggregate(BigInteger.One, (a, b) => a * b);
+            result += values[i] * foo;
         }
         
-        return result + values[^1];
+        return result;
     }
 }

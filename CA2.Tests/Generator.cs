@@ -14,11 +14,12 @@ public sealed class Generator
         sizes = sizes.Reverse().ToArray();
         values = values.Reverse().ToArray();
         BigInteger result = values[0];
-
+        var power = BigInteger.One;
+        
         for (var i = 1; i < sizes.Length; i++)
         {
-            var foo = sizes.Take(i).Aggregate(BigInteger.One, (a, b) => a * b);
-            result += values[i] * foo;
+            power *= sizes[i - 1];
+            result += values[i] * power;
         }
         
         return result;

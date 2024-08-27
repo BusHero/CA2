@@ -54,7 +54,7 @@ public sealed class GeneratorTests
 
     [Theory]
     [MemberData(nameof(Data))]
-    public void GenerateNumber(
+    public void GenerateGeneratesExpectedNumber(
         Combination combination,
         int expectedResult)
     {
@@ -81,7 +81,10 @@ public sealed class GeneratorTests
 
                 var number = Generator.Generate(numbers, sizes);
 
-                return (0 <= number).ToProperty().Label($"{number} should be bigger than 0");
+                var property = 0 <= number;
+                
+                return property
+                    .Label($"{number} should be bigger than 0");
             });
     }
 
@@ -101,7 +104,12 @@ public sealed class GeneratorTests
 
                 var number = Generator.Generate(numbers, sizes);
 
-                return (number < BigInteger.Pow(2, numbers.Length)).ToProperty();
+                var powerOfTwo = BigInteger.Pow(2, numbers.Length);
+                
+                var property = number < powerOfTwo;
+
+                return property
+                    .Label($"{number} < {powerOfTwo}");
             });
     }
 
@@ -119,7 +127,10 @@ public sealed class GeneratorTests
             var sizes = GetSizes(numbers.Length);
             var number = Generator.Generate(numbers, sizes);
 
-            return (number == 0).ToProperty();
+            var property = number == 0;
+            
+            return property
+                .Label($"{number} == 0");
         });
     }
 
@@ -137,22 +148,25 @@ public sealed class GeneratorTests
             var sizes = GetSizes(numbers.Length);
             var number = Generator.Generate(numbers, sizes);
 
-            return (number == BigInteger.Pow(2, numbers.Length) - 1).ToProperty();
+            var biggestPossibleNumber = BigInteger.Pow(2, numbers.Length) - 1;
+            var property = number == biggestPossibleNumber;
+            return property.Label($"{number} == {biggestPossibleNumber}");
         });
     }
 
-    [Property(Arbitrary = [typeof(Generators)], EndSize = 1_000)]
-    public Property NumberIsSmallerThanMaximumPosibileSize(Combination combination)
+    [Property(Arbitrary = [typeof(Generators)])]
+    public Property NumberIsSmallerThanMaximumPossibleSize(Combination combination)
     {
         var result = Generator.Generate(
             combination.Item,
             combination.Sizes);
 
-        var foo = CalculateMaximumNumber(combination.Sizes);
+        var maximumPossibleNumber = CalculateMaximumNumber(combination.Sizes);
 
-        return (result <= foo)
-            .ToProperty()
-            .Label($"{result} is smaller than {foo}");
+        var property = result <= maximumPossibleNumber;
+        
+        return property
+            .Label($"{result} is smaller than {maximumPossibleNumber}");
     }
 
     [Theory, MemberData(nameof(Sizes))]
@@ -177,12 +191,16 @@ public sealed class GeneratorTests
     [Property]
     public Property LastItemIsEqualToOne(NonEmptyArray<PositiveInt> sizes)
     {
-        var generatedSequence = CalculateSizes(sizes.Item.Select(x => x.Item).ToArray());
+        var actualSizes = sizes.Item
+            .Select(x => x.Item)
+            .ToArray();
+        
+        var generatedSequence = CalculateSizes(actualSizes);
 
-        var prop = new Func<bool>(() => generatedSequence[^1] == 1)
+        var property = () => generatedSequence[^1] == 1;
+
+        return property
             .Label("Last item is 1");
-
-        return prop;
     }
 
     [Property]
@@ -198,7 +216,9 @@ public sealed class GeneratorTests
         {
             var generatedSequence = CalculateSizes(sizes);
 
-            return (generatedSequence[0] == sizes[^1])
+            var property = generatedSequence[0] == sizes[^1];
+            
+            return property
                 .Label("Last item is equal to the last one");
         });
     }
@@ -206,7 +226,11 @@ public sealed class GeneratorTests
     [Property]
     public Property GeneratedArrayIsArrangedDescending(NonEmptyArray<PositiveInt> sizes)
     {
-        var generatedSequence = CalculateSizes(sizes.Item.Select(x => x.Item).ToArray());
+        var actualSizes = sizes.Item
+            .Select(x => x.Item)
+            .ToArray();
+        
+        var generatedSequence = CalculateSizes(actualSizes);
 
         return generatedSequence
             .OrderDescending()
@@ -217,37 +241,51 @@ public sealed class GeneratorTests
     [Property]
     public Property SizeOfGeneratedArrayIsEqualToTheOriginalSize(NonEmptyArray<PositiveInt> sizes)
     {
-        var generatedSequence = CalculateSizes(sizes.Item.Select(x => x.Item).ToArray());
+        var actualSizes = sizes.Item
+            .Select(x => x.Item)
+            .ToArray();
+        
+        var generatedSequence = CalculateSizes(actualSizes);
 
-        return (generatedSequence.Length == sizes.Item.Length)
-            .Label("Size does matter");
+        var property = generatedSequence.Length == sizes.Item.Length;
+        
+        return property
+            .Label($"{generatedSequence.Length} == {sizes.Item.Length}");
     }
 
     [Property]
     public Property FirstItemIsTheProductOfPreviousNumbers(NonEmptyArray<PositiveInt> sizes)
     {
-        var generatedSequence = CalculateSizes(sizes.Item.Select(x => x.Item).ToArray());
+        var actualSizes = sizes.Item
+            .Select(x => x.Item)
+            .ToArray();
 
-        return new Func<bool>(() =>
-                generatedSequence[0] == sizes.Item.Skip(1)
-                    .Select(x => x.Item)
-                    .Select(x => (BigInteger)x)
-                    .Aggregate(BigInteger.One, (fst, snd) => fst * snd))
+        var generatedSequence = CalculateSizes(actualSizes);
+
+        var property = () => generatedSequence[0] == sizes.Item.Skip(1)
+            .Select(x => x.Item)
+            .Select(x => (BigInteger)x)
+            .Aggregate(BigInteger.One, (fst, snd) => fst * snd);
+        
+        return property
             .When(2 <= sizes.Item.Length);
     }
 
     [Property(MaxTest = 10_000)]
     public Property ItemIsEqualToThePreviousGeneratedValueAndOriginalSize(NonEmptyArray<PositiveInt> sizes)
     {
-        var generatedSequence = CalculateSizes(sizes.Item.Select(x => x.Item).ToArray());
+        var actualSizes = sizes.Item
+            .Select(x => x.Item)
+            .ToArray();
 
-        return new Func<bool>(() =>
-            {
-                return generatedSequence
-                    .SkipLast(1)
-                    .Select((x, i) => (x, index: i + 1))
-                    .All(t => t.x == generatedSequence[t.index] * sizes.Item[t.index].Item);
-            })
+        var generatedSequence = CalculateSizes(actualSizes);
+
+        var property = () => generatedSequence
+            .SkipLast(1)
+            .Select((x, i) => (x, index: i + 1))
+            .All(t => t.x == generatedSequence[t.index] * sizes.Item[t.index].Item);
+        
+        return property
             .When(2 <= sizes.Item.Length);
     }
 
@@ -264,26 +302,24 @@ public sealed class GeneratorTests
         {
             var generatedSequence = CalculateSizes(sizes);
 
-            return new Func<bool>(() =>
-            {
-                return generatedSequence
-                    .SkipLast(1)
-                    .Select((x, i) => (x, index: i + 1))
-                    .All(t => t.x == generatedSequence[t.index] * sizes[t.index]);
-            }).ToProperty();
+            var property = () => generatedSequence
+                .SkipLast(1)
+                .Select((x, i) => (x, index: i + 1))
+                .All(t => t.x == generatedSequence[t.index] * sizes[t.index]);
+            
+            return property
+                .ToProperty();
         });
     }
 
-    private BigInteger[] CalculateSizes(int[] sizes)
+    private static BigInteger[] CalculateSizes(int[] sizes)
     {
-        if (sizes.Length == 0)
+        switch (sizes.Length)
         {
-            return [];
-        }
-
-        if (sizes.Length == 1)
-        {
-            return [1];
+            case 0:
+                return [];
+            case 1:
+                return [1];
         }
 
         var result = new BigInteger[sizes.Length];
@@ -298,17 +334,13 @@ public sealed class GeneratorTests
         return result;
     }
 
-    private BigInteger CalculateMaximumNumber(IEnumerable<int> sizes)
-    {
-        return sizes
+    private static BigInteger CalculateMaximumNumber(IEnumerable<int> sizes) =>
+        sizes
             .Aggregate(BigInteger.One, (r, x) => r * x);
-    }
 
-    private static int[] GetSizes(int numbersLength)
-    {
-        return Enumerable
+    private static int[] GetSizes(int numbersLength) =>
+        Enumerable
             .Range(0, numbersLength)
             .Select(_ => 2)
             .ToArray();
-    }
 }

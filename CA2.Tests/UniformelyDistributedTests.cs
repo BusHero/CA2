@@ -9,7 +9,8 @@ public sealed class UniformlyDistributedTests
     {
         int[] range = [1, 1];
 
-        var result = range.IsEvenlySpread(2, 0.05);
+        var result = range
+            .IsEvenlySpread(2, 0.05);
 
         result.Should().BeFalse();
     }

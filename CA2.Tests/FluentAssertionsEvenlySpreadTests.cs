@@ -11,7 +11,9 @@ public sealed class FluentAssertionsEvenlySpreadTests
     {
         int[] range = [1, 1];
 
-        var action = () => range.Should().BeEvenlySpread(2, 0.05);
+        var action = () => range
+            .Should()
+            .BeEvenlySpread(2, 0.05);
 
         action.Should()
             .Throw<XunitException>()
@@ -23,7 +25,9 @@ public sealed class FluentAssertionsEvenlySpreadTests
     {
         var range = default(int[]);
 
-        var action = () => range.Should().BeEvenlySpread(2, 0.05);
+        var action = () => range
+            .Should()
+            .BeEvenlySpread(2, 0.05);
 
         action.Should()
             .Throw<XunitException>()
@@ -35,7 +39,9 @@ public sealed class FluentAssertionsEvenlySpreadTests
     {
         int[] range = [1, 1];
 
-        var action = () => range.Should().BeEvenlySpread(2, 0.05, because);
+        var action = () => range
+            .Should()
+            .BeEvenlySpread(2, 0.05, because);
 
         action.Should()
             .Throw<XunitException>()
@@ -47,7 +53,9 @@ public sealed class FluentAssertionsEvenlySpreadTests
     {
         int[] range = [1, 1];
 
-        var action = () => range.Should().BeEvenlySpread(2, 0.05, "{0}", because);
+        var action = () => range
+            .Should()
+            .BeEvenlySpread(2, 0.05, "{0}", because);
 
         action.Should()
             .Throw<XunitException>()

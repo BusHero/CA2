@@ -13,7 +13,7 @@ public sealed class FsCheckGeneratorsTests
             .And(0 <= x.Item1).Label("First item is bigger than 0")
             .And(2 <= x.Item2).Label("Second item is at least 2");
     }
-    
+
     [Property(Arbitrary = [typeof(Generators)])]
     public Property LetsTryThis(
         (int, int)[] items)
@@ -96,7 +96,6 @@ public sealed class FsCheckGeneratorsTests
         return itemIsSmallerThanSize
             .And(sizeIsGreaterOrEqualToTwo)
             .And(itemsIsGreaterOrEqualToZero)
-            .And(lenghtOfItemsIsSameAsLengthOfSizes)
-            ;
+            .And(lenghtOfItemsIsSameAsLengthOfSizes);
     }
 }

@@ -2,22 +2,22 @@
 
 namespace CA2.Tests;
 
-public class Generators
+public sealed class Generators
 {
-    public static Gen<(int, int)> Generator3 { get; } = Gen
+    public static Gen<(int, int)> Generator { get; } = Gen
         .Sized(size => Gen
             .Choose(0, size < 2 ? 1 : size - 1)
             .Select(x => (x, size < 2 ? 2 : size)));
 
     public static Arbitrary<(int, int)> TupleArbitrary()
     {
-        return Generator3
+        return Generator
             .ToArbitrary();
     }
 
     public static Arbitrary<Combination> CombinationArbitrary()
     {
-        return Generator3
+        return Generator
             .ArrayOf()
             .Select(items => new Combination
             {

@@ -2,7 +2,7 @@
 
 namespace CA2.Tests;
 
-public class UniformlyDistributedTests
+public sealed class UniformlyDistributedTests
 {
     [Fact]
     public void TwoOnesAreNotEvenlySpread()

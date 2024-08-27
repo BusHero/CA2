@@ -1,6 +1,6 @@
 ﻿namespace CA2.Tests;
 
-public record Combination
+public sealed record Combination
 {
     public required int[] Item { get; init; }
 

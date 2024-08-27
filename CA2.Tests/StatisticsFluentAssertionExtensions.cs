@@ -7,16 +7,16 @@ namespace CA2.Tests;
 internal static class StatisticsFluentAssertionExtensions
 {
     public static AndConstraint<GenericCollectionAssertions<int>> BeEvenlySpread(
-        this GenericCollectionAssertions<int> foo, 
+        this GenericCollectionAssertions<int> assertion, 
         int numberOfElements, 
         double tolerance,
         string because = "", 
         params object[] becauseArgs)
     {
-        Execute.Assertion
+        var bar = Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .WithExpectation("Expected {context:collection} to be evenly distributed{reason}, ")
-            .Given(() => foo.Subject)
+            .Given(() => assertion.Subject)
             .ForCondition(subject => subject is not null)
             .FailWith("but found <null>")
             .Then
@@ -25,7 +25,7 @@ internal static class StatisticsFluentAssertionExtensions
             .Then
             .ClearExpectation();
         
-        return new AndConstraint<GenericCollectionAssertions<int>>(foo);
+        return new AndConstraint<GenericCollectionAssertions<int>>(assertion);
     }
     
     public static bool IsEvenlySpread(

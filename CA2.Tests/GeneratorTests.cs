@@ -1,15 +1,14 @@
 using System.Numerics;
-using AutoFixture;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
+using GeneratorLibrary;
 
 namespace CA2.Tests;
 
 public sealed class GeneratorTests
 {
-    private readonly IFixture _fixture = new Fixture();
     public static TheoryData<Combination, int> Data => new()
     {
         { new Combination { Item = [0, 0], Sizes = [2, 2] }, 0 },
@@ -410,9 +409,4 @@ public sealed class GeneratorTests
             .Range(0, numbersLength)
             .Select(_ => 2)
             .ToArray();
-}
-
-public static class Extensions
-{
-    public static Lazy<T> ToLazy<T>(this Func<T> t) => new(t);
 }

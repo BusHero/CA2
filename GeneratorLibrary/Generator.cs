@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace CA2.Tests;
+namespace GeneratorLibrary;
 
 public sealed class Generator
 {

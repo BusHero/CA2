@@ -24,4 +24,8 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\GeneratorLibrary\GeneratorLibrary.csproj" />
+    </ItemGroup>
+
 </Project>

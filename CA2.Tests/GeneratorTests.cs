@@ -1,4 +1,6 @@
 using System.Numerics;
+using AutoFixture;
+using AutoFixture.Xunit2;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
@@ -7,6 +9,7 @@ namespace CA2.Tests;
 
 public sealed class GeneratorTests
 {
+    private readonly IFixture _fixture = new Fixture();
     public static TheoryData<Combination, int> Data => new()
     {
         { new Combination { Item = [0, 0], Sizes = [2, 2] }, 0 },
@@ -52,6 +55,70 @@ public sealed class GeneratorTests
         { new Combination { Item = [1, 2, 1], Sizes = [2, 3, 2] }, 11 }
     };
 
+    [Theory, AutoData]
+    public void ValuesIsNullThrows(int[] sizes)
+    {
+        var func = () => Generator.Generate(
+            null!, 
+            sizes);
+
+        func.Should().Throw<ArgumentNullException>();
+    }
+
+    [Theory, AutoData]
+    public void SizesIsNullThrows(int[] values)
+    {
+        var func = () => Generator.Generate(
+            values, 
+            null!);
+
+        func.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void ValuesLengthIsDifferentFromSizesLength_ThrowInvalidOperationException()
+    {
+        int[] values = [1, 1, 1];
+        int[] sizes = [4, 4];
+
+        var func = () => Generator.Generate(values, sizes);
+
+        func.Should()
+            .Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void ValuesContainNegativeNumbers_ThrowInvalidOperationException()
+    {
+        int[] values = [-1, 1, 1];
+        int[] sizes = [4, 4, 4];
+
+        var func = () => Generator.Generate(values, sizes);
+
+        func.Should()
+            .Throw<InvalidOperationException>();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void SizesContainElementsSmallerOrEqualTo1_ThrowInvalidOperationException(int size)
+    {
+        var prop = () => Generator.Generate([0], [size]);
+
+        prop.Should().Throw<InvalidOperationException>();
+    }
+
+    [Theory]
+    [InlineData(10, 10)]
+    [InlineData(11, 10)]
+    public void ValuesContainElementsBiggerThanSizes_ThrowInvalidOperationException(int value, int size)
+    {
+        var property = () => Generator.Generate([value], [size]);
+        
+        property.Should().Throw<InvalidOperationException>();
+    }
+    
     [Theory]
     [MemberData(nameof(Data))]
     public void GenerateGeneratesExpectedNumber(
@@ -343,4 +410,9 @@ public sealed class GeneratorTests
             .Range(0, numbersLength)
             .Select(_ => 2)
             .ToArray();
+}
+
+public static class Extensions
+{
+    public static Lazy<T> ToLazy<T>(this Func<T> t) => new(t);
 }

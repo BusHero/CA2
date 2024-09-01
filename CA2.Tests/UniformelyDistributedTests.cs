@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace CA2.Tests;
+﻿namespace CA2.Tests;
 
 public sealed class UniformlyDistributedTests
 {

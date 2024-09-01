@@ -1,6 +1,4 @@
-﻿using AutoFixture.Xunit2;
-using FluentAssertions;
-using Xunit.Sdk;
+﻿using Xunit.Sdk;
 
 namespace CA2.Tests;
 
@@ -67,7 +65,7 @@ public sealed class FluentAssertionsEvenlySpreadTests
     {
         int[] range = [1, 0];
 
-        var subject = range
+        range
             .Should()
             .BeEvenlySpread(2, 0.05)
             .And

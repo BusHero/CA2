@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using FluentAssertions.Collections;
+﻿using FluentAssertions.Collections;
 using FluentAssertions.Execution;
 
 namespace CA2.Tests;
@@ -13,7 +12,7 @@ internal static class StatisticsFluentAssertionExtensions
         string because = "", 
         params object[] becauseArgs)
     {
-        var bar = Execute.Assertion
+        Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .WithExpectation("Expected {context:collection} to be evenly distributed{reason}, ")
             .Given(() => assertion.Subject)
@@ -24,7 +23,7 @@ internal static class StatisticsFluentAssertionExtensions
             .FailWith("but found non-even distribution")
             .Then
             .ClearExpectation();
-        
+
         return new AndConstraint<GenericCollectionAssertions<int>>(assertion);
     }
     

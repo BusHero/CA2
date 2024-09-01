@@ -1,7 +1,4 @@
-﻿using FsCheck;
-using FsCheck.Xunit;
-
-namespace CA2.Tests;
+﻿namespace CA2.Tests;
 
 public sealed class FsCheckGeneratorsTests
 {
@@ -80,7 +77,7 @@ public sealed class FsCheckGeneratorsTests
     [Property(Arbitrary = [typeof(Generators)])]
     public Property Generator2(Combination combination)
     {
-        var lenghtOfItemsIsSameAsLengthOfSizes = combination.Item.Length == combination.Sizes.Length;
+        var lengthOfItemsIsSameAsLengthOfSizes = combination.Item.Length == combination.Sizes.Length;
         var itemIsSmallerThanSize = combination
             .Item
             .Zip(combination.Sizes)
@@ -96,6 +93,6 @@ public sealed class FsCheckGeneratorsTests
         return itemIsSmallerThanSize
             .And(sizeIsGreaterOrEqualToTwo)
             .And(itemsIsGreaterOrEqualToZero)
-            .And(lenghtOfItemsIsSameAsLengthOfSizes);
+            .And(lengthOfItemsIsSameAsLengthOfSizes);
     }
 }

@@ -1,8 +1,4 @@
 using System.Numerics;
-using AutoFixture.Xunit2;
-using FluentAssertions;
-using FsCheck;
-using FsCheck.Xunit;
 using GeneratorLibrary;
 
 namespace CA2.Tests;

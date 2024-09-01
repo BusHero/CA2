@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Buffers.Binary;
+using System.Numerics;
 
 namespace GeneratorLibrary;
 
@@ -37,16 +38,21 @@ public sealed class Generator
             return 0;
         }
 
-        BigInteger result = values[^1];
-        var power = BigInteger.One;
+        return values
+            .Zip(sizes.Skip(1))
+            .Reverse()
+            .Aggregate(
+                (result: (BigInteger)values[^1], power: BigInteger.One),
+                (r, t) =>
+                {
+                    var (result, power) = r;
+                    var (value, size) = t;
 
-        for (var i = sizes.Length - 2; 0 <= i; i--)
-        {
-            power *= sizes[i + 1];
-            result += values[i] * power;
-        }
+                    power *= size;
+                    result += value * power;
 
-        return result;
+                    return (result, power);
+                }).result;
     }
 
     public static long GetNumberOfBitsFoCombination(int[] sizes)

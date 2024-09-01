@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Text;
 using GeneratorLibrary;
 
 namespace CA2.Tests;

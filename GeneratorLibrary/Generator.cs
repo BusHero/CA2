@@ -31,7 +31,7 @@ public sealed class Generator
         {
             throw new InvalidOperationException("value is bigger than size");
         }
-        
+
         if (values.Length == 0)
         {
             return 0;
@@ -47,5 +47,12 @@ public sealed class Generator
         }
 
         return result;
+    }
+
+    public static long GetNumberOfBitsFoCombination(int[] sizes)
+    {
+        return sizes
+            .Aggregate(BigInteger.One, (x, y) => x * y)
+            .GetBitLength();
     }
 }

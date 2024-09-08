@@ -1,9 +1,9 @@
 using System.Numerics;
 using GeneratorLibrary;
 
-namespace CA2.Tests;
+namespace CA2.Tests.GeneratorTests;
 
-public sealed class GeneratorTests
+public sealed class GenerateTests
 {
     public static TheoryData<Combination, int> Data => new()
     {
@@ -223,182 +223,13 @@ public sealed class GeneratorTests
             combination.Item,
             combination.Sizes);
 
-        var maximumPossibleNumber = CalculateMaximumNumber(combination.Sizes);
+        var maximumPossibleNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
 
         var property = result <= maximumPossibleNumber;
         
         return property
             .Label($"{result} is smaller than {maximumPossibleNumber}");
     }
-
-    [Theory, MemberData(nameof(Sizes))]
-    public void MaximumNumberIsCalculatedCorrectly(int[] sizes, BigInteger expectedResult)
-    {
-        var result = CalculateMaximumNumber(sizes);
-
-        result.Should().Be(expectedResult);
-    }
-
-    public static TheoryData<int[], BigInteger> Sizes => new()
-    {
-        { [2], 2 },
-        { [3], 3 },
-        { [10], 10 },
-        { [10, 10], 100 },
-        { [10, 10, 10], 1000 },
-        { [2, 2, 2], 8 },
-        { [2, 7, 3, 2, 2, 2, 2], 672 }
-    };
-
-    [Property]
-    public Property LastItemIsEqualToOne(NonEmptyArray<PositiveInt> sizes)
-    {
-        var actualSizes = sizes.Item
-            .Select(x => x.Item)
-            .ToArray();
-        
-        var generatedSequence = CalculateSizes(actualSizes);
-
-        var property = () => generatedSequence[^1] == 1;
-
-        return property
-            .Label("Last item is 1");
-    }
-
-    [Property]
-    public Property FirstItemIsEqualToTheLastOne()
-    {
-        var arb = Arb.Default.PositiveInt()
-            .Generator
-            .Select(x => x.Item)
-            .ArrayOf(2)
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, sizes =>
-        {
-            var generatedSequence = CalculateSizes(sizes);
-
-            var property = generatedSequence[0] == sizes[^1];
-            
-            return property
-                .Label("Last item is equal to the last one");
-        });
-    }
-
-    [Property]
-    public Property GeneratedArrayIsArrangedDescending(NonEmptyArray<PositiveInt> sizes)
-    {
-        var actualSizes = sizes.Item
-            .Select(x => x.Item)
-            .ToArray();
-        
-        var generatedSequence = CalculateSizes(actualSizes);
-
-        return generatedSequence
-            .OrderDescending()
-            .SequenceEqual(generatedSequence)
-            .Label($"The generated array should be sorted [{string.Join(", ", generatedSequence)}]");
-    }
-
-    [Property]
-    public Property SizeOfGeneratedArrayIsEqualToTheOriginalSize(NonEmptyArray<PositiveInt> sizes)
-    {
-        var actualSizes = sizes.Item
-            .Select(x => x.Item)
-            .ToArray();
-        
-        var generatedSequence = CalculateSizes(actualSizes);
-
-        var property = generatedSequence.Length == sizes.Item.Length;
-        
-        return property
-            .Label($"{generatedSequence.Length} == {sizes.Item.Length}");
-    }
-
-    [Property]
-    public Property FirstItemIsTheProductOfPreviousNumbers(NonEmptyArray<PositiveInt> sizes)
-    {
-        var actualSizes = sizes.Item
-            .Select(x => x.Item)
-            .ToArray();
-
-        var generatedSequence = CalculateSizes(actualSizes);
-
-        var property = () => generatedSequence[0] == sizes.Item.Skip(1)
-            .Select(x => x.Item)
-            .Select(x => (BigInteger)x)
-            .Aggregate(BigInteger.One, (fst, snd) => fst * snd);
-        
-        return property
-            .When(2 <= sizes.Item.Length);
-    }
-
-    [Property(MaxTest = 10_000)]
-    public Property ItemIsEqualToThePreviousGeneratedValueAndOriginalSize(NonEmptyArray<PositiveInt> sizes)
-    {
-        var actualSizes = sizes.Item
-            .Select(x => x.Item)
-            .ToArray();
-
-        var generatedSequence = CalculateSizes(actualSizes);
-
-        var property = () => generatedSequence
-            .SkipLast(1)
-            .Select((x, i) => (x, index: i + 1))
-            .All(t => t.x == generatedSequence[t.index] * sizes.Item[t.index].Item);
-        
-        return property
-            .When(2 <= sizes.Item.Length);
-    }
-
-    [Property]
-    public Property ItemIsEqualToThePreviousGeneratedValueAndOriginalSizeSizeIs3()
-    {
-        var arb = Arb.Default.PositiveInt()
-            .Generator
-            .Select(x => x.Item)
-            .ArrayOf(3)
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, sizes =>
-        {
-            var generatedSequence = CalculateSizes(sizes);
-
-            var property = () => generatedSequence
-                .SkipLast(1)
-                .Select((x, i) => (x, index: i + 1))
-                .All(t => t.x == generatedSequence[t.index] * sizes[t.index]);
-            
-            return property
-                .ToProperty();
-        });
-    }
-
-    private static BigInteger[] CalculateSizes(int[] sizes)
-    {
-        switch (sizes.Length)
-        {
-            case 0:
-                return [];
-            case 1:
-                return [1];
-        }
-
-        var result = new BigInteger[sizes.Length];
-
-        result[^1] = 1;
-
-        for (var i = 2; i <= result.Length; i++)
-        {
-            result[^i] = result[^(i - 1)] * sizes[^(i - 1)];
-        }
-
-        return result;
-    }
-
-    private static BigInteger CalculateMaximumNumber(IEnumerable<int> sizes) =>
-        sizes
-            .Aggregate(BigInteger.One, (r, x) => r * x);
 
     private static int[] GetSizes(int numbersLength) =>
         Enumerable

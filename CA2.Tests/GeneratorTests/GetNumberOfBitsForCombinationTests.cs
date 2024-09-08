@@ -1,10 +1,9 @@
 ﻿using System.Numerics;
-using System.Text;
 using GeneratorLibrary;
 
-namespace CA2.Tests;
+namespace CA2.Tests.GeneratorTests;
 
-public sealed class GeneratorArrayTests
+public sealed class GetNumberOfBitsForCombinationTests
 {
     [Property(Arbitrary = [typeof(Generators)])]
     public Property ResultIsBiggerThanZero(

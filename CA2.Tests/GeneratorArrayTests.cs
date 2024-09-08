@@ -10,7 +10,7 @@ public sealed class GeneratorArrayTests
     public Property ResultIsBiggerThanZero(
         Combination combination)
     {
-        var bytesPerCombination = Generator.GetNumberOfBitsFoCombination(combination.Sizes);
+        var bytesPerCombination = Generator.GetNumberOfBitsForCombination(combination.Sizes);
 
         var property = 0 < bytesPerCombination;
 
@@ -22,7 +22,7 @@ public sealed class GeneratorArrayTests
     {
         var property = () =>
         {
-            var bitsPerCombination = Generator.GetNumberOfBitsFoCombination(combination.Sizes);
+            var bitsPerCombination = Generator.GetNumberOfBitsForCombination(combination.Sizes);
 
             var maxNumber = CalculateMaximumNumber(combination.Sizes);
 
@@ -39,7 +39,7 @@ public sealed class GeneratorArrayTests
     public Property ValueReturnedIsEnoughToStoreASingleNumber(
         PositiveInt nbr)
     {
-        var bitsPerCombination = Generator.GetNumberOfBitsFoCombination([nbr.Get]);
+        var bitsPerCombination = Generator.GetNumberOfBitsForCombination([nbr.Get]);
 
         var lengthOfBitString = nbr.Get.ToString("b").Length;
 

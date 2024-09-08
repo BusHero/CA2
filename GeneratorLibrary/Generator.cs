@@ -1,5 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace GeneratorLibrary;
 
@@ -55,7 +54,7 @@ public sealed class Generator
                 }).result;
     }
 
-    public static long GetNumberOfBitsFoCombination(int[] sizes)
+    public static long GetNumberOfBitsForCombination(int[] sizes)
     {
         return sizes
             .Aggregate(BigInteger.One, (x, y) => x * y)

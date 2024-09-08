@@ -92,23 +92,36 @@ public sealed class Generator
 
     public static bool TryWriteToBuffer(
         Stream stream,
-        BigInteger number,
+        BigInteger[] numbers,
         int sizeItem)
     {
         using var writer = new BinaryWriter(stream);
 
-        if (sizeItem < number.GetByteCount())
+        if (numbers is [])
+        {
+            return true;
+        }
+
+        var byteCount = numbers
+            .Max(BigInteger.Abs)
+            .GetByteCount();
+
+        if (sizeItem
+            < byteCount)
         {
             return false;
         }
 
-        var bytes = new byte[sizeItem];
+        foreach (var number in numbers)
+        {
+            var bytes = new byte[sizeItem];
 
-        number.TryWriteBytes(
-            bytes,
-            out _);
+            number.TryWriteBytes(
+                bytes,
+                out _);
 
-        writer.Write(bytes);
+            writer.Write(bytes);
+        }
 
         return true;
     }

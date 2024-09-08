@@ -14,7 +14,7 @@ public sealed class WriteToBufferTests
 
         Generator.TryWriteToBuffer(
             stream,
-            BigInteger.One,
+            [BigInteger.One],
             size.Item);
 
         var array = stream.ToArray();
@@ -29,9 +29,10 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return Generator.TryWriteToBuffer(
+        return Generator
+            .TryWriteToBuffer(
                 stream,
-                BigInteger.One,
+                [BigInteger.One],
                 size.Item)
             .ToProperty();
     }
@@ -49,12 +50,83 @@ public sealed class WriteToBufferTests
 
             var result = Generator.TryWriteToBuffer(
                 stream,
-                number,
+                [number],
                 size.Item);
 
             return !result;
         };
 
         return prop.When(size.Item < bytes.Length);
+    }
+
+    [Property]
+    public Property RecoverNumberFromStream(
+        BigInteger number)
+    {
+        var stream = new MemoryStream();
+
+        Generator.TryWriteToBuffer(
+            stream,
+            [number],
+            number.GetByteCount());
+
+        var newNumber = new BigInteger(stream.ToArray());
+
+        return (newNumber == number)
+            .Label($"{newNumber} == {number}");
+    }
+
+    [Property]
+    public Property RecoverNumberFromStream2(
+        NonEmptyArray<BigInteger> numbers)
+    {
+        var stream = new MemoryStream();
+
+        var bytesPerNumber = numbers
+            .Item
+            .Max(BigInteger.Abs)
+            .GetByteCount();
+
+        Generator.TryWriteToBuffer(
+            stream,
+            numbers.Item,
+            bytesPerNumber);
+
+        var bufferSize = stream.ToArray()
+            .Length;
+
+        var expectedSize = bytesPerNumber * numbers.Item.Length;
+
+        return (bufferSize == expectedSize)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property EmptyArrayWriteNothingToStream(PositiveInt size)
+    {
+        var stream = new MemoryStream();
+
+        Generator.TryWriteToBuffer(
+            stream,
+            [],
+            size.Item);
+
+        var bufferSize = stream.ToArray()
+            .Length;
+
+        return (bufferSize == 0)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property EmptyArrayReturnsTrue(PositiveInt size)
+    {
+        var stream = new MemoryStream();
+
+        return Generator.TryWriteToBuffer(
+                stream,
+                [],
+                size.Item)
+            .ToProperty();
     }
 }

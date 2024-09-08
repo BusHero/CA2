@@ -10,6 +10,7 @@ public sealed class Generator
     {
         ArgumentNullException.ThrowIfNull(values);
         ArgumentNullException.ThrowIfNull(sizes);
+
         if (values.Length != sizes.Length)
         {
             throw new InvalidOperationException($"Values and Sizes have different length");
@@ -26,7 +27,9 @@ public sealed class Generator
         }
 
         if (values
-            .Zip(sizes, (value, size) => size <= value)
+            .Zip(
+                sizes,
+                (value, size) => size <= value)
             .Any(x => x))
         {
             throw new InvalidOperationException("value is bigger than size");
@@ -51,31 +54,62 @@ public sealed class Generator
                     result += value * power;
 
                     return (result, power);
-                }).result;
+                })
+            .result;
     }
 
     public static long GetNumberOfBitsForCombination(int[] sizes)
     {
         return sizes
-            .Aggregate(BigInteger.One, (x, y) => x * y)
+            .Aggregate(
+                BigInteger.One,
+                (x, y) => x * y)
             .GetBitLength();
     }
 
     private static int GetNumberOfBytesForCombination(int[] sizes)
     {
         return sizes
-            .Aggregate(BigInteger.One, (x, y) => x * y)
+            .Aggregate(
+                BigInteger.One,
+                (x, y) => x * y)
             .GetByteCount();
     }
 
     public static byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
     {
         var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
-        
-        Generate(combinationItem, combinationSizes).TryWriteBytes(
-            buffer, 
-            out _);
-        
+
+        Generate(
+                combinationItem,
+                combinationSizes)
+            .TryWriteBytes(
+                buffer,
+                out _);
+
         return buffer;
+    }
+
+    public static bool TryWriteToBuffer(
+        Stream stream,
+        BigInteger number,
+        int sizeItem)
+    {
+        using var writer = new BinaryWriter(stream);
+
+        if (sizeItem < number.GetByteCount())
+        {
+            return false;
+        }
+
+        var bytes = new byte[sizeItem];
+
+        number.TryWriteBytes(
+            bytes,
+            out _);
+
+        writer.Write(bytes);
+
+        return true;
     }
 }

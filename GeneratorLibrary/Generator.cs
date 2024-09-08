@@ -60,4 +60,22 @@ public sealed class Generator
             .Aggregate(BigInteger.One, (x, y) => x * y)
             .GetBitLength();
     }
+
+    private static int GetNumberOfBytesForCombination(int[] sizes)
+    {
+        return sizes
+            .Aggregate(BigInteger.One, (x, y) => x * y)
+            .GetByteCount();
+    }
+
+    public static byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
+    {
+        var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
+        
+        Generate(combinationItem, combinationSizes).TryWriteBytes(
+            buffer, 
+            out _);
+        
+        return buffer;
+    }
 }

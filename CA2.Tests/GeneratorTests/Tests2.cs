@@ -2,9 +2,14 @@
 
 public sealed class Tests2
 {
-    [Fact]
+    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public void Foo()
     {
-        true.Should().BeFalse();
+        var stream = new MemoryStream();
+
+        var array = stream.ToArray();
+
+        array.Should()
+            .NotBeEmpty();
     }
 }

@@ -4,7 +4,7 @@ namespace CA2.Tests.GeneratorTests;
 
 public sealed class GetBytesTests
 {
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
     {
         var bytes = GeneratorLibrary.Generator
@@ -16,7 +16,7 @@ public sealed class GetBytesTests
         return (bytesCount == bytes.Length).ToProperty();
     }
     
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property CanConvertBytesBackToBigNumber(Combination combination)
     {
         var number = GeneratorLibrary.Generator.Generate(

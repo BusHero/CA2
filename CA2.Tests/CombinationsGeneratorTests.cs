@@ -1,8 +1,8 @@
 ﻿namespace CA2.Tests;
 
-public sealed class FsCheckGeneratorsTests
+public sealed class CombinationsGeneratorTests
 {
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public Property FirstItemIsSmallerThanSecondItem(
         (int, int) x)
     {
@@ -11,7 +11,7 @@ public sealed class FsCheckGeneratorsTests
             .And(2 <= x.Item2).Label("Second item is at least 2");
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public Property LetsTryThis(
         (int, int)[] items)
     {
@@ -23,7 +23,7 @@ public sealed class FsCheckGeneratorsTests
     [Property]
     public Property SizesAreDifferent()
     {
-        var gen = Generators
+        var gen = CombinationsGenerator
             .Generator
             .ArrayOf(1000)
             .ToArbitrary();
@@ -40,7 +40,7 @@ public sealed class FsCheckGeneratorsTests
             ? 2
             : size.Item;
 
-        var gen = Generators
+        var gen = CombinationsGenerator
             .Generator
             .ArrayOf(10)
             .Resize(size.Item)
@@ -61,7 +61,7 @@ public sealed class FsCheckGeneratorsTests
     {
         const int arraySize = 10_000;
 
-        var gen = Generators
+        var gen = CombinationsGenerator
             .Generator
             .ArrayOf(arraySize)
             .Resize(size)
@@ -74,7 +74,7 @@ public sealed class FsCheckGeneratorsTests
             .QuickCheckThrowOnFailure();
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public Property Generator2(Combination combination)
     {
         var lengthOfItemsIsSameAsLengthOfSizes = combination.Item.Length == combination.Sizes.Length;

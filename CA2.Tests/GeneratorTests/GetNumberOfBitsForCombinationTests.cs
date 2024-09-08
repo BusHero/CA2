@@ -5,7 +5,7 @@ namespace CA2.Tests.GeneratorTests;
 
 public sealed class GetNumberOfBitsForCombinationTests
 {
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ResultIsBiggerThanZero(
         Combination combination)
     {
@@ -16,7 +16,7 @@ public sealed class GetNumberOfBitsForCombinationTests
         return property.ToProperty();
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ValueReturnedIsEnoughToStoreASingleNumber2(Combination combination)
     {
         var property = () =>
@@ -34,7 +34,7 @@ public sealed class GetNumberOfBitsForCombinationTests
             .When(combination is { Sizes.Length: > 2 });
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ValueReturnedIsEnoughToStoreASingleNumber(
         PositiveInt nbr)
     {

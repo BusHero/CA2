@@ -2,7 +2,7 @@
 
 namespace CA2.Tests;
 
-public sealed class Generators
+public sealed class CombinationsGenerator
 {
     public static Gen<(int, int)> Generator { get; } = Gen
         .Sized(size => Gen
@@ -24,7 +24,7 @@ public sealed class Generators
             .Select(items => new Combination
             {
                 Item = items.Select(x => x.Item1).ToArray(),
-                Sizes = items.Select(x => x.Item2).ToArray()
+                Sizes = items.Select(x => x.Item2).ToArray(),
             })
             .ToArbitrary();
     }

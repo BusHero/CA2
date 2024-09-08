@@ -1,4 +1,6 @@
-﻿namespace CA2.Tests;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CA2.Tests;
 
 public sealed class Generators
 {
@@ -7,12 +9,14 @@ public sealed class Generators
             .Choose(0, size < 2 ? 1 : size - 1)
             .Select(x => (x, size < 2 ? 2 : size)));
 
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static Arbitrary<(int, int)> TupleArbitrary()
     {
         return Generator
             .ToArbitrary();
     }
 
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static Arbitrary<Combination> CombinationArbitrary()
     {
         return Generator

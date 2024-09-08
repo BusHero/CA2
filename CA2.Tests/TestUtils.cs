@@ -1,13 +1,13 @@
-﻿using System.Numerics;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using System.Numerics;
 
 internal static class TestUtils
 {
     public static BigInteger CalculateMaximumNumber(IEnumerable<int> sizes) =>
         sizes
             .Aggregate(BigInteger.One, (r, x) => r * x);
-    
+
     public static BigInteger[] CalculateSizes(int[] sizes)
     {
         switch (sizes.Length)

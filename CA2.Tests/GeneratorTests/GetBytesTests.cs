@@ -2,7 +2,7 @@
 
 namespace CA2.Tests.GeneratorTests;
 
-public class GetBytesTests
+public sealed class GetBytesTests
 {
     [Property(Arbitrary = [typeof(Generators)])]
     public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)

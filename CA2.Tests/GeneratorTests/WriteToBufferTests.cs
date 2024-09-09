@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 using GeneratorLibrary;
 
@@ -24,7 +24,7 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property FunctionReturnsTrue(
+    public Property SizeIsEnoughToHoldNumber_ReturnsTrue(
         PositiveInt size)
     {
         var stream = new MemoryStream();
@@ -38,7 +38,7 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property SizeIsSmallerThanNumber(
+    public Property SizeIsNotEnoughToHoldNumber_ReturnsFalse(
         byte[] bytes,
         PositiveInt size)
     {
@@ -60,7 +60,7 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property RecoverNumberFromStream(
+    public Property NumberIsWrittenToStream(
         BigInteger number)
     {
         var stream = new MemoryStream();
@@ -77,7 +77,7 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property RecoverNumberFromStream2(
+    public Property MultipleNumberAreWrittenToStream_BytesAreMultiplierOfSize(
         NonEmptyArray<BigInteger> numbers)
     {
         var stream = new MemoryStream();
@@ -102,7 +102,35 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property EmptyArrayWriteNothingToStream(PositiveInt size)
+    public Property MultipleNumberAreWrittenToStream_RecoverNumbers(
+        NonEmptyArray<BigInteger> numbers)
+    {
+        using var stream = new MemoryStream();
+
+        var bytesPerNumber = numbers
+            .Item
+            .Max(BigInteger.Abs)
+            .GetByteCount();
+
+        Generator.TryWriteToBuffer(
+            stream,
+            numbers.Item,
+            bytesPerNumber);
+
+        using var reader = new BinaryReader(stream);
+
+        var numbers2 = Enumerable
+            .Range(0, numbers.Item.Length)
+            .Select(_ => reader.ReadBytes(bytesPerNumber))
+            .Select(x => new BigInteger(x));
+
+        return numbers2
+            .SequenceEqual(numbers.Item)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property EmptyArray_WriteNothingToStream(PositiveInt size)
     {
         var stream = new MemoryStream();
 
@@ -119,7 +147,7 @@ public sealed class WriteToBufferTests
     }
 
     [Property]
-    public Property EmptyArrayReturnsTrue(PositiveInt size)
+    public Property EmptyArray_ReturnsTrue(PositiveInt size)
     {
         var stream = new MemoryStream();
 

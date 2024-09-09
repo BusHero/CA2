@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace GeneratorLibrary;
 
@@ -95,7 +95,7 @@ public sealed class Generator
         BigInteger[] numbers,
         int sizeItem)
     {
-        using var writer = new BinaryWriter(stream);
+        var writer = new BinaryWriter(stream);
 
         if (numbers is [])
         {

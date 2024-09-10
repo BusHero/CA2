@@ -1,8 +1,8 @@
+namespace CA2.Tests.GeneratorTests;
+
 using System.Numerics;
 
 using GeneratorLibrary;
-
-namespace CA2.Tests.GeneratorTests;
 
 public sealed class WriteToBufferTests
 {
@@ -117,15 +117,19 @@ public sealed class WriteToBufferTests
             numbers.Item,
             bytesPerNumber);
 
-        using var reader = new BinaryReader(stream);
-
+        stream.Position = 0;
+        var buffer = new byte[bytesPerNumber];
         var numbers2 = Enumerable
             .Range(0, numbers.Item.Length)
-            .Select(_ => reader.ReadBytes(bytesPerNumber))
-            .Select(x => new BigInteger(x));
+            .Select(_ =>
+            {
+                stream.Read(buffer);
+                return new BigInteger(buffer);
+            })
+            .ToArray();
 
         return numbers2
-            .SequenceEqual(numbers.Item)
+            .SequenceEqual(numbers.Get)
             .ToProperty();
     }
 

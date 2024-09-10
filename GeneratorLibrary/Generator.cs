@@ -1,6 +1,4 @@
-#pragma warning disable IDE0065 // Misplaced using directive
 using System.Numerics;
-#pragma warning restore IDE0065 // Misplaced using directive
 
 namespace GeneratorLibrary;
 
@@ -60,23 +58,19 @@ public sealed class Generator
             .result;
     }
 
-    public static long GetNumberOfBitsForCombination(int[] sizes)
-    {
-        return sizes
+    public static long GetNumberOfBitsForCombination(int[] sizes) 
+        => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetBitLength();
-    }
 
-    private static int GetNumberOfBytesForCombination(int[] sizes)
-    {
-        return sizes
+    private static int GetNumberOfBytesForCombination(int[] sizes) 
+        => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetByteCount();
-    }
 
     public static byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
     {

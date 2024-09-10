@@ -162,6 +162,9 @@ dotnet_diagnostic.xUnit2024.severity = error
 dotnet_diagnostic.xUnit2025.severity = error
 
 dotnet_diagonsitc.
+dotnet_diagnostic.CA1812.severity = error
+dotnet_diagnostic.SYSLIB1045.severity = error
+dotnet_diagnostic.CA1820.severity = error
 
 [*.{appxmanifest,asax,ascx,aspx,axaml,blockshader,build,c,c++,c++m,cc,ccm,cginc,compute,cp,cpp,cppm,cs,cshtml,cu,cuh,cxx,cxxm,dtd,fs,fsi,fsscript,fsx,fx,fxh,h,h++,hh,hlsl,hlsli,hlslinc,hp,hpp,hxx,icc,inc,inl,ino,ipp,ixx,master,ml,mli,mpp,mq4,mq5,mqh,mxx,nuspec,paml,razor,resw,resx,shaderFoundry,skin,tcc,tpp,usf,ush,vb,xaml,xamlx,xoml,xsd}]
 indent_style = space
@@ -232,3 +235,9 @@ dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_diagnostic.CA2011.severity = suggestion
 dotnet_diagnostic.IDE0065.severity = none
+dotnet_diagnostic.IDE0001.severity = error
+dotnet_diagnostic.CA1823.severity = error
+dotnet_diagnostic.CA1826.severity = error
+dotnet_diagnostic.CA1827.severity = error
+dotnet_diagnostic.CA1828.severity = error
+dotnet_diagnostic.CA1836.severity = error

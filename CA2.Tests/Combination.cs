@@ -20,8 +20,6 @@ public sealed record Combination : IXunitSerializable
         info.AddValue(nameof(Sizes), Sizes);
     }
 
-    public override string ToString()
-    {
-        return $$"""Combination { Item = [{{string.Join(", ", Item)}}], Sizes = [{{string.Join(", ", Sizes)}}] }""";
-    }
+    public override string ToString() 
+        => $$"""Combination { Item = [{{string.Join(", ", Item)}}], Sizes = [{{string.Join(", ", Sizes)}}] }""";
 }

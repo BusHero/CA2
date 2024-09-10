@@ -51,7 +51,7 @@ public sealed class GenerateTests
         { new Combination { Item = [1, 2, 1], Sizes = [2, 3, 2] }, 11 },
     };
 
-    [Theory, AutoData,]
+    [Theory, AutoData]
     public void ValuesIsNullThrows(int[] sizes)
     {
         var func = () => Generator.Generate(
@@ -115,12 +115,8 @@ public sealed class GenerateTests
     }
 
     [Theory]
-    [InlineData(
-        10,
-        10)]
-    [InlineData(
-        11,
-        10)]
+    [InlineData(10, 10)]
+    [InlineData(11, 10)]
     public void ValuesContainElementsBiggerThanSizes_ThrowInvalidOperationException(int value, int size)
     {
         var property = () => Generator.Generate(

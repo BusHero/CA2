@@ -1,4 +1,6 @@
+#pragma warning disable IDE0065 // Misplaced using directive
 using System.Numerics;
+#pragma warning restore IDE0065 // Misplaced using directive
 
 namespace GeneratorLibrary;
 
@@ -106,8 +108,7 @@ public sealed class Generator
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        if (sizeItem
-            < byteCount)
+        if (sizeItem < byteCount)
         {
             return false;
         }

@@ -1,10 +1,24 @@
 ﻿namespace CA2.Tests;
 
-public sealed record Combination
-{
-    public required int[] Item { get; init; }
+using Xunit.Abstractions;
 
-    public required int[] Sizes { get; init; }
+public sealed record Combination : IXunitSerializable
+{
+    public int[] Item { get; set; } = null!;
+
+    public int[] Sizes { get; set; } = null!;
+
+    public void Deserialize(IXunitSerializationInfo info)
+    {
+        Item = info.GetValue<int[]>(nameof(Item));
+        Sizes = info.GetValue<int[]>(nameof(Sizes));
+    }
+
+    public void Serialize(IXunitSerializationInfo info)
+    {
+        info.AddValue(nameof(Item), Item);
+        info.AddValue(nameof(Sizes), Sizes);
+    }
 
     public override string ToString()
     {

@@ -4,21 +4,17 @@ public sealed class CombinationsGeneratorTests
 {
     [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public Property FirstItemIsSmallerThanSecondItem(
-        (int, int) x)
-    {
-        return (x.Item1 < x.Item2).Label("First item is smaller than Second item")
+        (int, int) x) 
+        => (x.Item1 < x.Item2).Label("First item is smaller than Second item")
             .And(0 <= x.Item1).Label("First item is bigger than 0")
             .And(2 <= x.Item2).Label("Second item is at least 2");
-    }
 
     [Property(Arbitrary = [typeof(CombinationsGenerator),])]
     public Property LetsTryThis(
-        (int, int)[] items)
-    {
-        return items.All(x => x.Item1 < x.Item2).Label("First item is smaller than Second item")
+        (int, int)[] items) 
+        => items.All(x => x.Item1 < x.Item2).Label("First item is smaller than Second item")
             .And(items.All(x => 0 <= x.Item1)).Label("First item is bigger than 0")
             .And(items.All(x => 2 <= x.Item2)).Label("Second item is at least 2");
-    }
 
     [Property]
     public Property SizesAreDifferent()

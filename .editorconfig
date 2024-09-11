@@ -11,7 +11,7 @@ indent_size = 4
 csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_between_query_expression_clauses = true
 csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:error
-csharp_style_namespace_declarations = file_scoped:error
+csharp_style_namespace_declarations = block_scoped:suggestion
 csharp_style_var_elsewhere = true:error
 csharp_style_var_for_built_in_types = true:error
 csharp_style_var_when_type_is_apparent = true:error
@@ -165,6 +165,12 @@ dotnet_diagonsitc.
 dotnet_diagnostic.CA1812.severity = error
 dotnet_diagnostic.SYSLIB1045.severity = error
 dotnet_diagnostic.CA1820.severity = error
+dotnet_diagnostic.IDE0060.severity = error
+dotnet_diagnostic.IDE0160.severity = none
+dotnet_diagnostic.IDE0161.severity = error
+dotnet_diagnostic.IDE0059.severity = error
+dotnet_diagnostic.IDE0051.severity = error
+dotnet_diagnostic.IDE0052.severity = error
 
 [*.{appxmanifest,asax,ascx,aspx,axaml,blockshader,build,c,c++,c++m,cc,ccm,cginc,compute,cp,cpp,cppm,cs,cshtml,cu,cuh,cxx,cxxm,dtd,fs,fsi,fsscript,fsx,fx,fxh,h,h++,hh,hlsl,hlsli,hlslinc,hp,hpp,hxx,icc,inc,inl,ino,ipp,ixx,master,ml,mli,mpp,mq4,mq5,mqh,mxx,nuspec,paml,razor,resw,resx,shaderFoundry,skin,tcc,tpp,usf,ush,vb,xaml,xamlx,xoml,xsd}]
 indent_style = space
@@ -234,8 +240,9 @@ dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_diagnostic.CA2011.severity = suggestion
-dotnet_diagnostic.IDE0065.severity = none
 dotnet_diagnostic.IDE0001.severity = error
+dotnet_diagnostic.IDE0060.severity = error
+dotnet_diagnostic.IDE0065.severity = none
 dotnet_diagnostic.CA1823.severity = error
 dotnet_diagnostic.CA1826.severity = error
 dotnet_diagnostic.CA1827.severity = error

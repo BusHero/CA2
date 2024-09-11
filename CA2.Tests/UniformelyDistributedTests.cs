@@ -126,4 +126,17 @@ public sealed class UniformlyDistributedTests
             .Should()
             .BeTrue();
     }
+
+    [Fact]
+    public void FiftyZerosAndFiftyOnesAreEvenlySpread3()
+    {
+        var enum1 = Enumerable.Range(0, 50).Select(_ => "0");
+        var enum2 = Enumerable.Range(0, 50).Select(_ => "1");
+        var range = enum2.Concat(enum1);
+
+        var result = range
+            .IsEvenlySpread(2, 0.05);
+
+        result.Should().BeTrue();
+    }
 }

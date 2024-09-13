@@ -2,7 +2,7 @@ namespace GeneratorLibrary;
 
 public static class CsvOptimizer
 {
-    public static int[][] Optimize(string[][] csv)
+    public static OptimizationReport Optimize(string[][] csv)
     {
         var dicts = Enumerable
             .Range(0, csv[0].Length)
@@ -41,6 +41,11 @@ public static class CsvOptimizer
             }
         }
 
-        return result;
+        return new OptimizationReport(result);
+    }
+
+    public sealed record OptimizationReport(int[][] Csv)
+    {
+        public List<Dictionary<string, int>> ValuesMap { get; set; }
     }
 }

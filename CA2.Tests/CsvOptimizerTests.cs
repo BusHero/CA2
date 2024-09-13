@@ -14,7 +14,7 @@ public sealed class CsvOptimizerTests
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
-        var pivot = result.Pivot();
+        var pivot = result.Csv.Pivot();
 
         return pivot.Zip(columnSizes.Get)
             .All(t => t.First.Distinct().Count() == t.Second.Get)
@@ -31,7 +31,7 @@ public sealed class CsvOptimizerTests
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
-        var pivot = result.Pivot();
+        var pivot = result.Csv.Pivot();
 
         return pivot.All(row => row.Min() == 0).ToProperty();
     }
@@ -46,7 +46,7 @@ public sealed class CsvOptimizerTests
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
-        var pivot = result.Pivot();
+        var pivot = result.Csv.Pivot();
 
         return pivot
             .Zip(columnSizes.Get)
@@ -64,8 +64,29 @@ public sealed class CsvOptimizerTests
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
-        var pivot = result.Pivot();
+        var pivot = result.Csv.Pivot();
 
         return (pivot.Length == columnSizes.Get.Length).ToProperty();
+    }
+
+    [Property]
+    public Property Map(NonEmptyArray<NonEmptyArray<NonEmptyString>> columns)
+    {
+        var csvGenerator = new RandomCsvGenerator()
+            .WithRowsCount(10000);
+        foreach (var column in columns.Get)
+        {
+            var realColumn = column.Item.Select(x => x.Item).ToArray();
+
+            csvGenerator.WithColumn(realColumn);
+        }
+        var csv = csvGenerator.Generate();
+
+        var result = CsvOptimizer.Optimize(csv);
+
+        var valuesMap = result.ValuesMap;
+        var foo = valuesMap
+            .Select(x => x.Keys)
+            .Zip(columns.Get.Select(x => x.Get.Select(y => y.Get).Distinct().ToArray()).Distinct())
     }
 }

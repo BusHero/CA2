@@ -4,21 +4,43 @@ public static class CsvOptimizer
 {
     public static int[][] Optimize(string[][] csv)
     {
-        var counter = 0;
-        var dict = new Dictionary<string, int>();
+        var dicts = Enumerable
+            .Range(0, csv[0].Length)
+            .Select(_ => new Dictionary<string, int>())
+            .ToList();
 
-        return csv
-            .Select(x =>
+        for (var i = 0; i < csv.Length; i++)
+        {
+            for (var j = 0; j < csv[i].Length; j++)
             {
-                if (!dict.TryGetValue(x[0], out var value))
+                if (!dicts[j].TryGetValue(csv[i][j], out var value))
                 {
-                    value = counter;
-                    dict[x[0]] = value;
-                    counter++;
+                    if (dicts[j].Count == 0)
+                    {
+                        dicts[j][csv[i][j]] = 0;
+                    }
+                    else
+                    {
+                        var max = dicts[j].Values.Max();
+                        dicts[j][csv[i][j]] = max + 1;
+                    }
                 }
+            }
+        }
 
-                return new[] { value };
-            })
+        var result = Enumerable
+            .Range(0, csv.Length)
+            .Select(_ => new int[csv[0].Length])
             .ToArray();
+
+        for (var i = 0; i < csv.Length; i++)
+        {
+            for (var j = 0; j < csv[i].Length; j++)
+            {
+                result[i][j] = dicts[j][csv[i][j]];
+            }
+        }
+
+        return result;
     }
 }

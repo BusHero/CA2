@@ -1,57 +1,48 @@
 namespace CA2.Tests;
 
-using System;
+using GeneratorLibrary;
 
 public sealed class CsvOptimizerTests
 {
-
     [Property]
-    public Property GeneratorIsNeverEmpty()
+    public Property OptimizedCsvContainsColumnSizeOfDistinctNumbers(PositiveInt columnSize)
     {
-        var arb = Generator();
+        var csv = new RandomCsvGenerator()
+            .WithColumn(columnSize.Get)
+            .WithRowsCount(10_000)
+            .Generate();
 
-        return Prop.ForAll(arb, rows =>
-        {
-            return 0 < rows.Length;
-        });
+        var result = CsvOptimizer.Optimize(csv);
+        var pivot = result.Pivot();
+
+        return (pivot[0].Distinct().Count() == columnSize.Get).ToProperty();
     }
 
     [Property]
-    public Property ColumnsAreNeverEmpty()
+    public Property MinimumValueIsZero(PositiveInt columnSize)
     {
-        var arb = Generator();
+        var csv = new RandomCsvGenerator()
+            .WithColumn(columnSize.Get)
+            .WithRowsCount(10_000)
+            .Generate();
 
-        return Prop.ForAll(arb, rows =>
-        {
-            return rows.All(row => 0 < row.Length);
-        });
+        var result = CsvOptimizer.Optimize(csv);
+        var pivot = result.Pivot();
+
+        return (pivot[0].Min() == 0).ToProperty();
     }
 
     [Property]
-    public Property AllRowsHaveSameLength()
+    public Property MaximumValueIsColumnSizeMinus1(PositiveInt columnSize)
     {
-        var arb = Generator();
+        var csv = new RandomCsvGenerator()
+            .WithColumn(columnSize.Get)
+            .WithRowsCount(10_000)
+            .Generate();
 
-        return Prop.ForAll(arb, rows =>
-        {
-            var uniqueValues = rows
-                .Select(row => row.Length)
-                .Distinct()
-                .Count();
+        var result = CsvOptimizer.Optimize(csv);
+        var pivot = result.Pivot();
 
-            return uniqueValues == 1;
-        });
-    }
-
-    private static Arbitrary<string[][]> Generator()
-    {
-        var arb = Arb
-            .Default
-            .NonEmptyArray<string>()
-            .Generator
-            .Select(item => new string[][] { item.Item })
-            .ToArbitrary();
-
-        return arb;
+        return (pivot[0].Max() == columnSize.Get - 1).ToProperty();
     }
 }

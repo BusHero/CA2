@@ -2,9 +2,9 @@
 
 internal static class Extensions
 {
-    internal static string[,] Pivot(this string[,] csv)
+    internal static T[,] Pivot<T>(this T[,] csv)
     {
-        var result = new string[csv.GetLength(1), csv.GetLength(0)];
+        var result = new T[csv.GetLength(1), csv.GetLength(0)];
 
         for (var i = 0; i < csv.GetLength(0); i++)
         {
@@ -17,11 +17,11 @@ internal static class Extensions
         return result;
     }
 
-    internal static string[][] Pivot(this string[][] csv)
+    internal static T[][] Pivot<T>(this T[][] csv)
     {
         var result = Enumerable
             .Range(0, csv[0].Length)
-            .Select(_ => new string[csv.Length])
+            .Select(_ => new T[csv.Length])
             .ToArray();
 
         for (var i = 0; i < csv.Length; i++)

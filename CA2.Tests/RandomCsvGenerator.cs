@@ -9,13 +9,18 @@ internal sealed class RandomCsvGenerator
 
     private readonly Random _random = Random.Shared;
 
-    internal string[][] Generate()
+    public string[][] Generate()
         => Enumerable.Range(0, _rows)
             .Select(_ => Enumerable
                 .Range(0, _columns.Count)
                 .Select(i => GetRandomValueFromRange(_columns[i]))
                 .ToArray())
             .ToArray();
+
+    public string[,] Generate2()
+    {
+        return default!;
+    }
 
     private string GetRandomValueFromRange(string[] range) 
         => range[_random.Next(range.Length)];
@@ -27,12 +32,6 @@ internal sealed class RandomCsvGenerator
         return this;
     }
 
-    public RandomCsvGenerator WithColumn()
-    {
-        _columns.Add(["foo"]);
-
-        return this;
-    }
 
     public RandomCsvGenerator WithColumn(string[] column)
     {
@@ -49,4 +48,10 @@ internal sealed class RandomCsvGenerator
 
         return WithColumn(column);
     }
+
+    public RandomCsvGenerator WithColumns(int[] columns) 
+        => columns
+            .Aggregate(
+                this,
+                (gen, column) => gen.WithColumn(column));
 }

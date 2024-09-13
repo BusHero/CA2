@@ -1,19 +1,24 @@
 namespace GeneratorLibrary;
 
-using System;
-
 public static class CsvOptimizer
 {
-    public static CsvOptimizationResult Optimize(string[][] items)
+    public static int[][] Optimize(string[][] csv)
     {
-        return new CsvOptimizationResult
-        {
-            Rows = Enumerable.Range(0, items.Length).ToArray(),
-        };
-    }
-}
+        var counter = 0;
+        var dict = new Dictionary<string, int>();
 
-public sealed class CsvOptimizationResult
-{
-    public int[] Rows { get; set; } = null!;
+        return csv
+            .Select(x =>
+            {
+                if (!dict.TryGetValue(x[0], out var value))
+                {
+                    value = counter;
+                    dict[x[0]] = value;
+                    counter++;
+                }
+
+                return new[] { value };
+            })
+            .ToArray();
+    }
 }

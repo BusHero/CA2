@@ -15,22 +15,9 @@ public sealed class RandomCsvGeneratorTests
     }
 
     [Property]
-    public Property WithColumn(PositiveInt rows, PositiveInt columns)
-    {
-        var generator = Enumerable.Range(0, columns.Get)
-            .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(rows.Item),
-                (gen, _) => gen.WithColumn());
-
-        var csv = generator.Generate();
-
-        return csv
-            .All(row => row.Length == columns.Item)
-            .ToProperty();
-    }
-
-    [Property]
-    public Property WithColumn2(PositiveInt rows, NonEmptyArray<NonEmptyArray<string>> columns)
+    public Property WithColumn_AllRowsHaveSpecifiedNumberOfItems(
+        PositiveInt rows,
+        NonEmptyArray<NonEmptyArray<string>> columns)
     {
         var generator = columns
             .Item
@@ -117,6 +104,23 @@ public sealed class RandomCsvGeneratorTests
         var csv = generator.Generate();
         var pivot = csv.Pivot();
 
-        return (pivot[0].Distinct().Count() == valuesForColumn.Item).ToProperty();
+        return pivot[0]
+            .IsEvenlySpread(valuesForColumn.Item, 0.05).ToProperty();
+    }
+
+    [Property]
+    public Property WithColumns_CsvReportHasSpecifiedNumberOfColumns(
+        NonEmptyArray<PositiveInt> valuesForColumn)
+    {
+        var columns = valuesForColumn.Item.Select(x => x.Item).ToArray();
+        var generator = new RandomCsvGenerator()
+            .WithRowsCount(10000)
+            .WithColumns(columns);
+
+        var csv = generator.Generate();
+
+        return csv
+            .All(x => x.Length == valuesForColumn.Item.Length)
+            .ToProperty();
     }
 }

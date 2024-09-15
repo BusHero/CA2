@@ -123,7 +123,7 @@ public sealed class WriteToBufferTests
             .Range(0, numbers.Item.Length)
             .Select(_ =>
             {
-                stream.Read(buffer);
+                var __ = stream.Read(buffer);
                 return new BigInteger(buffer);
             })
             .ToArray();

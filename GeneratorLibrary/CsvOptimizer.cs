@@ -4,32 +4,39 @@ public static class CsvOptimizer
 {
     public static OptimizationReport Optimize(string[][] csv)
     {
-        var dicts = Enumerable
+        var dictionaries = Enumerable
             .Range(0, csv[0].Length)
             .Select(_ => new Dictionary<string, int>())
             .ToList();
 
-        for (var i = 0; i < csv.Length; i++)
+        foreach (var t in csv)
         {
-            for (var j = 0; j < csv[i].Length; j++)
+            for (var j = 0; j < t.Length; j++)
             {
-                if (!dicts[j].TryGetValue(csv[i][j], out var value))
+                if (dictionaries[j]
+                    .TryGetValue(t[j], out _))
                 {
-                    if (dicts[j].Count == 0)
-                    {
-                        dicts[j][csv[i][j]] = 0;
-                    }
-                    else
-                    {
-                        var max = dicts[j].Values.Max();
-                        dicts[j][csv[i][j]] = max + 1;
-                    }
+                    continue;
+                }
+
+                if (dictionaries[j].Count == 0)
+                {
+                    dictionaries[j][t[j]] = 0;
+                }
+                else
+                {
+                    var max = dictionaries[j]
+                        .Values
+                        .Max();
+                    dictionaries[j][t[j]] = max + 1;
                 }
             }
         }
 
         var result = Enumerable
-            .Range(0, csv.Length)
+            .Range(
+                0,
+                csv.Length)
             .Select(_ => new int[csv[0].Length])
             .ToArray();
 
@@ -37,15 +44,16 @@ public static class CsvOptimizer
         {
             for (var j = 0; j < csv[i].Length; j++)
             {
-                result[i][j] = dicts[j][csv[i][j]];
+                result[i][j] = dictionaries[j][csv[i][j]];
             }
         }
 
-        return new OptimizationReport(result);
+        return new OptimizationReport(
+            result,
+            dictionaries);
     }
 
-    public sealed record OptimizationReport(int[][] Csv)
-    {
-        public List<Dictionary<string, int>> ValuesMap { get; set; }
-    }
+    public sealed record OptimizationReport(
+        int[][] Csv,
+        List<Dictionary<string, int>> ValuesMap);
 }

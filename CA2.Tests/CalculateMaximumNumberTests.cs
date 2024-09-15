@@ -1,6 +1,6 @@
-﻿using System.Numerics;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using System.Numerics;
 
 public sealed class CalculateMaximumNumberTests
 {
@@ -12,7 +12,7 @@ public sealed class CalculateMaximumNumberTests
         { [10, 10], 100 },
         { [10, 10, 10], 1000 },
         { [2, 2, 2], 8 },
-        { [2, 7, 3, 2, 2, 2, 2], 672 }
+        { [2, 7, 3, 2, 2, 2, 2], 672 },
     };
     
     [Theory, MemberData(nameof(Sizes))]

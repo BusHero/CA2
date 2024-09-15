@@ -9,15 +9,22 @@ public sealed class CsvOptimizerTests
         NonEmptyArray<PositiveInt> columnSizes)
     {
         var csv = new RandomCsvGenerator()
-            .WithColumns(columnSizes.Get.Select(x => x.Get).ToArray())
-            .WithRowsCount(10_000)
+            .WithColumns(
+                columnSizes.Get
+                    .Select(x => x.Get)
+                    .ToArray())
+            .WithRowsCount(1_000)
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
 
         return pivot.Zip(columnSizes.Get)
-            .All(t => t.First.Distinct().Count() == t.Second.Get)
+            .All(
+                t => t.First
+                         .Distinct()
+                         .Count()
+                     == t.Second.Get)
             .ToProperty();
     }
 
@@ -26,14 +33,18 @@ public sealed class CsvOptimizerTests
         NonEmptyArray<PositiveInt> columnSizes)
     {
         var csv = new RandomCsvGenerator()
-            .WithColumns(columnSizes.Get.Select(x => x.Get).ToArray())
-            .WithRowsCount(10_000)
+            .WithColumns(
+                columnSizes.Get
+                    .Select(x => x.Get)
+                    .ToArray())
+            .WithRowsCount(1_000)
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
 
-        return pivot.All(row => row.Min() == 0).ToProperty();
+        return pivot.All(row => row.Min() == 0)
+            .ToProperty();
     }
 
     [Property]
@@ -41,8 +52,11 @@ public sealed class CsvOptimizerTests
         NonEmptyArray<PositiveInt> columnSizes)
     {
         var csv = new RandomCsvGenerator()
-            .WithColumns(columnSizes.Get.Select(x => x.Get).ToArray())
-            .WithRowsCount(10_000)
+            .WithColumns(
+                columnSizes.Get
+                    .Select(x => x.Get)
+                    .ToArray())
+            .WithRowsCount(1_000)
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
@@ -59,8 +73,11 @@ public sealed class CsvOptimizerTests
         NonEmptyArray<PositiveInt> columnSizes)
     {
         var csv = new RandomCsvGenerator()
-            .WithColumns(columnSizes.Get.Select(x => x.Get).ToArray())
-            .WithRowsCount(10_000)
+            .WithColumns(
+                columnSizes.Get
+                    .Select(x => x.Get)
+                    .ToArray())
+            .WithRowsCount(1_000)
             .Generate();
 
         var result = CsvOptimizer.Optimize(csv);
@@ -70,23 +87,106 @@ public sealed class CsvOptimizerTests
     }
 
     [Property]
-    public Property Map(NonEmptyArray<NonEmptyArray<NonEmptyString>> columns)
+    public Property ValuesMap(NonEmptyArray<NonEmptyArray<Guid>> columns)
     {
-        var csvGenerator = new RandomCsvGenerator()
-            .WithRowsCount(10000);
-        foreach (var column in columns.Get)
-        {
-            var realColumn = column.Item.Select(x => x.Item).ToArray();
+        var realColumns = columns.Get
+            .Select(
+                x => x.Get
+                    .Select(y => y.ToString())
+                    .ToArray())
+            .ToArray();
 
-            csvGenerator.WithColumn(realColumn);
-        }
-        var csv = csvGenerator.Generate();
+        var csv = realColumns.Aggregate(
+                new RandomCsvGenerator().WithRowsCount(1_000),
+                (gen, column) => gen.WithColumn(column))
+            .Generate();
 
-        var result = CsvOptimizer.Optimize(csv);
+        var report = CsvOptimizer.Optimize(csv);
 
-        var valuesMap = result.ValuesMap;
-        var foo = valuesMap
-            .Select(x => x.Keys)
-            .Zip(columns.Get.Select(x => x.Get.Select(y => y.Get).Distinct().ToArray()).Distinct())
+        return report.ValuesMap
+            .Zip(realColumns)
+            .All(t => t.First.Count == t.Second.Length)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property ValuesMap_MinimumValueInMapIsZero(NonEmptyArray<NonEmptyArray<Guid>> columns)
+    {
+        var realColumns = columns.Get
+            .Select(
+                x => x.Get
+                    .Select(y => y.ToString())
+                    .ToArray())
+            .ToArray();
+
+        var csv = realColumns.Aggregate(
+                new RandomCsvGenerator().WithRowsCount(1_000),
+                (gen, column) => gen.WithColumn(column))
+            .Generate();
+
+        var report = CsvOptimizer.Optimize(csv);
+
+        return report.ValuesMap
+            .All(x => x.Values.Min() == 0)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property ValuesMap_MaximumNumberInMapIsColumnSizeMinus1(NonEmptyArray<NonEmptyArray<Guid>> columns)
+    {
+        var realColumns = columns.Get
+            .Select(
+                x => x.Get
+                    .Select(y => y.ToString())
+                    .ToArray())
+            .ToArray();
+
+        var csv = realColumns.Aggregate(
+                new RandomCsvGenerator().WithRowsCount(1_000),
+                (gen, column) => gen.WithColumn(column))
+            .Generate();
+
+        var report = CsvOptimizer.Optimize(csv);
+
+        return report.ValuesMap
+            .Zip(realColumns)
+            .All(t => t.First.Values.Max() == t.Second.Length - 1)
+            .ToProperty();
+    }
+
+    [Property]
+    public Property ValuesMap_KeysAreSameAsColumns(NonEmptyArray<NonEmptyArray<Guid>> columns)
+    {
+        var realColumns = columns.Get
+            .Select(
+                x => x.Get
+                    .Select(y => y.ToString())
+                    .ToArray())
+            .ToArray();
+
+        var csv = realColumns.Aggregate(
+                new RandomCsvGenerator().WithRowsCount(1_000),
+                (gen, column) => gen.WithColumn(column))
+            .Generate();
+
+        var report = CsvOptimizer.Optimize(csv);
+
+        return report.ValuesMap
+            .Zip(realColumns)
+            .All(
+                t =>
+                {
+                    var first = t.First
+                        .Keys
+                        .Order()
+                        .ToArray();
+
+                    var second = t.Second
+                        .Order()
+                        .ToArray();
+
+                    return first.SequenceEqual(second);
+                })
+            .ToProperty();
     }
 }

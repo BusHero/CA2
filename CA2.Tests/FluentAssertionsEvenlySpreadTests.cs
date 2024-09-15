@@ -1,6 +1,6 @@
-﻿using Xunit.Sdk;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using Xunit.Sdk;
 
 public sealed class FluentAssertionsEvenlySpreadTests
 {
@@ -59,7 +59,7 @@ public sealed class FluentAssertionsEvenlySpreadTests
             .Throw<XunitException>()
             .WithMessage($"Expected collection to be evenly distributed {because}, but found non-even distribution");
     }
-    
+
     [Fact]
     public void ThePreviousAssertionIsReturned()
     {

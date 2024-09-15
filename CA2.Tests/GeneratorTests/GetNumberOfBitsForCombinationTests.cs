@@ -1,7 +1,8 @@
-﻿using System.Numerics;
-using GeneratorLibrary;
+﻿namespace CA2.Tests.GeneratorTests;
 
-namespace CA2.Tests.GeneratorTests;
+using System.Numerics;
+
+using GeneratorLibrary;
 
 public sealed class GetNumberOfBitsForCombinationTests
 {

@@ -4,7 +4,7 @@ using Random = System.Random;
 
 internal sealed class RandomCsvGenerator
 {
-    private int _rows = 0;
+    private int _rows;
     private readonly List<string[]> _columns = [];
 
     private readonly Random _random = Random.Shared;
@@ -17,12 +17,7 @@ internal sealed class RandomCsvGenerator
                 .ToArray())
             .ToArray();
 
-    public string[,] Generate2()
-    {
-        return default!;
-    }
-
-    private string GetRandomValueFromRange(string[] range) 
+    private string GetRandomValueFromRange(string[] range)
         => range[_random.Next(range.Length)];
 
     internal RandomCsvGenerator WithRowsCount(int rows)
@@ -31,7 +26,6 @@ internal sealed class RandomCsvGenerator
 
         return this;
     }
-
 
     public RandomCsvGenerator WithColumn(string[] column)
     {
@@ -49,7 +43,7 @@ internal sealed class RandomCsvGenerator
         return WithColumn(column);
     }
 
-    public RandomCsvGenerator WithColumns(int[] columns) 
+    public RandomCsvGenerator WithColumns(int[] columns)
         => columns
             .Aggregate(
                 this,

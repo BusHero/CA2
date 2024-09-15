@@ -1,7 +1,7 @@
-﻿using FluentAssertions.Collections;
-using FluentAssertions.Execution;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using FluentAssertions.Collections;
+using FluentAssertions.Execution;
 
 internal static class StatisticsFluentAssertionExtensions
 {

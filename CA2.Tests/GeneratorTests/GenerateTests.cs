@@ -1,8 +1,8 @@
+namespace CA2.Tests.GeneratorTests;
+
 using System.Numerics;
 
 using GeneratorLibrary;
-
-namespace CA2.Tests.GeneratorTests;
 
 public sealed class GenerateTests
 {

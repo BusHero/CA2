@@ -1,6 +1,6 @@
-﻿using System.Numerics;
+﻿namespace CA2.Tests.GeneratorTests;
 
-namespace CA2.Tests.GeneratorTests;
+using System.Numerics;
 
 public sealed class GetBytesTests
 {
@@ -12,15 +12,15 @@ public sealed class GetBytesTests
 
         var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
         var bytesCount = biggestNumber.GetByteCount();
-        
+
         return (bytesCount == bytes.Length).ToProperty();
     }
-    
+
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property CanConvertBytesBackToBigNumber(Combination combination)
     {
         var number = GeneratorLibrary.Generator.Generate(
-            combination.Item, 
+            combination.Item,
             combination.Sizes);
         var bytes = GeneratorLibrary.Generator
             .GetBytes(combination.Item, combination.Sizes);

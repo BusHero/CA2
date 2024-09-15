@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using System.Diagnostics.CodeAnalysis;
 
 public sealed class CombinationsGenerator
 {

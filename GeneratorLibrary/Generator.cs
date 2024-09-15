@@ -1,6 +1,6 @@
-using System.Numerics;
-
 namespace GeneratorLibrary;
+
+using System.Numerics;
 
 public sealed class Generator
 {
@@ -58,14 +58,14 @@ public sealed class Generator
             .result;
     }
 
-    public static long GetNumberOfBitsForCombination(int[] sizes) 
+    public static long GetNumberOfBitsForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetBitLength();
 
-    private static int GetNumberOfBytesForCombination(int[] sizes) 
+    private static int GetNumberOfBytesForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,

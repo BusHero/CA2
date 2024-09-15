@@ -1,6 +1,6 @@
-﻿using System.Numerics;
+﻿namespace CA2.Tests;
 
-namespace CA2.Tests;
+using System.Numerics;
 
 public sealed class CalculateSizesTests
 {
@@ -10,7 +10,7 @@ public sealed class CalculateSizesTests
         var actualSizes = sizes.Item
             .Select(x => x.Item)
             .ToArray();
-        
+
         var generatedSequence = TestUtils.CalculateSizes(actualSizes);
 
         var property = () => generatedSequence[^1] == 1;
@@ -18,7 +18,7 @@ public sealed class CalculateSizesTests
         return property
             .Label("Last item is 1");
     }
-    
+
     [Property]
     public Property FirstItemIsEqualToTheLastOne()
     {
@@ -33,19 +33,19 @@ public sealed class CalculateSizesTests
             var generatedSequence = TestUtils.CalculateSizes(sizes);
 
             var property = generatedSequence[0] == sizes[^1];
-            
+
             return property
                 .Label("Last item is equal to the last one");
         });
     }
-    
+
     [Property]
     public Property GeneratedArrayIsArrangedDescending(NonEmptyArray<PositiveInt> sizes)
     {
         var actualSizes = sizes.Item
             .Select(x => x.Item)
             .ToArray();
-        
+
         var generatedSequence = TestUtils.CalculateSizes(actualSizes);
 
         return generatedSequence
@@ -53,22 +53,22 @@ public sealed class CalculateSizesTests
             .SequenceEqual(generatedSequence)
             .Label($"The generated array should be sorted [{string.Join(", ", generatedSequence)}]");
     }
-    
+
     [Property]
     public Property SizeOfGeneratedArrayIsEqualToTheOriginalSize(NonEmptyArray<PositiveInt> sizes)
     {
         var actualSizes = sizes.Item
             .Select(x => x.Item)
             .ToArray();
-        
+
         var generatedSequence = TestUtils.CalculateSizes(actualSizes);
 
         var property = generatedSequence.Length == sizes.Item.Length;
-        
+
         return property
             .Label($"{generatedSequence.Length} == {sizes.Item.Length}");
     }
-    
+
     [Property]
     public Property FirstItemIsTheProductOfPreviousNumbers(NonEmptyArray<PositiveInt> sizes)
     {
@@ -82,7 +82,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .Select(x => (BigInteger)x)
             .Aggregate(BigInteger.One, (fst, snd) => fst * snd);
-        
+
         return property
             .When(2 <= sizes.Item.Length);
     }
@@ -100,11 +100,11 @@ public sealed class CalculateSizesTests
             .SkipLast(1)
             .Select((x, i) => (x, index: i + 1))
             .All(t => t.x == generatedSequence[t.index] * sizes.Item[t.index].Item);
-        
+
         return property
             .When(2 <= sizes.Item.Length);
     }
-    
+
     [Property]
     public Property ItemIsEqualToThePreviousGeneratedValueAndOriginalSizeSizeIs3()
     {
@@ -122,7 +122,7 @@ public sealed class CalculateSizesTests
                 .SkipLast(1)
                 .Select((x, i) => (x, index: i + 1))
                 .All(t => t.x == generatedSequence[t.index] * sizes[t.index]);
-            
+
             return property
                 .ToProperty();
         });

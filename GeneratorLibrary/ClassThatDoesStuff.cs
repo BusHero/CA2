@@ -1,4 +1,7 @@
-﻿namespace GeneratorLibrary;
+﻿using System.IO.Abstractions;
+using System.Numerics;
+
+namespace GeneratorLibrary;
 
 public class ClassThatDoesStuff(
     IFileSystem fileSystem)
@@ -6,7 +9,12 @@ public class ClassThatDoesStuff(
     public void DoStuff(string inputFile)
     {
         var result = Path.GetFileNameWithoutExtension(inputFile);
-        
-        fileSystem.Add($"{result}.cca", string.Empty);
+        var outputFile = $"{result}.cca";
+
+        using var stream = fileSystem.File.Create(outputFile);
+        Generator.TryWriteToBuffer(
+            stream,
+            [BigInteger.One],
+            1);
     }
 }

@@ -1,64 +1,51 @@
 ﻿namespace CA2.Tests;
 
+using System.IO.Abstractions.TestingHelpers;
+
 using GeneratorLibrary;
 
 public sealed class CombiningStuffTogetherTests
 {
-    [Fact]
-    public void OutputFileGetsWritten()
+    [Theory, AutoData]
+    public void OutputFileGetsWritten(string inputFile)
     {
-        const string inputFile = "test.csv";
-        const string outputFile = "test.cca";
-        
-        var fileSystem = new FakeFileSystem();
-        fileSystem.Add(inputFile, string.Empty);
+        var fileSystem = new MockFileSystem();
+        fileSystem.File.WriteAllText(inputFile, string.Empty);
 
         var instance = new ClassThatDoesStuff(fileSystem);
         instance.DoStuff(inputFile);
 
-        var result = fileSystem.ContainsFile(outputFile);
-
-        result.Should().BeTrue();
-    }
-}
-
-public sealed class MockFileSystemTests
-{
-    [Theory, AutoData]
-    public void AddedFileIsReportedAsAdded(
-        string inputFile, string content)
-    {
-        var fileSystem = new FakeFileSystem();
-        
-        fileSystem.Add(inputFile, content);
-
         fileSystem
-            .ContainsFile(inputFile)
+            .File
+            .Exists($"{inputFile}.cca")
             .Should()
             .BeTrue();
     }
-    
-    [Theory, AutoData]
-    public void FileThatDoesNotExistIsReportedAsNotAdded(
-        string inputFile)
-    {
-        var fileSystem = new FakeFileSystem();
-        
-        fileSystem
-            .ContainsFile(inputFile)
-            .Should()
-            .BeFalse();
-    }
 
-    [Theory, AutoData]
-    public void CanReadFileContent(string filename, string content)
+    [Property]
+    public Property CsvOfASingleLineContainsASingleByte(
+        string inputFile,
+        PositiveInt rows,
+        NonEmptyArray<PositiveInt> columns)
     {
-        var fileSystem = new FakeFileSystem();
+        var realColumns = columns.Get
+            .Select(x => x.Get)
+            .ToArray();
         
-        fileSystem.Add(filename, content);
+        var csv = new RandomCsvGenerator()
+            .WithColumns(realColumns)
+            .WithRowsCount(rows.Get)
+            .Generate();
+        var csvAsContent = string.Join("\n\r", csv.Select(x => string.Join(',', x)));
 
-        var savedContent = fileSystem.ReadFile(filename);
-        
-        savedContent.Should().Be(content);
+        var fileSystem = new MockFileSystem();
+        fileSystem.File.WriteAllText(inputFile, csvAsContent);
+
+        var instance = new ClassThatDoesStuff(fileSystem);
+        instance.DoStuff(inputFile);
+
+        var stream = fileSystem.File.OpenRead($"{inputFile}.cca");
+
+        return (stream.Length == 1).ToProperty();
     }
 }

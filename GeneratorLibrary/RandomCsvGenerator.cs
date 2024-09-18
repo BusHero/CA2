@@ -1,8 +1,6 @@
-namespace CA2.Tests;
+namespace GeneratorLibrary;
 
-using Random = System.Random;
-
-internal sealed class RandomCsvGenerator
+public sealed class RandomCsvGenerator
 {
     private int _rows;
     private readonly List<string[]> _columns = [];
@@ -20,7 +18,7 @@ internal sealed class RandomCsvGenerator
     private string GetRandomValueFromRange(string[] range)
         => range[_random.Next(range.Length)];
 
-    internal RandomCsvGenerator WithRowsCount(int rows)
+    public RandomCsvGenerator WithRowsCount(int rows)
     {
         _rows = rows;
 

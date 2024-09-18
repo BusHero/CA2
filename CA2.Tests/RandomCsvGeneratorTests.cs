@@ -1,5 +1,7 @@
 namespace CA2.Tests;
 
+using GeneratorLibrary;
+
 public sealed class RandomCsvGeneratorTests
 {
     [Property]

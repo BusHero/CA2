@@ -55,5 +55,10 @@ public static class CsvOptimizer
 
     public sealed record OptimizationReport(
         int[][] Csv,
-        List<Dictionary<string, int>> ValuesMap);
+        List<Dictionary<string, int>> ValuesMap)
+    {
+        public int[] Sizes { get; } = ValuesMap
+            .Select(x => x.Count)
+            .ToArray();
+    }
 }

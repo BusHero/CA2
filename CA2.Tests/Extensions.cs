@@ -1,4 +1,4 @@
-﻿namespace CA2.Tests;
+namespace CA2.Tests;
 
 using System.Diagnostics.CodeAnalysis;
 
@@ -36,5 +36,12 @@ internal static class Extensions
         }
 
         return result;
+    }
+
+    public static string ConvertToString(this string[][] csv)
+    {
+        var rows = csv.Select(row => string.Join(',', row));
+
+        return string.Join(Environment.NewLine, rows);
     }
 }

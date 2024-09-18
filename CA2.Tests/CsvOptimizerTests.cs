@@ -52,7 +52,7 @@ public sealed class CsvOptimizerTests
         var realColumn = columnSizes.Get
             .Select(x => x.Get)
             .ToArray();
-        
+
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumn)
             .WithRowsCount(1_000)
@@ -185,6 +185,24 @@ public sealed class CsvOptimizerTests
 
                 return first.SequenceEqual(second);
             })
+            .ToProperty();
+    }
+
+    [Property]
+    public Property Sizes(NonEmptyArray<PositiveInt> columns)
+    {
+        var realColumns = columns.Get.Select(x => x.Get).ToArray();
+
+        var csv = new RandomCsvGenerator()
+            .WithColumns(realColumns)
+            .WithRowsCount(10000)
+            .Generate();
+
+        var report = CsvOptimizer.Optimize(csv);
+
+        return report
+            .Sizes
+            .SequenceEqual(realColumns)
             .ToProperty();
     }
 }

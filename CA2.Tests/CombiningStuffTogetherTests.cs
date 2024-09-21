@@ -6,12 +6,12 @@ using GeneratorLibrary;
 
 public sealed class CombiningStuffTogetherTests
 {
-    [Property(Replay = "(2011936214,297381972)")]
-    public Property CCAFileGetsGenerated(
+    [Property]
+    public Property CcaFileGetsGenerated(
         Guid filename,
         NonEmptyArray<PositiveInt> columns)
     {
-        var rowsCount = 10000;
+        const int rowsCount = 10000;
         var inputFile = filename.ToString();
         var realColumns = columns.Get
             .Select(x => x.Get + 2)

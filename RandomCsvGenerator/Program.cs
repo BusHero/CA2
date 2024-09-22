@@ -1,12 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
+
 using CommandLine;
 
 using GeneratorLibrary;
 
-var foo = Parser.Default.ParseArguments<Options>(args)
+Parser.Default.ParseArguments<Options>(args)
     .WithParsed(o =>
     {
         DoStuff(o.Filename, o.Rows, o.Columns.ToArray());
     });
+
+return;
 
 
 void DoStuff(string? filename, int rowsCount, int[] columns)
@@ -31,7 +35,9 @@ void DoStuff(string? filename, int rowsCount, int[] columns)
 }
 
 
-public sealed record Options
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+internal sealed record Options
 {
     [Option("filename", HelpText = "Set name of the output file")]
     public string? Filename { get; set; }

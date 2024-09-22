@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace GeneratorLibrary;
 
 public sealed class RandomCsvGenerator
@@ -46,4 +48,11 @@ public sealed class RandomCsvGenerator
             .Aggregate(
                 this,
                 (gen, column) => gen.WithColumn(column));
+
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+    public RandomCsvGenerator WithColumns(string[][] columns)
+    {
+        return columns
+            .Aggregate(this, (gen, column) => gen.WithColumn(column));
+    }
 }

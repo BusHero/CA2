@@ -1,4 +1,6 @@
-﻿namespace CA2.Tests;
+﻿namespace CA2.Tests.TestUtilsTests;
+
+using FluentAssertionExtensions;
 
 public sealed class UniformlyDistributedTests
 {

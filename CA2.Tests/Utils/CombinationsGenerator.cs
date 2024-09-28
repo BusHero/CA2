@@ -1,4 +1,4 @@
-﻿namespace CA2.Tests;
+﻿namespace CA2.Tests.Utils;
 
 using System.Diagnostics.CodeAnalysis;
 

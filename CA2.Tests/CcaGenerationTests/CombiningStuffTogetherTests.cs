@@ -1,8 +1,8 @@
-namespace CA2.Tests;
+namespace CA2.Tests.CcaGenerationTests;
 
 using System.IO.Abstractions.TestingHelpers;
-
 using GeneratorLibrary;
+using Utils;
 
 public sealed class CombiningStuffTogetherTests
 {

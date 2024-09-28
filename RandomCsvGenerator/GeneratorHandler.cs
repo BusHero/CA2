@@ -1,6 +1,6 @@
 ﻿namespace RandomCsvGenerator;
 
-internal static class GeneratorHandler
+public static class GeneratorHandler
 {
     public static async Task HandleAsync(
         string destination,
@@ -21,6 +21,7 @@ internal static class GeneratorHandler
         string outputFile,
         string[][] strings)
     {
+        // Use a logger instead.
         Console.WriteLine($"Write to {outputFile}");
 
         var rows = strings

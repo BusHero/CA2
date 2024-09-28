@@ -1,6 +1,8 @@
-namespace CA2.Tests;
+namespace CA2.Tests.CsvGenerationTests;
 
+using FluentAssertionExtensions;
 using GeneratorLibrary;
+using Utils;
 
 public sealed class RandomCsvGeneratorTests
 {

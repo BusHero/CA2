@@ -1,4 +1,6 @@
-﻿namespace CA2.Tests;
+﻿namespace CA2.Tests.TestUtilsTests;
+
+using FluentAssertionExtensions;
 
 using Xunit.Sdk;
 

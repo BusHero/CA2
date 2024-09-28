@@ -4,7 +4,7 @@ namespace GeneratorLibrary;
 
 public class CsvGeneratorToFile(
     IFileSystem fileSystem,
-    IRandomCsvGenerator csvGenerator)
+    IRandomCsvGeneratorFactory factory)
 {
     public async Task Generate(
         string destinationFolder, 
@@ -14,7 +14,8 @@ public class CsvGeneratorToFile(
     {
         fileSystem.Directory.CreateDirectory(destinationFolder);
 
-        var csv = csvGenerator
+        var csv = factory
+            .Create()
             .WithRowsCount(rowsCount)
             .WithColumns(columns)
             .Generate();

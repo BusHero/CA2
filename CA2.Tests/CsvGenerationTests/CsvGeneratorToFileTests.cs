@@ -179,10 +179,12 @@ public class CsvGeneratorToFileTests
         public Fixture Build()
         {
             var fileSystem = new MockFileSystem(_fileData);
-
+            var csvGeneratorFactory = Substitute.For<IRandomCsvGeneratorFactory>();
+            csvGeneratorFactory.Create().Returns(_csvGenerator);
+            
             var sut = new CsvGeneratorToFile(
                 fileSystem,
-                _csvGenerator);
+                csvGeneratorFactory);
 
             return new Fixture(
                 sut,

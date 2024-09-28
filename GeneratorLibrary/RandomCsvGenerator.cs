@@ -1,13 +1,28 @@
 namespace GeneratorLibrary;
 
-public class RandomCsvGenerator
+public interface IRandomCsvGenerator
+{
+    string[][] Generate();
+    
+    IRandomCsvGenerator WithRowsCount(int rows);
+    
+    IRandomCsvGenerator WithColumn(string[] column);
+    
+    IRandomCsvGenerator WithColumn(int numberOfValues);
+    
+    IRandomCsvGenerator WithColumns(int[] columns);
+    
+    IRandomCsvGenerator WithColumns(string[][] columns);
+}
+
+public sealed class RandomCsvGenerator : IRandomCsvGenerator
 {
     private int _rows;
     private readonly List<string[]> _columns = [];
 
     private readonly Random _random = Random.Shared;
 
-    public virtual string[][] Generate()
+    public string[][] Generate()
         => Enumerable.Range(0, _rows)
             .Select(_ => Enumerable
                 .Range(0, _columns.Count)
@@ -18,21 +33,21 @@ public class RandomCsvGenerator
     private string GetRandomValueFromRange(string[] range)
         => range[_random.Next(range.Length)];
 
-    public virtual RandomCsvGenerator WithRowsCount(int rows)
+    public IRandomCsvGenerator WithRowsCount(int rows)
     {
         _rows = rows;
 
         return this;
     }
 
-    public virtual RandomCsvGenerator WithColumn(string[] column)
+    public IRandomCsvGenerator WithColumn(string[] column)
     {
         _columns.Add(column);
 
         return this;
     }
 
-    public virtual RandomCsvGenerator WithColumn(int numberOfValues)
+    public IRandomCsvGenerator WithColumn(int numberOfValues)
     {
         var column = Enumerable
             .Range(0, numberOfValues)
@@ -41,15 +56,15 @@ public class RandomCsvGenerator
         return WithColumn(column);
     }
 
-    public virtual RandomCsvGenerator WithColumns(int[] columns)
+    public IRandomCsvGenerator WithColumns(int[] columns)
         => columns
             .Aggregate(
-                this,
+                this as IRandomCsvGenerator,
                 (gen, column) => gen.WithColumn(column));
 
-    public virtual RandomCsvGenerator WithColumns(string[][] columns)
+    public IRandomCsvGenerator WithColumns(string[][] columns)
     {
         return columns
-            .Aggregate(this, (gen, column) => gen.WithColumn(column));
+            .Aggregate(this as IRandomCsvGenerator, (gen, column) => gen.WithColumn(column));
     }
 }

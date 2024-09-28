@@ -4,7 +4,7 @@ namespace GeneratorLibrary;
 
 public class CsvGeneratorToFile(
     IFileSystem fileSystem,
-    RandomCsvGenerator csvGenerator)
+    IRandomCsvGenerator csvGenerator)
 {
     public async Task Generate(
         string destinationFolder, 

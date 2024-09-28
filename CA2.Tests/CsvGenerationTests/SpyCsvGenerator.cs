@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using GeneratorLibrary;
 
-internal sealed class SpyCsvGenerator : RandomCsvGenerator
+internal sealed class SpyCsvGenerator : IRandomCsvGenerator
 {
     private string[][]? _csv;
 
@@ -12,20 +12,20 @@ internal sealed class SpyCsvGenerator : RandomCsvGenerator
 
     public List<ColumnDefinition> Columns { get; } = [];
 
-    public override RandomCsvGenerator WithColumn(string[] column)
+    public IRandomCsvGenerator WithColumn(string[] column)
     {
         Columns.Add(new ValuesColumnDefinition(column));
         return this;
     }
 
-    public override RandomCsvGenerator WithColumn(int numberOfValues)
+    public IRandomCsvGenerator WithColumn(int numberOfValues)
     {
         Columns.Add(new CountColumnDefinition(numberOfValues));
 
         return this;
     }
 
-    public override RandomCsvGenerator WithColumns(int[] columns)
+    public IRandomCsvGenerator WithColumns(int[] columns)
     {
         var columnDefinitions = columns.Select(x => new CountColumnDefinition(x));
         Columns.AddRange(columnDefinitions);
@@ -33,16 +33,16 @@ internal sealed class SpyCsvGenerator : RandomCsvGenerator
         return this;
     }
 
-    public override RandomCsvGenerator WithColumns(string[][] columns)
+    public IRandomCsvGenerator WithColumns(string[][] columns)
     {
         var columnDefinitions = columns
             .Select(c => new ValuesColumnDefinition(c));
         Columns.AddRange(columnDefinitions);
-        
+
         return this;
     }
 
-    public override RandomCsvGenerator WithRowsCount(int rows)
+    public IRandomCsvGenerator WithRowsCount(int rows)
     {
         RowsCount = rows;
 
@@ -52,7 +52,7 @@ internal sealed class SpyCsvGenerator : RandomCsvGenerator
     public void WithRandomCsv(string[][] csv)
         => _csv = csv;
 
-    public override string[][] Generate()
+    public string[][] Generate()
         => _csv!;
 
     internal abstract record ColumnDefinition;

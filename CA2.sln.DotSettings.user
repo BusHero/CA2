@@ -4,24 +4,8 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Users\Petru\.nuget\packages\commandlineparser\2.9.1\lib\netstandard2.0\CommandLine.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=617cfad3_002Db868_002D4815_002Dbd57_002D55b21e230465/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;And&gt;&#xD;
-    &lt;Or&gt;&#xD;
-      &lt;And&gt;&#xD;
-        &lt;Namespace&gt;CA2.Tests&lt;/Namespace&gt;&#xD;
-        &lt;Project Location="C:\Users\Petru\projects\csharp\CA2\CA2.Tests" Presentation="&amp;lt;CA2.Tests&amp;gt;" /&gt;&#xD;
-      &lt;/And&gt;&#xD;
-      &lt;TestAncestor&gt;&#xD;
-        &lt;TestId&gt;xUnit::DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9::net8.0::CA2.IntegrationTests.UnitTest1.Test1&lt;/TestId&gt;&#xD;
-        &lt;TestId&gt;xUnit::DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9::net8.0::CA2.IntegrationTests.CcMetaGenerationTests&lt;/TestId&gt;&#xD;
-      &lt;/TestAncestor&gt;&#xD;
-    &lt;/Or&gt;&#xD;
-    &lt;TestAncestor&gt;&#xD;
-      &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.CsvGeneratorToFileTests&lt;/TestId&gt;&#xD;
-    &lt;/TestAncestor&gt;&#xD;
-  &lt;/And&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=749d78aa_002D8709_002D46a7_002D8a9a_002D32d45885b412/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=749d78aa_002D8709_002D46a7_002D8a9a_002D32d45885b412/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Or&gt;&#xD;
     &lt;And&gt;&#xD;
       &lt;Namespace&gt;CA2.Tests&lt;/Namespace&gt;&#xD;

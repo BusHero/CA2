@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MiscFiles", "MiscFiles", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomCsvGenerator", "RandomCsvGenerator\RandomCsvGenerator.csproj", "{71858DEB-7EB7-419F-9933-604855677EA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA2.IntegrationTests", "CA2.IntegrationTests\CA2.IntegrationTests.csproj", "{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{71858DEB-7EB7-419F-9933-604855677EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71858DEB-7EB7-419F-9933-604855677EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71858DEB-7EB7-419F-9933-604855677EA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

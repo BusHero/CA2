@@ -2,14 +2,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GeneratorLibrary;
 
-public sealed class RandomCsvGenerator
+public class RandomCsvGenerator
 {
     private int _rows;
     private readonly List<string[]> _columns = [];
 
     private readonly Random _random = Random.Shared;
 
-    public string[][] Generate()
+    public virtual string[][] Generate()
         => Enumerable.Range(0, _rows)
             .Select(_ => Enumerable
                 .Range(0, _columns.Count)

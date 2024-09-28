@@ -3,7 +3,10 @@
 namespace GeneratorLibrary;
 
 public class CsvGeneratorToFile(
-    IFileSystem fileSystem)
+    IFileSystem fileSystem,
+#pragma warning disable CS9113 // Parameter is unread.
+    RandomCsvGenerator csvGenerator)
+#pragma warning restore CS9113 // Parameter is unread.
 {
     public async Task Generate(
         string destinationFolder, 
@@ -13,8 +16,11 @@ public class CsvGeneratorToFile(
     {
         fileSystem.Directory.CreateDirectory(destinationFolder);
 
-        await fileSystem.File.WriteAllTextAsync(
+        var csv = csvGenerator.Generate();
+        var content = csv.Select(x => string.Join(',', x));
+        
+        await fileSystem.File.WriteAllLinesAsync(
             Path.Combine(destinationFolder, filename), 
-            string.Empty);
+            content);
     }
 }

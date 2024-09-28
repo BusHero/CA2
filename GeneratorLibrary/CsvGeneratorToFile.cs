@@ -16,6 +16,7 @@ public class CsvGeneratorToFile(
 
         var csv = csvGenerator
             .WithRowsCount(rowsCount)
+            .WithColumns(columns)
             .Generate();
         
         var content = csv.Select(x => string.Join(',', x));

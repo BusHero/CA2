@@ -5,6 +5,8 @@ using System.IO.Abstractions.TestingHelpers;
 
 using AutoFixture;
 
+using FluentAssertions.Execution;
+
 using GeneratorLibrary;
 
 public class CsvGeneratorToFileTests
@@ -135,6 +137,28 @@ public class CsvGeneratorToFileTests
         fixture.AssertExpectedRowsCount(rowsCount);
     }
 
+    [Theory, AutoData]
+    public async Task Generate_ExpectedColumns(
+        string parent,
+        string filename,
+        int rowsCount,
+        string[][] columns,
+        string[][] csv)
+    {
+        var fixture = _builder
+            .WithFile(parent, filename)
+            .WithRandomCsv(csv)
+            .Build();
+
+        await fixture.Sut.Generate(
+            parent,
+            filename,
+            rowsCount,
+            columns);
+
+        fixture.AssertExpectedColumns(columns);
+    }
+
     private class FixtureBuilder
     {
         public static FixtureBuilder CreateDefaultBuilder()
@@ -235,25 +259,29 @@ public class CsvGeneratorToFileTests
 
         public void AssertExpectedRowsCount(int rowsCount)
             => csvGenerator.RowsCount.Should().Be(rowsCount);
+
+        public void AssertExpectedColumns(string[][] columns)
+        {
+            using (new AssertionScope())
+            {
+                csvGenerator
+                    .Columns
+                    .Should()
+                    .HaveSameCount(columns);
+
+                var actualColumns = csvGenerator
+                    .Columns
+                    .Select(x => x switch
+                    {
+                        SpyCsvGenerator.ValuesColumnDefinition { Values: var values } => values,
+                        _ => default,
+                    })
+                    .ToArray();
+
+                actualColumns
+                    .Should()
+                    .BeEquivalentTo(columns);
+            }
+        }
     }
-}
-
-internal sealed class SpyCsvGenerator : RandomCsvGenerator
-{
-    private string[][]? _csv;
-
-    public int RowsCount { get; private set; }
-
-    public override RandomCsvGenerator WithRowsCount(int rows)
-    {
-        RowsCount = rows;
-
-        return base.WithRowsCount(rows);
-    }
-
-    public void WithRandomCsv(string[][] csv)
-        => _csv = csv;
-
-    public override string[][] Generate()
-        => _csv!;
 }

@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace GeneratorLibrary;
 
 public class RandomCsvGenerator
@@ -27,14 +25,14 @@ public class RandomCsvGenerator
         return this;
     }
 
-    public RandomCsvGenerator WithColumn(string[] column)
+    public virtual RandomCsvGenerator WithColumn(string[] column)
     {
         _columns.Add(column);
 
         return this;
     }
 
-    public RandomCsvGenerator WithColumn(int numberOfValues)
+    public virtual RandomCsvGenerator WithColumn(int numberOfValues)
     {
         var column = Enumerable
             .Range(0, numberOfValues)
@@ -43,14 +41,13 @@ public class RandomCsvGenerator
         return WithColumn(column);
     }
 
-    public RandomCsvGenerator WithColumns(int[] columns)
+    public virtual RandomCsvGenerator WithColumns(int[] columns)
         => columns
             .Aggregate(
                 this,
                 (gen, column) => gen.WithColumn(column));
 
-    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
-    public RandomCsvGenerator WithColumns(string[][] columns)
+    public virtual RandomCsvGenerator WithColumns(string[][] columns)
     {
         return columns
             .Aggregate(this, (gen, column) => gen.WithColumn(column));

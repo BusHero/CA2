@@ -4,7 +4,7 @@ using System.IO.Abstractions.TestingHelpers;
 using GeneratorLibrary;
 using Utils;
 
-public sealed class CombiningStuffTogetherTests
+public sealed class CcaGeneratorTests
 {
     [Property]
     public Property CcaFileGetsGenerated(
@@ -32,8 +32,8 @@ public sealed class CombiningStuffTogetherTests
             inputFile,
             csvAsContent);
 
-        var instance = new ClassThatDoesStuff(fileSystem);
-        instance.DoStuff(inputFile);
+        var instance = new CcaGenerator(fileSystem);
+        instance.GenerateCcaFile(inputFile);
 
         var stream = fileSystem.File.OpenRead($"{inputFile}.cca");
 

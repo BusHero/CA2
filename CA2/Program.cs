@@ -3,5 +3,5 @@ using System.IO.Abstractions;
 using GeneratorLibrary;
 
 IFileSystem fileSystem = new FileSystem();
-var foo = new ClassThatDoesStuff(fileSystem);
-foo.DoStuff(args[0]);
+var foo = new CcaGenerator(fileSystem);
+foo.GenerateCcaFile(args[0]);

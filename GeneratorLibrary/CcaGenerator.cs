@@ -2,10 +2,10 @@ using System.IO.Abstractions;
 
 namespace GeneratorLibrary;
 
-public class ClassThatDoesStuff(
+public class CcaGenerator(
     IFileSystem fileSystem)
 {
-    public void DoStuff(string inputFile)
+    public void GenerateCcaFile(string inputFile)
     {
         var csv = GetCsv(inputFile);
         var outputFile = GetOutputFile(inputFile);

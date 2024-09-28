@@ -20,7 +20,7 @@ public class RandomCsvGenerator
     private string GetRandomValueFromRange(string[] range)
         => range[_random.Next(range.Length)];
 
-    public RandomCsvGenerator WithRowsCount(int rows)
+    public virtual RandomCsvGenerator WithRowsCount(int rows)
     {
         _rows = rows;
 

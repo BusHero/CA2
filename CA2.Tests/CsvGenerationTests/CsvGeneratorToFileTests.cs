@@ -3,11 +3,14 @@
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 
+using AutoFixture;
+
 using GeneratorLibrary;
 
 public class CsvGeneratorToFileTests
 {
-    private readonly FixtureBuilder _builder = new();
+    private readonly FixtureBuilder _builder
+        = FixtureBuilder.CreateDefaultBuilder();
 
     [Theory, AutoData]
     public async Task FileIsCreated(
@@ -15,7 +18,8 @@ public class CsvGeneratorToFileTests
         int rowsCount,
         string[][] columns)
     {
-        var fixture = _builder.Build();
+        var fixture = _builder
+            .Build();
 
         await fixture.Sut.Generate(
             ".",
@@ -85,7 +89,7 @@ public class CsvGeneratorToFileTests
     }
 
     [Theory, AutoData]
-    public async Task Generate_CsvWithExpectedNumberOfRowsIsCreated(
+    public async Task Generate_ExpectedCsvIsGenerated(
         string parent,
         string filename,
         int rowsCount,
@@ -104,15 +108,49 @@ public class CsvGeneratorToFileTests
             columns);
 
         await fixture.AssetGeneratedCsvContainsExpectedCsv(
-            parent, 
+            parent,
             filename,
             csv);
     }
 
+    [Theory, AutoData]
+    public async Task Generate_ExpectedRowsCount(
+        string parent,
+        string filename,
+        int rowsCount,
+        string[][] columns,
+        string[][] csv)
+    {
+        var fixture = _builder
+            .WithFile(parent, filename)
+            .WithRandomCsv(csv)
+            .Build();
+
+        await fixture.Sut.Generate(
+            parent,
+            filename,
+            rowsCount,
+            columns);
+
+        fixture.AssertExpectedRowsCount(rowsCount);
+    }
+
     private class FixtureBuilder
     {
+        public static FixtureBuilder CreateDefaultBuilder()
+        {
+            var builder = new FixtureBuilder()
+                .WithRandomCsv();
+
+            return builder;
+        }
+
         private readonly Dictionary<string, MockFileData> _fileData = [];
-        private readonly RandomCsvGenerator _csvGenerator = Substitute.For<RandomCsvGenerator>();
+        private readonly SpyCsvGenerator _csvGenerator = new();
+        private readonly IFixture _fixture;
+
+        private FixtureBuilder()
+            => _fixture = new AutoFixture.Fixture();
 
         public Fixture Build()
         {
@@ -124,7 +162,8 @@ public class CsvGeneratorToFileTests
 
             return new Fixture(
                 sut,
-                fileSystem);
+                fileSystem,
+                _csvGenerator);
         }
 
         public FixtureBuilder WithDirectory(string folder)
@@ -144,9 +183,18 @@ public class CsvGeneratorToFileTests
             return this;
         }
 
+        private FixtureBuilder WithRandomCsv()
+        {
+            var csv = _fixture
+                .CreateMany<string[]>()
+                .ToArray();
+
+            return WithRandomCsv(csv);
+        }
+
         public FixtureBuilder WithRandomCsv(string[][] csv)
         {
-            _csvGenerator.Generate().Returns(csv);
+            _csvGenerator.WithRandomCsv(csv);
 
             return this;
         }
@@ -154,7 +202,8 @@ public class CsvGeneratorToFileTests
 
     private class Fixture(
         CsvGeneratorToFile sut,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        SpyCsvGenerator csvGenerator)
     {
         public CsvGeneratorToFile Sut { get; } = sut;
 
@@ -162,13 +211,11 @@ public class CsvGeneratorToFileTests
             => AssetFileExists(Path.Combine(parent, filename));
 
         public void AssetFileExists(string filename)
-        {
-            fileSystem
+            => fileSystem
                 .File
                 .Exists(filename)
                 .Should()
                 .BeTrue();
-        }
 
         public async Task AssetGeneratedCsvContainsExpectedCsv(
             string parent,
@@ -185,5 +232,28 @@ public class CsvGeneratorToFileTests
                 .Should()
                 .BeEquivalentTo(csv);
         }
+
+        public void AssertExpectedRowsCount(int rowsCount)
+            => csvGenerator.RowsCount.Should().Be(rowsCount);
     }
+}
+
+internal sealed class SpyCsvGenerator : RandomCsvGenerator
+{
+    private string[][]? _csv;
+
+    public int RowsCount { get; private set; }
+
+    public override RandomCsvGenerator WithRowsCount(int rows)
+    {
+        RowsCount = rows;
+
+        return base.WithRowsCount(rows);
+    }
+
+    public void WithRandomCsv(string[][] csv)
+        => _csv = csv;
+
+    public override string[][] Generate()
+        => _csv!;
 }

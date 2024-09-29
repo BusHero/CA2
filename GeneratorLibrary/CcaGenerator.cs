@@ -3,28 +3,39 @@ using System.IO.Abstractions;
 namespace GeneratorLibrary;
 
 public class CcaGenerator(
-    IFileSystem fileSystem)
+    IFileSystem fileSystem,
+    ICsvCompressor csvCompressor)
 {
-    public void GenerateCcaFile(string inputFile)
+    public void GenerateCcaFile(string csvFile)
     {
-        var csv = GetCsv(inputFile);
-        var outputFile = GetOutputFile(inputFile);
+        var ccaFilename = GetCcaFilename(csvFile);
 
-        var report = CsvOptimizer.Optimize(csv);
-
-
-        using var stream = fileSystem.File.Create(outputFile);
-        var foo = Generator.GetNumberOfBytesForCombination(report.Sizes);
-
-        var result = report.Csv
-            .Select(x => Generator.Generate(x, report.Sizes))
-            .ToArray();
-
-        Generator.TryWriteToBuffer(
-            stream,
-            result,
-            foo);
+        var csv = GetCsv(csvFile);
+        var bytes = csvCompressor.Compress(csv);
+        
+        fileSystem.File.WriteAllBytes(ccaFilename, bytes);
     }
+    
+    // public void GenerateCcaFile(string inputFile)
+    // {
+    //     var csv = GetCsv(inputFile);
+    //     var outputFile = GetOutputFile(inputFile);
+    //
+    //     var report = CsvOptimizer.Optimize(csv);
+    //
+    //
+    //     using var stream = fileSystem.File.Create(outputFile);
+    //     var foo = Generator.GetNumberOfBytesForCombination(report.Sizes);
+    //
+    //     var result = report.Csv
+    //         .Select(x => Generator.Generate(x, report.Sizes))
+    //         .ToArray();
+    //
+    //     Generator.TryWriteToBuffer(
+    //         stream,
+    //         result,
+    //         foo);
+    // }
 
     private string[][] GetCsv(string inputFile)
     {
@@ -34,7 +45,7 @@ public class CcaGenerator(
         return content;
     }
 
-    private string GetOutputFile(string inputFile)
+    private string GetCcaFilename(string inputFile)
     {
         var result = Path.GetFileNameWithoutExtension(inputFile);
         var outputFile = $"{result}.cca";

@@ -1,5 +1,7 @@
 using System.IO.Abstractions;
 
+using GeneratorLibrary.Compression;
+
 namespace GeneratorLibrary;
 
 public class CcaGenerator(

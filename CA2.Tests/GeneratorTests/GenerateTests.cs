@@ -8,6 +8,8 @@ using Utils;
 
 public sealed class GenerateTests
 {
+    private readonly Generator _generator = new();
+
     public static TheoryData<Combination, int> Data => new()
     {
         { new Combination { Item = [0, 0], Sizes = [2, 2] }, 0 },
@@ -56,7 +58,7 @@ public sealed class GenerateTests
     [Theory, AutoData]
     public void ValuesIsNullThrows(int[] sizes)
     {
-        var func = () => Generator.Generate(
+        var func = () => _generator.Generate(
             null!,
             sizes);
 
@@ -67,7 +69,7 @@ public sealed class GenerateTests
     [Theory, AutoData]
     public void SizesIsNullThrows(int[] values)
     {
-        var func = () => Generator.Generate(
+        var func = () => _generator.Generate(
             values,
             null!);
 
@@ -81,7 +83,7 @@ public sealed class GenerateTests
         int[] values = [1, 1, 1];
         int[] sizes = [4, 4];
 
-        var func = () => Generator.Generate(
+        var func = () => _generator.Generate(
             values,
             sizes);
 
@@ -95,7 +97,7 @@ public sealed class GenerateTests
         int[] values = [-1, 1, 1];
         int[] sizes = [4, 4, 4];
 
-        var func = () => Generator.Generate(
+        var func = () => _generator.Generate(
             values,
             sizes);
 
@@ -108,7 +110,7 @@ public sealed class GenerateTests
     [InlineData(1)]
     public void SizesContainElementsSmallerOrEqualTo1_ThrowInvalidOperationException(int size)
     {
-        var prop = () => Generator.Generate(
+        var prop = () => _generator.Generate(
             [0],
             [size]);
 
@@ -121,7 +123,7 @@ public sealed class GenerateTests
     [InlineData(11, 10)]
     public void ValuesContainElementsBiggerThanSizes_ThrowInvalidOperationException(int value, int size)
     {
-        var property = () => Generator.Generate(
+        var property = () => _generator.Generate(
             [value],
             [size]);
 
@@ -135,7 +137,7 @@ public sealed class GenerateTests
         Combination combination,
         int expectedResult)
     {
-        var number = Generator.Generate(
+        var number = _generator.Generate(
             combination.Item,
             combination.Sizes);
 
@@ -147,12 +149,8 @@ public sealed class GenerateTests
     public Property ResultIsBiggerOrEqualToZero()
     {
         var arb = Gen
-            .Sized(
-                size => Gen
-                    .Elements(
-                        0,
-                        1)
-                    .ArrayOf(size))
+            .Sized(size => Gen.Elements(0, 1)
+                .ArrayOf(size))
             .ToArbitrary();
 
         return Prop
@@ -162,7 +160,7 @@ public sealed class GenerateTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = Generator.Generate(
+                    var number = _generator.Generate(
                         numbers,
                         sizes);
 
@@ -177,12 +175,9 @@ public sealed class GenerateTests
     public Property ResultIsSmallerOrEqualToTheCount()
     {
         var arb = Gen
-            .Sized(
-                size => Gen
-                    .Elements(
-                        0,
-                        1)
-                    .ArrayOf(size))
+            .Sized(size => Gen
+                .Elements(0, 1)
+                .ArrayOf(size))
             .ToArbitrary();
 
         return Prop
@@ -192,13 +187,9 @@ public sealed class GenerateTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = Generator.Generate(
-                        numbers,
-                        sizes);
+                    var number = _generator.Generate(numbers, sizes);
 
-                    var powerOfTwo = BigInteger.Pow(
-                        2,
-                        numbers.Length);
+                    var powerOfTwo = BigInteger.Pow(2, numbers.Length);
 
                     var property = number < powerOfTwo;
 
@@ -211,10 +202,9 @@ public sealed class GenerateTests
     public Property ArraysOfZerosHaveZero()
     {
         var arb = Gen
-            .Sized(
-                size => Gen
-                    .Elements(0)
-                    .ArrayOf(size))
+            .Sized(size => Gen
+                .Elements(0)
+                .ArrayOf(size))
             .ToArbitrary();
 
         return Prop.ForAll(
@@ -223,7 +213,7 @@ public sealed class GenerateTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = Generator.Generate(
+                var number = _generator.Generate(
                     numbers,
                     sizes);
 
@@ -238,10 +228,9 @@ public sealed class GenerateTests
     public Property ArraysOfOnesHaveMaxPower()
     {
         var arb = Gen
-            .Sized(
-                size => Gen
-                    .Elements(1)
-                    .ArrayOf(size))
+            .Sized(size => Gen
+                .Elements(1)
+                .ArrayOf(size))
             .ToArbitrary();
 
         return Prop.ForAll(
@@ -250,14 +239,9 @@ public sealed class GenerateTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = Generator.Generate(
-                    numbers,
-                    sizes);
+                var number = _generator.Generate(numbers, sizes);
 
-                var biggestPossibleNumber = BigInteger.Pow(
-                                                2,
-                                                numbers.Length)
-                                            - 1;
+                var biggestPossibleNumber = BigInteger.Pow(2, numbers.Length) - 1;
                 var property = number == biggestPossibleNumber;
 
                 return property.Label($"{number} == {biggestPossibleNumber}");
@@ -267,7 +251,7 @@ public sealed class GenerateTests
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property NumberIsSmallerThanMaximumPossibleSize(Combination combination)
     {
-        var result = Generator.Generate(
+        var result = _generator.Generate(
             combination.Item,
             combination.Sizes);
 
@@ -279,11 +263,26 @@ public sealed class GenerateTests
             .Label($"{result} is smaller than {maximumPossibleNumber}");
     }
 
-    private static int[] GetSizes(int numbersLength) =>
-        Enumerable
-            .Range(
-                0,
-                numbersLength)
+    [Fact]
+    public void Foo()
+    {
+        using var memoryStream = new MemoryStream();
+        
+        var comb = new Combination { Item = [0, 0], Sizes = [2, 2] };
+        
+        _generator.Generate(
+            comb.Item,
+            comb.Sizes,
+            memoryStream);
+
+        var streamContent = memoryStream.ToArray();
+        
+        streamContent.Should().ContainSingle().Which.Should().Be(0);
+    }
+
+    private static int[] GetSizes(int numbersLength)
+        => Enumerable
+            .Range(0, numbersLength)
             .Select(_ => 2)
             .ToArray();
 }

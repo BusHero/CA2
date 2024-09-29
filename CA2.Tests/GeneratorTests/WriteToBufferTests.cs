@@ -6,13 +6,15 @@ using GeneratorLibrary;
 
 public sealed class WriteToBufferTests
 {
+    private readonly Generator _generator = new();
+
     [Property]
     public Property SpecifiedNumberOfBytesIsWrittenToTheStream(
         PositiveInt size)
     {
         var stream = new MemoryStream();
 
-        Generator.TryWriteToBuffer(
+        _generator.TryWriteToBuffer(
             stream,
             [BigInteger.One],
             size.Item);
@@ -29,7 +31,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return Generator
+        return _generator
             .TryWriteToBuffer(
                 stream,
                 [BigInteger.One],
@@ -48,7 +50,7 @@ public sealed class WriteToBufferTests
 
             var number = new BigInteger(bytes);
 
-            var result = Generator.TryWriteToBuffer(
+            var result = _generator.TryWriteToBuffer(
                 stream,
                 [number],
                 size.Item);
@@ -65,7 +67,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        Generator.TryWriteToBuffer(
+        _generator.TryWriteToBuffer(
             stream,
             [number],
             number.GetByteCount());
@@ -87,7 +89,7 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        Generator.TryWriteToBuffer(
+        _generator.TryWriteToBuffer(
             stream,
             numbers.Item,
             bytesPerNumber);
@@ -112,7 +114,7 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        Generator.TryWriteToBuffer(
+        _generator.TryWriteToBuffer(
             stream,
             numbers.Item,
             bytesPerNumber);
@@ -138,7 +140,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        Generator.TryWriteToBuffer(
+        _generator.TryWriteToBuffer(
             stream,
             [],
             size.Item);
@@ -155,7 +157,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return Generator.TryWriteToBuffer(
+        return _generator.TryWriteToBuffer(
                 stream,
                 [],
                 size.Item)

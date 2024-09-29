@@ -1,4 +1,4 @@
-﻿namespace GeneratorLibrary;
+﻿namespace GeneratorLibrary.Compression;
 
 public interface ICsvCompressor
 {

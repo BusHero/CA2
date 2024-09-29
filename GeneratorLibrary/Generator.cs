@@ -4,7 +4,7 @@ using System.Numerics;
 
 public sealed class Generator
 {
-    public static BigInteger Generate(
+    public BigInteger Generate(
         int[] values,
         int[] sizes)
     {
@@ -58,21 +58,21 @@ public sealed class Generator
             .result;
     }
 
-    public static long GetNumberOfBitsForCombination(int[] sizes)
+    public long GetNumberOfBitsForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetBitLength();
 
-    private static int GetNumberOfBytesForCombination(int[] sizes)
+    private int GetNumberOfBytesForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetByteCount();
 
-    public static byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
+    public byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
     {
         var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
 
@@ -86,7 +86,7 @@ public sealed class Generator
         return buffer;
     }
 
-    public static bool TryWriteToBuffer(
+    public bool TryWriteToBuffer(
         Stream stream,
         BigInteger[] numbers,
         int sizeItem)
@@ -119,5 +119,23 @@ public sealed class Generator
         }
 
         return true;
+    }
+
+    public void CompressAsync(
+        int[][] csv,
+        int[] columns,
+        Stream stream)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Generate(
+        int[] combination,
+        int[] sizes,
+        Stream stream)
+    {
+        var number = Generate(combination, sizes);
+        var size = GetNumberOfBytesForCombination(sizes);
+        TryWriteToBuffer(stream, [number], size);
     }
 }

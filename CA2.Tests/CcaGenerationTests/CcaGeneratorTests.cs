@@ -1,3 +1,5 @@
+using GeneratorLibrary.Compression;
+
 namespace CA2.Tests.CcaGenerationTests;
 
 using System.IO.Abstractions;

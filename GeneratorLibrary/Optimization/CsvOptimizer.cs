@@ -1,4 +1,4 @@
-namespace GeneratorLibrary;
+namespace GeneratorLibrary.Optimization;
 
 public static class CsvOptimizer
 {

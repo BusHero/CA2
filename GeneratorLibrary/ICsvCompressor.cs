@@ -2,6 +2,8 @@
 
 public interface ICsvCompressor
 {
-    // ReSharper disable once UnusedMember.Global
-    byte[] Compress(string[][] csv);
+    Task CompressAsync(
+        string[][] csv, 
+        Stream stream, 
+        CancellationToken cancellationToken = default);
 }

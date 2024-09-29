@@ -12,7 +12,7 @@ public sealed class CcaGeneratorTests
     private readonly FixtureBuilder _builder = new();
 
     [Fact]
-    public void CcaFileGetsGenerated()
+    public async Task CcaFileGetsGenerated()
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
@@ -20,13 +20,13 @@ public sealed class CcaGeneratorTests
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
         var sut = fixture.Sut;
-        sut.GenerateCcaFile(csvFilename);
+        await sut.GenerateCcaFile(csvFilename);
 
         fixture.AssetFileExists(ccaFilename);
     }
 
     [Fact]
-    public void CcaFileContainsExpectedContent()
+    public async Task CcaFileContainsExpectedContent()
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
@@ -35,20 +35,20 @@ public sealed class CcaGeneratorTests
         
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
-        fixture.Sut.GenerateCcaFile(csvFilename);
+        await fixture.Sut.GenerateCcaFile(csvFilename);
 
         fixture.AssetFileExists(ccaFilename, expectedContent);
     }
 
     [Fact]
-    public void RightCsvGotCompressed()
+    public async Task RightCsvGotCompressed()
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename, out var csv)
             .WithRandomCompressedCsv()
             .Build();
 
-        fixture.Sut.GenerateCcaFile(csvFilename);
+        await fixture.Sut.GenerateCcaFile(csvFilename);
 
         fixture.AssertRightCsvWasCompressed(csv);
     }
@@ -135,11 +135,14 @@ public sealed class CcaGeneratorTests
         public void WithCompressionResult(byte[] result) 
             => _result = result;
 
-        public byte[] Compress(string[][] csv)
+        public async Task CompressAsync(
+            string[][] csv, 
+            Stream stream, 
+            CancellationToken cancellationToken = default)
         {
             CompressedCsvFiles.Add(csv);
             
-            return _result;
+            await stream.WriteAsync(_result, cancellationToken);
         }
     }
 }

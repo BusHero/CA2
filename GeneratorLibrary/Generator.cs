@@ -65,7 +65,7 @@ public sealed class Generator
                 (x, y) => x * y)
             .GetBitLength();
 
-    public static int GetNumberOfBytesForCombination(int[] sizes)
+    private static int GetNumberOfBytesForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,

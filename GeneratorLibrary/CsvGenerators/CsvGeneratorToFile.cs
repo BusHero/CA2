@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace GeneratorLibrary;
+namespace GeneratorLibrary.CsvGenerators;
 
 public class CsvGeneratorToFile(
     IFileSystem fileSystem,

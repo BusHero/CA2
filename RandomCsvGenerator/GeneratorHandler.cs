@@ -8,7 +8,7 @@ public static class GeneratorHandler
         int rowsCount,
         string[][] columns)
     {
-        var csv = new GeneratorLibrary.RandomCsvGenerator()
+        var csv = new GeneratorLibrary.CsvGenerators.RandomCsvGenerator()
             .WithColumns(columns)
             .WithRowsCount(rowsCount)
             .Generate();

@@ -16,7 +16,7 @@ public sealed class CalculateMaximumNumberTests
         { [2, 2, 2], 8 },
         { [2, 7, 3, 2, 2, 2, 2], 672 },
     };
-    
+
     [Theory, MemberData(nameof(Sizes))]
     public void MaximumNumberIsCalculatedCorrectly(int[] sizes, BigInteger expectedResult)
     {

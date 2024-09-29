@@ -2,7 +2,7 @@ namespace CA2.Tests.CsvGenerationTests;
 
 using FluentAssertionExtensions;
 
-using GeneratorLibrary;
+using GeneratorLibrary.CsvGenerators;
 
 using Utils;
 

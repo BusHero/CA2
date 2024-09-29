@@ -45,7 +45,7 @@ public class CcaGenerator(
         return content;
     }
 
-    private string GetCcaFilename(string inputFile)
+    private static string GetCcaFilename(string inputFile)
     {
         var result = Path.GetFileNameWithoutExtension(inputFile);
         var outputFile = $"{result}.cca";

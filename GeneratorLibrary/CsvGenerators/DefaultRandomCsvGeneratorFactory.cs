@@ -1,4 +1,4 @@
-﻿namespace GeneratorLibrary;
+﻿namespace GeneratorLibrary.CsvGenerators;
 
 public sealed class DefaultRandomCsvGeneratorFactory : IRandomCsvGeneratorFactory
 {

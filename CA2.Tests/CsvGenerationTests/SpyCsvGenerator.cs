@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-using GeneratorLibrary;
+using GeneratorLibrary.CsvGenerators;
 
 internal sealed class SpyCsvGenerator : IRandomCsvGenerator
 {

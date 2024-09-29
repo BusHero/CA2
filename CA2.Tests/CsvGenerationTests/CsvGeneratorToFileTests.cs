@@ -9,7 +9,7 @@ using FluentAssertions.Execution;
 
 using GeneratorLibrary.CsvGenerators;
 
-public class CsvGeneratorToFileTests
+public sealed class CsvGeneratorToFileTests
 {
     private readonly FixtureBuilder _builder
         = FixtureBuilder.CreateDefaultBuilder();

@@ -23,13 +23,13 @@ public class CsvGeneratorToFileTests
         var fixture = _builder
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             ".",
             filename,
             rowsCount,
             columns);
 
-        fixture.AssetFileExists(filename);
+        fixture.AssetFileExists($"{filename}.csv");
     }
 
     [Theory, AutoData]
@@ -43,13 +43,13 @@ public class CsvGeneratorToFileTests
             .WithDirectory(parent)
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,
             columns);
 
-        fixture.AssetFileExists(parent, filename);
+        fixture.AssetFileExists(parent, $"{filename}.csv");
     }
 
     [Theory, AutoData]
@@ -61,13 +61,13 @@ public class CsvGeneratorToFileTests
     {
         var fixture = _builder.Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,
             columns);
 
-        fixture.AssetFileExists(parent, filename);
+        fixture.AssetFileExists(parent, $"{filename}.csv");
     }
 
     [Theory, AutoData]
@@ -81,13 +81,13 @@ public class CsvGeneratorToFileTests
             .WithFile(parent, filename)
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,
             columns);
 
-        fixture.AssetFileExists(parent, filename);
+        fixture.AssetFileExists(parent, $"{filename}.csv");
     }
 
     [Theory, AutoData]
@@ -103,7 +103,7 @@ public class CsvGeneratorToFileTests
             .WithRandomCsv(csv)
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,
@@ -111,7 +111,7 @@ public class CsvGeneratorToFileTests
 
         await fixture.AssetGeneratedCsvContainsExpectedCsv(
             parent,
-            filename,
+            $"{filename}.csv",
             csv);
     }
 
@@ -128,7 +128,7 @@ public class CsvGeneratorToFileTests
             .WithRandomCsv(csv)
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,
@@ -150,7 +150,7 @@ public class CsvGeneratorToFileTests
             .WithRandomCsv(csv)
             .Build();
 
-        await fixture.Sut.Generate(
+        await fixture.Sut.GenerateAsync(
             parent,
             filename,
             rowsCount,

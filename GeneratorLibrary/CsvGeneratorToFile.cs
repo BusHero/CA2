@@ -6,7 +6,7 @@ public class CsvGeneratorToFile(
     IFileSystem fileSystem,
     IRandomCsvGeneratorFactory factory)
 {
-    public async Task Generate(
+    public async Task GenerateAsync(
         string destinationFolder, 
         string filename, 
         int rowsCount, 
@@ -23,7 +23,7 @@ public class CsvGeneratorToFile(
         var content = csv.Select(x => string.Join(',', x));
         
         await fileSystem.File.WriteAllLinesAsync(
-            Path.Combine(destinationFolder, filename), 
+            Path.Combine(destinationFolder, $"{filename}.csv"), 
             content);
     }
 }

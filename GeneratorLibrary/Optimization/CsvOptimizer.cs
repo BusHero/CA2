@@ -2,41 +2,30 @@ namespace GeneratorLibrary.Optimization;
 
 public static class CsvOptimizer
 {
-    public static OptimizationReport Optimize(string[][] csv)
+    public static OptimizedCsv Optimize(string[][] csv)
     {
-        var dictionaries = Enumerable
+        var values = Enumerable
             .Range(0, csv[0].Length)
-            .Select(_ => new Dictionary<string, int>())
+            .Select(_ => new List<string>())
             .ToList();
 
         foreach (var t in csv)
         {
             for (var j = 0; j < t.Length; j++)
             {
-                if (dictionaries[j]
-                    .TryGetValue(t[j], out _))
+                var indexOf = values[j].IndexOf(t[j]);
+
+                if (indexOf != -1)
                 {
                     continue;
                 }
 
-                if (dictionaries[j].Count == 0)
-                {
-                    dictionaries[j][t[j]] = 0;
-                }
-                else
-                {
-                    var max = dictionaries[j]
-                        .Values
-                        .Max();
-                    dictionaries[j][t[j]] = max + 1;
-                }
+                values[j].Add(t[j]);
             }
         }
 
         var result = Enumerable
-            .Range(
-                0,
-                csv.Length)
+            .Range(0, csv.Length)
             .Select(_ => new int[csv[0].Length])
             .ToArray();
 
@@ -44,21 +33,12 @@ public static class CsvOptimizer
         {
             for (var j = 0; j < csv[i].Length; j++)
             {
-                result[i][j] = dictionaries[j][csv[i][j]];
+                result[i][j] = values[j].IndexOf(csv[i][j]);
             }
         }
 
-        return new OptimizationReport(
+        return new OptimizedCsv(
             result,
-            dictionaries);
-    }
-
-    public sealed record OptimizationReport(
-        int[][] Csv,
-        List<Dictionary<string, int>> ValuesMap)
-    {
-        public int[] Sizes { get; } = ValuesMap
-            .Select(x => x.Count)
-            .ToArray();
+            values);
     }
 }

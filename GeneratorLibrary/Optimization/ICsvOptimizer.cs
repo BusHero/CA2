@@ -2,5 +2,5 @@
 
 public interface ICsvOptimizer
 {
-    CsvOptimizer.OptimizationReport Optimize(string[][] csv);
+    OptimizedCsv Optimize(string[][] csv);
 }

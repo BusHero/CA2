@@ -112,28 +112,6 @@ public sealed class CsvOptimizerTests
     }
 
     [Property]
-    public Property ValuesMap_MinimumValueInMapIsZero(NonEmptyArray<NonEmptyArray<Guid>> columns)
-    {
-        var realColumns = columns.Get
-            .Select(x => x.Get
-                .Select(y => y.ToString())
-                .ToArray())
-            .ToArray();
-
-        var csv = realColumns
-            .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(1_000),
-                (gen, column) => gen.WithColumn(column))
-            .Generate();
-
-        var report = CsvOptimizer.Optimize(csv);
-
-        return report.ValuesMap
-            .All(x => x.Values.Min() == 0)
-            .ToProperty();
-    }
-
-    [Property]
     public Property ValuesMap_MaximumNumberInMapIsColumnSizeMinus1(NonEmptyArray<NonEmptyArray<Guid>> columns)
     {
         var realColumns = columns.Get
@@ -152,7 +130,7 @@ public sealed class CsvOptimizerTests
 
         return report.ValuesMap
             .Zip(realColumns)
-            .All(t => t.First.Values.Max() == t.Second.Length - 1)
+            .All(t => t.First.Count == t.Second.Length)
             .ToProperty();
     }
 
@@ -178,14 +156,11 @@ public sealed class CsvOptimizerTests
             .All(t =>
             {
                 var first = t.First
-                    .Keys
-                    .Order()
-                    .ToArray();
+                    .Order();
 
                 var second = t.Second
-                    .Order()
-                    .ToArray();
-
+                    .Order();
+                
                 return first.SequenceEqual(second);
             })
             .ToProperty();

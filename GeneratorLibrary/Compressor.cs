@@ -127,7 +127,9 @@ public sealed class Compressor : IDecompressor
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
+#pragma warning disable IDE0060 // Remove unused parameter
     public BigInteger Compress(OptimizedCsv report)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         return BigInteger.One;
     }
@@ -143,15 +145,11 @@ public sealed class Compressor : IDecompressor
     public int[] Decompress(BigInteger compressedValue, int[] sizes)
     {
         var result = new int[sizes.Length];
-
-        if (sizes.Length == 2)
+        var intermediateResult = compressedValue;
+        for (var i = sizes.Length - 1; i >= 0; i--)
         {
-            result[0] = (int)compressedValue / sizes[0];
-            result[1] = (int)compressedValue % sizes[1];
-        }
-        else
-        {
-            result[0] = (int)compressedValue;
+            result[i] = (int)(intermediateResult % sizes[i]);
+            intermediateResult = intermediateResult / sizes[i];
         }
 
         return result;

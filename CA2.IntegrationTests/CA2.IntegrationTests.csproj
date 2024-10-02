@@ -30,13 +30,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="bins\cca.exe">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <ProjectReference Include="..\RandomCsvGenerator\RandomCsvGenerator.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RandomCsvGenerator\RandomCsvGenerator.csproj" />
+      <Folder Include="bins\" />
     </ItemGroup>
 
 </Project>

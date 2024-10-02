@@ -1,20 +1,16 @@
 ﻿namespace CA2.Tests.CsvCompressionsTests;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
 public sealed class DefaultCompressorTests
 {
     [Theory, AutoData]
-    public void CsvOptimizer(
-        int[][] csv,
-        int[] columns)
+    public async Task CsvOptimizer(string[][] csv)
     {
-        var memoryStream = new MemoryStream();
-        var compressor = new Generator();
+        using var stream = new MemoryStream();
 
-        compressor.CompressAsync(
-            csv,
-            columns,
-            memoryStream);
+        var compressor = new DefaultCompressor();
+        
+        await compressor.CompressAsync(csv, stream);
     }
 }

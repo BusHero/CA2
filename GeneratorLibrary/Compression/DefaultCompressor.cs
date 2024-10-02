@@ -11,11 +11,4 @@ public sealed class DefaultCompressor : ICsvCompressor
 
         return Task.CompletedTask;
     }
-
-    public void CompressAsync(
-        int[][] csv, 
-        int[] columns, 
-        Stream stream)
-    {
-    }
 }

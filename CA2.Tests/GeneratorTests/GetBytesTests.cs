@@ -6,12 +6,12 @@ using Utils;
 
 public sealed class GetBytesTests
 {
-    private readonly GeneratorLibrary.Generator _generator = new();
+    private readonly GeneratorLibrary.Compressor _compressor = new();
     
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
     {
-        var bytes = _generator
+        var bytes = _compressor
             .GetBytes(combination.Item, combination.Sizes);
 
         var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
@@ -23,11 +23,11 @@ public sealed class GetBytesTests
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property CanConvertBytesBackToBigNumber(Combination combination)
     {
-        var number = _generator.Generate(
+        var number = _compressor.Compress(
             combination.Item,
             combination.Sizes);
         
-        var bytes = _generator
+        var bytes = _compressor
             .GetBytes(combination.Item, combination.Sizes);
         var newNumber = new BigInteger(bytes);
 

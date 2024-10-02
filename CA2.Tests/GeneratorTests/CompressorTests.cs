@@ -6,9 +6,9 @@ using GeneratorLibrary;
 
 using Utils;
 
-public sealed class GenerateTests
+public sealed class CompressorTests
 {
-    private readonly Generator _generator = new();
+    private readonly Compressor _compressor = new();
 
     public static TheoryData<Combination, int> Data => new()
     {
@@ -58,7 +58,7 @@ public sealed class GenerateTests
     [Theory, AutoData]
     public void ValuesIsNullThrows(int[] sizes)
     {
-        var func = () => _generator.Generate(
+        var func = () => _compressor.Compress(
             null!,
             sizes);
 
@@ -69,7 +69,7 @@ public sealed class GenerateTests
     [Theory, AutoData]
     public void SizesIsNullThrows(int[] values)
     {
-        var func = () => _generator.Generate(
+        var func = () => _compressor.Compress(
             values,
             null!);
 
@@ -83,7 +83,7 @@ public sealed class GenerateTests
         int[] values = [1, 1, 1];
         int[] sizes = [4, 4];
 
-        var func = () => _generator.Generate(
+        var func = () => _compressor.Compress(
             values,
             sizes);
 
@@ -97,7 +97,7 @@ public sealed class GenerateTests
         int[] values = [-1, 1, 1];
         int[] sizes = [4, 4, 4];
 
-        var func = () => _generator.Generate(
+        var func = () => _compressor.Compress(
             values,
             sizes);
 
@@ -110,7 +110,7 @@ public sealed class GenerateTests
     [InlineData(1)]
     public void SizesContainElementsSmallerOrEqualTo1_ThrowInvalidOperationException(int size)
     {
-        var prop = () => _generator.Generate(
+        var prop = () => _compressor.Compress(
             [0],
             [size]);
 
@@ -123,7 +123,7 @@ public sealed class GenerateTests
     [InlineData(11, 10)]
     public void ValuesContainElementsBiggerThanSizes_ThrowInvalidOperationException(int value, int size)
     {
-        var property = () => _generator.Generate(
+        var property = () => _compressor.Compress(
             [value],
             [size]);
 
@@ -137,7 +137,7 @@ public sealed class GenerateTests
         Combination combination,
         int expectedResult)
     {
-        var number = _generator.Generate(
+        var number = _compressor.Compress(
             combination.Item,
             combination.Sizes);
 
@@ -160,7 +160,7 @@ public sealed class GenerateTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = _generator.Generate(
+                    var number = _compressor.Compress(
                         numbers,
                         sizes);
 
@@ -187,7 +187,7 @@ public sealed class GenerateTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = _generator.Generate(numbers, sizes);
+                    var number = _compressor.Compress(numbers, sizes);
 
                     var powerOfTwo = BigInteger.Pow(2, numbers.Length);
 
@@ -213,7 +213,7 @@ public sealed class GenerateTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = _generator.Generate(
+                var number = _compressor.Compress(
                     numbers,
                     sizes);
 
@@ -239,7 +239,7 @@ public sealed class GenerateTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = _generator.Generate(numbers, sizes);
+                var number = _compressor.Compress(numbers, sizes);
 
                 var biggestPossibleNumber = BigInteger.Pow(2, numbers.Length) - 1;
                 var property = number == biggestPossibleNumber;
@@ -251,7 +251,7 @@ public sealed class GenerateTests
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property NumberIsSmallerThanMaximumPossibleSize(Combination combination)
     {
-        var result = _generator.Generate(
+        var result = _compressor.Compress(
             combination.Item,
             combination.Sizes);
 
@@ -263,22 +263,6 @@ public sealed class GenerateTests
             .Label($"{result} is smaller than {maximumPossibleNumber}");
     }
 
-    [Fact]
-    public void Foo()
-    {
-        using var memoryStream = new MemoryStream();
-        
-        var comb = new Combination { Item = [0, 0], Sizes = [2, 2] };
-        
-        _generator.Generate(
-            comb.Item,
-            comb.Sizes,
-            memoryStream);
-
-        var streamContent = memoryStream.ToArray();
-        
-        streamContent.Should().ContainSingle().Which.Should().Be(0);
-    }
 
     private static int[] GetSizes(int numbersLength)
         => Enumerable

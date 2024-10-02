@@ -18,14 +18,13 @@ public sealed class CombinationsGenerator
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static Arbitrary<Combination> CombinationArbitrary()
-    {
-        return Generator
+        => Generator
             .ArrayOf()
+            .Where(x => x is not [])
             .Select(items => new Combination
             {
                 Item = items.Select(x => x.Item1).ToArray(),
                 Sizes = items.Select(x => x.Item2).ToArray(),
             })
             .ToArbitrary();
-    }
 }

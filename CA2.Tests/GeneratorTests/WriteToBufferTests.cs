@@ -4,9 +4,30 @@ using System.Numerics;
 
 using GeneratorLibrary;
 
+using Utils;
+
 public sealed class WriteToBufferTests
 {
-    private readonly Generator _generator = new();
+    private readonly Compressor _compressor = new();
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property Foo(Combination combination)
+    {
+        using var stream = new MemoryStream();
+        
+        _compressor.Compress(
+            combination.Item, 
+            combination.Sizes, 
+            stream);
+        var actualBytes = stream.ToArray();
+        
+        var lengthBiggerThanZero = (actualBytes.Length > 0).ToProperty();
+        var lengthSmallerThan = (actualBytes.Length < combination.Item.Length * 4).ToProperty();
+        
+        return lengthBiggerThanZero
+            .And(lengthSmallerThan)
+            .When(combination.Item is not []);
+    }
 
     [Property]
     public Property SpecifiedNumberOfBytesIsWrittenToTheStream(
@@ -14,7 +35,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _generator.TryWriteToBuffer(
+        _compressor.TryWriteToBuffer(
             stream,
             [BigInteger.One],
             size.Item);
@@ -31,7 +52,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return _generator
+        return _compressor
             .TryWriteToBuffer(
                 stream,
                 [BigInteger.One],
@@ -50,7 +71,7 @@ public sealed class WriteToBufferTests
 
             var number = new BigInteger(bytes);
 
-            var result = _generator.TryWriteToBuffer(
+            var result = _compressor.TryWriteToBuffer(
                 stream,
                 [number],
                 size.Item);
@@ -67,7 +88,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _generator.TryWriteToBuffer(
+        _compressor.TryWriteToBuffer(
             stream,
             [number],
             number.GetByteCount());
@@ -89,7 +110,7 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        _generator.TryWriteToBuffer(
+        _compressor.TryWriteToBuffer(
             stream,
             numbers.Item,
             bytesPerNumber);
@@ -114,7 +135,7 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        _generator.TryWriteToBuffer(
+        _compressor.TryWriteToBuffer(
             stream,
             numbers.Item,
             bytesPerNumber);
@@ -140,7 +161,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _generator.TryWriteToBuffer(
+        _compressor.TryWriteToBuffer(
             stream,
             [],
             size.Item);
@@ -157,7 +178,7 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return _generator.TryWriteToBuffer(
+        return _compressor.TryWriteToBuffer(
                 stream,
                 [],
                 size.Item)

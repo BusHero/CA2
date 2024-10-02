@@ -41,8 +41,11 @@ internal static class Extensions
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static string ConvertToString(this string[][] csv)
     {
-        var rows = csv.Select(row => string.Join(',', row));
+        var rows = csv.Select(row => row.ConvertToString());
 
         return string.Join(Environment.NewLine, rows);
     }
+
+    public static string ConvertToString<T>(this IEnumerable<T> csv, string delimiter = ", ")
+        => string.Join(delimiter, csv);
 }

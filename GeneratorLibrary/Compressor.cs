@@ -1,22 +1,27 @@
+using System.Diagnostics.CodeAnalysis;
+
+using GeneratorLibrary.Compression;
+using GeneratorLibrary.Optimization;
+
 namespace GeneratorLibrary;
 
 using System.Numerics;
 
-public sealed class Generator
+public sealed class Compressor : IDecompressor
 {
-    public BigInteger Generate(
-        int[] values,
+    public BigInteger Compress(
+        int[] row,
         int[] sizes)
     {
-        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(row);
         ArgumentNullException.ThrowIfNull(sizes);
 
-        if (values.Length != sizes.Length)
+        if (row.Length != sizes.Length)
         {
             throw new InvalidOperationException($"Values and Sizes have different length");
         }
 
-        if (values.Any(x => x < 0))
+        if (row.Any(x => x < 0))
         {
             throw new InvalidOperationException($"Values contain elements smaller than zero");
         }
@@ -26,7 +31,7 @@ public sealed class Generator
             throw new InvalidOperationException($"Sizes contain elements smaller than 2");
         }
 
-        if (values
+        if (row
             .Zip(
                 sizes,
                 (value, size) => size <= value)
@@ -35,16 +40,16 @@ public sealed class Generator
             throw new InvalidOperationException("value is bigger than size");
         }
 
-        if (values.Length == 0)
+        if (row.Length == 0)
         {
             return 0;
         }
 
-        return values
+        return row
             .Zip(sizes.Skip(1))
             .Reverse()
             .Aggregate(
-                (result: (BigInteger)values[^1], power: BigInteger.One),
+                (result: (BigInteger)row[^1], power: BigInteger.One),
                 (r, t) =>
                 {
                     var (result, power) = r;
@@ -76,7 +81,7 @@ public sealed class Generator
     {
         var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
 
-        Generate(
+        Compress(
                 combinationItem,
                 combinationSizes)
             .TryWriteBytes(
@@ -121,21 +126,34 @@ public sealed class Generator
         return true;
     }
 
-    public void CompressAsync(
-        int[][] csv,
-        int[] columns,
-        Stream stream)
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public BigInteger Compress(OptimizedCsv report)
     {
-        throw new NotImplementedException();
+        return BigInteger.One;
     }
 
-    public void Generate(
-        int[] combination,
-        int[] sizes,
-        Stream stream)
+    public void Compress(int[] combinationItem, int[] combinationSizes, MemoryStream stream)
     {
-        var number = Generate(combination, sizes);
-        var size = GetNumberOfBytesForCombination(sizes);
+        var number = Compress(combinationItem, combinationSizes);
+        var size = GetNumberOfBytesForCombination(combinationSizes);
+
         TryWriteToBuffer(stream, [number], size);
+    }
+
+    public int[] Decompress(BigInteger compressedValue, int[] sizes)
+    {
+        var result = new int[sizes.Length];
+
+        if (sizes.Length == 2)
+        {
+            result[0] = (int)compressedValue / sizes[0];
+            result[1] = (int)compressedValue % sizes[1];
+        }
+        else
+        {
+            result[0] = (int)compressedValue;
+        }
+
+        return result;
     }
 }

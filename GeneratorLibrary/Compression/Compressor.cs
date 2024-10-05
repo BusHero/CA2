@@ -133,7 +133,7 @@ public sealed class Compressor : IDecompressor, ICompressor
         return BigInteger.One;
     }
 
-    public void Compress(int[] combinationItem, int[] combinationSizes, MemoryStream stream)
+    public void Compress(int[] combinationItem, int[] combinationSizes, Stream stream)
     {
         var number = Compress(combinationItem, combinationSizes);
         var size = GetNumberOfBytesForCombination(combinationSizes);
@@ -159,5 +159,16 @@ public sealed class Compressor : IDecompressor, ICompressor
         var number = new BigInteger(bytes, isUnsigned: true);
 
         return Decompress(number, sizes);
+    }
+
+    public int[] Decompress(int[] sizes, Stream stream)
+    {
+        var count = GetNumberOfBytesForCombination(sizes);
+        
+        var bytes = new byte[count];
+
+        stream.ReadExactly(bytes);
+
+        return Decompress(bytes, sizes);
     }
 }

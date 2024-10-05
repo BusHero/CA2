@@ -36,4 +36,52 @@ public sealed class CompressToBytesTests
         return (newNumber == number)
             .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
     }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        _compressor
+            .Compress(combination.Item, combination.Sizes, stream);
+        var bytes = stream.ToArray();
+
+        var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
+        var bytesCount = biggestNumber.GetByteCount();
+
+        return (bytesCount == bytes.Length).ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_CanConvertBytesBackToBigNumber(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        var number = _compressor.Compress(
+            combination.Item,
+            combination.Sizes);
+
+        _compressor
+            .Compress(combination.Item, combination.Sizes, stream);
+        var bytes = stream.ToArray();
+
+        var newNumber = new BigInteger(bytes);
+
+        return (newNumber == number)
+            .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_CanDecompress(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        _compressor.Compress(combination.Item, combination.Sizes, stream);
+
+        stream.Position = 0;
+
+        var item = _compressor.Decompress(combination.Sizes, stream);
+
+        return item.SequenceEqual(combination.Item).ToProperty();
+    }
 }

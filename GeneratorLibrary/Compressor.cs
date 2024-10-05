@@ -77,7 +77,7 @@ public sealed class Compressor : IDecompressor
                 (x, y) => x * y)
             .GetByteCount();
 
-    public byte[] GetBytes(int[] combinationItem, int[] combinationSizes)
+    public byte[] CompressToBytes(int[] combinationItem, int[] combinationSizes)
     {
         var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
 

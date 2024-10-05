@@ -1,18 +1,18 @@
-﻿namespace CA2.Tests.GeneratorTests;
+namespace CA2.Tests.CompressionTests;
 
 using System.Numerics;
 
 using Utils;
 
-public sealed class GetBytesTests
+public sealed class CompressToBytesTests
 {
     private readonly GeneratorLibrary.Compressor _compressor = new();
-    
+
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
     {
         var bytes = _compressor
-            .GetBytes(combination.Item, combination.Sizes);
+            .CompressToBytes(combination.Item, combination.Sizes);
 
         var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
         var bytesCount = biggestNumber.GetByteCount();
@@ -26,9 +26,9 @@ public sealed class GetBytesTests
         var number = _compressor.Compress(
             combination.Item,
             combination.Sizes);
-        
+
         var bytes = _compressor
-            .GetBytes(combination.Item, combination.Sizes);
+            .CompressToBytes(combination.Item, combination.Sizes);
         var newNumber = new BigInteger(bytes);
 
         return (newNumber == number)

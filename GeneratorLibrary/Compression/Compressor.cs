@@ -161,14 +161,25 @@ public sealed class Compressor : IDecompressor, ICompressor
         return Decompress(number, sizes);
     }
 
-    public int[] Decompress(int[] sizes, Stream stream)
+    public int[][] Decompress(int[] sizes, Stream stream)
     {
         var count = GetNumberOfBytesForCombination(sizes);
         
         var bytes = new byte[count];
+        var result = new List<int[]>();
+        while (stream.Read(bytes, 0, bytes.Length) > 0)
+        {
+            result.Add(Decompress(bytes, sizes));
+        }
 
-        stream.ReadExactly(bytes);
+        return result.ToArray();
+    }
 
-        return Decompress(bytes, sizes);
+    public void Compress(int[][] items, int[] sizes, MemoryStream stream)
+    {
+        foreach(var item in items)
+        {
+            Compress(item, sizes, stream);
+        }
     }
 }

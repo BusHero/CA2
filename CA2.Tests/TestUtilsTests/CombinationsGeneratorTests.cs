@@ -1,4 +1,4 @@
-﻿namespace CA2.Tests.TestUtilsTests;
+namespace CA2.Tests.TestUtilsTests;
 
 using FluentAssertionExtensions;
 

@@ -1,13 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 
-using GeneratorLibrary.Compression;
 using GeneratorLibrary.Optimization;
 
-namespace GeneratorLibrary;
+namespace GeneratorLibrary.Compression;
 
 using System.Numerics;
 
-public sealed class Compressor : IDecompressor
+public sealed class Compressor : IDecompressor, ICompressor
 {
     public BigInteger Compress(
         int[] row,
@@ -153,5 +152,12 @@ public sealed class Compressor : IDecompressor
         }
 
         return result;
+    }
+
+    public int[] Decompress(byte[] bytes, int[] sizes)
+    {
+        var number = new BigInteger(bytes, isUnsigned: true);
+
+        return Decompress(number, sizes);
     }
 }

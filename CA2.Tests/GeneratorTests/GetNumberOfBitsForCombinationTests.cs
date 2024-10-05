@@ -2,7 +2,7 @@
 
 using System.Numerics;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
 using Utils;
 

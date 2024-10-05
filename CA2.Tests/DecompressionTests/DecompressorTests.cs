@@ -2,7 +2,7 @@ using CA2.Tests.Utils;
 
 namespace CA2.Tests.DecompressionTests;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
 public class DecompressorTests
 {

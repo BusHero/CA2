@@ -2,7 +2,7 @@ namespace CA2.Tests.GeneratorTests;
 
 using System.Numerics;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
 using Utils;
 

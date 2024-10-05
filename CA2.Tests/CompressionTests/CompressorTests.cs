@@ -2,7 +2,7 @@ namespace CA2.Tests.CompressionTests;
 
 using System.Numerics;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
 using Utils;
 

@@ -2,11 +2,13 @@ namespace CA2.Tests.CompressionTests;
 
 using System.Numerics;
 
+using GeneratorLibrary.Compression;
+
 using Utils;
 
 public sealed class CompressToBytesTests
 {
-    private readonly GeneratorLibrary.Compressor _compressor = new();
+    private readonly Compressor _compressor = new();
 
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)

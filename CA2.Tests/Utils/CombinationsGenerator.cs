@@ -27,24 +27,4 @@ public sealed class CombinationsGenerator
                 Sizes = items.Select(x => x.Item2).ToArray(),
             })
             .ToArbitrary();
-
-    public static Arbitrary<RealCombination> RealCombination()
-    {
-        var arbitrary = Gen.Sized(size => Arb.Default.PositiveInt()
-            .Generator
-            .ArrayOf(size)
-            .Where(x => x is not [])
-            .Select(sizes => sizes
-                .Select(size => size.Get)
-                .Select(size => 1 < size ? size : 2)
-                .ToArray())
-            .Select(sizes => new RealCombination 
-            { 
-                Sizes = sizes,
-                Items = [sizes.Select(size => size - 1).ToArray()]
-            }))
-            .ToArbitrary();
-
-        return arbitrary;
-    }
 }

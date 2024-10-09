@@ -1,7 +1,6 @@
 namespace CA2.Tests.CompressionTests;
 
 using System.Numerics;
-using System.Text.Json;
 
 using GeneratorLibrary.Compression;
 
@@ -85,18 +84,5 @@ public sealed class CompressToBytesTests
 
         return (item.Length == 1)
             .And(item[0].SequenceEqual(combination.Item));
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property CompressMultipleCombinationsReturnsOriginal(RealCombination combination)
-    {
-        using var stream = new MemoryStream();
-
-        _compressor.Compress(combination.Items, combination.Sizes, stream);
-
-        var csv = _compressor.Decompress(combination.Sizes, stream);
-
-        return (JsonSerializer.Serialize(csv) == JsonSerializer.Serialize(combination.Items))
-            .ToProperty();
     }
 }

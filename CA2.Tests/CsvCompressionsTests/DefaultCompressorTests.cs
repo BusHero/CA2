@@ -20,7 +20,7 @@ public sealed class DefaultCompressorTests
 
     [Property]
     public void StreamContainsExpectedNumberOfBytes(
-        NonEmptyArray<PositiveInt> rows,
+        PositiveInt samples,
         NonEmptyArray<PositiveInt> sizes)
     {
         var realSizes = sizes
@@ -29,17 +29,18 @@ public sealed class DefaultCompressorTests
             .Select(x => 2 <= x ? x : 2)
             .ToArray();
 
-
-        var actualRows = rows
-            .Get
+        var actualRows = Arb.Default.PositiveInt()
+            .Generator
             .Select(x => x.Get)
-            .Select(x => realSizes.Select(size => x % size).ToArray())
+            .ArrayOf(sizes.Get.Length)
+            .Select(x => x.Zip(realSizes, (nbr, size) => nbr % size).ToArray())
+            .Sample(100, samples.Get)
             .ToArray();
 
         using var stream = new MemoryStream();
 
         compressor.Compress(actualRows, realSizes, stream);
 
-        stream.Should().HaveLength(realSizes.CalculateMaximumNumber().GetByteCount() * rows.Get.Length);
+        stream.Should().HaveLength(realSizes.CalculateMaximumNumber().GetByteCount() * samples.Get);
     }
 }

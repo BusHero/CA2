@@ -1,10 +1,10 @@
-﻿namespace CA2.Tests.Utils;
+namespace CA2.Tests.Utils;
 
 using System.Numerics;
 
 internal static class TestUtils
 {
-    public static BigInteger CalculateMaximumNumber(IEnumerable<int> sizes) =>
+    public static BigInteger CalculateMaximumNumber(this IEnumerable<int> sizes) =>
         sizes
             .Aggregate(BigInteger.One, (r, x) => r * x);
 

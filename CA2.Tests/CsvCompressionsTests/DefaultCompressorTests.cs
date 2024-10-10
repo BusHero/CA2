@@ -1,5 +1,7 @@
 namespace CA2.Tests.CsvCompressionsTests;
 
+using System.Text.Json;
+
 using CA2.Tests.Utils;
 
 using GeneratorLibrary.Compression;
@@ -18,29 +20,26 @@ public sealed class DefaultCompressorTests
         await compressor.CompressAsync(csv, stream);
     }
 
-    [Property]
-    public void StreamContainsExpectedNumberOfBytes(
-        PositiveInt samples,
-        NonEmptyArray<PositiveInt> sizes)
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public void StreamContainsExpectedNumberOfBytes(RealCombination combination)
     {
-        var realSizes = sizes
-            .Get
-            .Select(x => x.Get)
-            .Select(x => 2 <= x ? x : 2)
-            .ToArray();
-
-        var actualRows = Arb.Default.PositiveInt()
-            .Generator
-            .Select(x => x.Get)
-            .ArrayOf(sizes.Get.Length)
-            .Select(x => x.Zip(realSizes, (nbr, size) => nbr % size).ToArray())
-            .Sample(100, samples.Get)
-            .ToArray();
-
         using var stream = new MemoryStream();
 
-        compressor.Compress(actualRows, realSizes, stream);
+        compressor.Compress(combination.Items, combination.Sizes, stream);
 
-        stream.Should().HaveLength(realSizes.CalculateMaximumNumber().GetByteCount() * samples.Get);
+        stream.Should().HaveLength(combination.Sizes.CalculateMaximumNumber().GetByteCount() * combination.Items.Length);
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public void DecompressFromStream(RealCombination combination)
+    {
+        using var stream = new MemoryStream();
+
+        compressor.Compress(combination.Items, combination.Sizes, stream);
+        stream.Position = 0;
+
+        var rows = compressor.Decompress(combination.Sizes, stream);
+
+        JsonSerializer.Serialize(rows).Should().BeEquivalentTo(JsonSerializer.Serialize(combination.Items));
     }
 }

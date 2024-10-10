@@ -172,7 +172,7 @@ public sealed class Compressor : IDecompressor, ICompressor
             result.Add(Decompress(bytes, sizes));
         }
 
-        return result.ToArray();
+        return [.. result];
     }
 
     public void Compress(int[][] items, int[] sizes, MemoryStream stream)

@@ -23,3 +23,5 @@ public sealed record Combination : IXunitSerializable
     public override string ToString() 
         => $$"""Combination { Item = [{{string.Join(", ", Item)}}], Sizes = [{{string.Join(", ", Sizes)}}] }""";
 }
+
+public record RealCombination(int[][] Items, int[] Sizes);

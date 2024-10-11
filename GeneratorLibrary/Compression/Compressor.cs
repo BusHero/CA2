@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
-
-using GeneratorLibrary.Optimization;
-
 namespace GeneratorLibrary.Compression;
 
 using System.Numerics;
+
+using GeneratorLibrary.Optimization;
 
 public sealed class Compressor : IDecompressor, ICompressor
 {
@@ -125,14 +123,6 @@ public sealed class Compressor : IDecompressor, ICompressor
         return true;
     }
 
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-#pragma warning disable IDE0060 // Remove unused parameter
-    public BigInteger Compress(OptimizedCsv report)
-#pragma warning restore IDE0060 // Remove unused parameter
-    {
-        return BigInteger.One;
-    }
-
     public void Compress(int[] combinationItem, int[] combinationSizes, Stream stream)
     {
         var number = Compress(combinationItem, combinationSizes);
@@ -175,11 +165,18 @@ public sealed class Compressor : IDecompressor, ICompressor
         return [.. result];
     }
 
-    public void Compress(int[][] items, int[] sizes, MemoryStream stream)
+    public void Compress(int[][] items, int[] sizes, Stream stream)
     {
         foreach(var item in items)
         {
             Compress(item, sizes, stream);
         }
+    }
+
+    public void Compress(string[][] csv, int[] sizes, Stream stream)
+    {
+        var report = CsvOptimizer.Optimize(csv);
+
+        this.Compress(report.Csv, sizes, stream);
     }
 }

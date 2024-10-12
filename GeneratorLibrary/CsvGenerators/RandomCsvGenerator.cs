@@ -51,7 +51,8 @@ public sealed class RandomCsvGenerator : IRandomCsvGenerator
     {
         var column = Enumerable
             .Range(0, numberOfValues)
-            .Select(x => x.ToString()).ToArray();
+            .Select(x => x.ToString())
+            .ToArray();
 
         return WithColumn(column);
     }
@@ -62,9 +63,9 @@ public sealed class RandomCsvGenerator : IRandomCsvGenerator
                 this as IRandomCsvGenerator,
                 (gen, column) => gen.WithColumn(column));
 
-    public IRandomCsvGenerator WithColumns(string[][] columns)
-    {
-        return columns
-            .Aggregate(this as IRandomCsvGenerator, (gen, column) => gen.WithColumn(column));
-    }
+    public IRandomCsvGenerator WithColumns(string[][] columns) 
+        => columns
+            .Aggregate(
+                this as IRandomCsvGenerator, 
+                (gen, column) => gen.WithColumn(column));
 }

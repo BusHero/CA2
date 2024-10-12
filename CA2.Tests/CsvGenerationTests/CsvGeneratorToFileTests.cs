@@ -1,4 +1,4 @@
-﻿namespace CA2.Tests.CsvGenerationTests;
+namespace CA2.Tests.CsvGenerationTests;
 
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -13,6 +13,23 @@ public sealed class CsvGeneratorToFileTests
 {
     private readonly FixtureBuilder _builder
         = FixtureBuilder.CreateDefaultBuilder();
+
+    [Theory, AutoData]
+    public async Task Generate_AddToStream(
+        int rowsCount,
+        string[][] columns,
+        string[][] csv)
+    {
+        using var stream = new MemoryStream();
+
+        var fixture = _builder
+            .WithRandomCsv(csv)
+            .Build();
+
+        await fixture.Sut.GenerateAsync(stream, rowsCount, columns);
+
+        await fixture.AssetGeneratedCsvContainsExpectedCsv(stream, csv);
+    }
 
     [Theory, AutoData]
     public async Task FileIsCreated(
@@ -161,13 +178,9 @@ public sealed class CsvGeneratorToFileTests
 
     private class FixtureBuilder
     {
-        public static FixtureBuilder CreateDefaultBuilder()
-        {
-            var builder = new FixtureBuilder()
+        public static FixtureBuilder CreateDefaultBuilder() 
+            => new FixtureBuilder()
                 .WithRandomCsv();
-
-            return builder;
-        }
 
         private readonly Dictionary<string, MockFileData> _fileData = [];
         private readonly SpyCsvGenerator _csvGenerator = new();
@@ -257,6 +270,33 @@ public sealed class CsvGeneratorToFileTests
             actualLines
                 .Should()
                 .BeEquivalentTo(csv);
+        }
+
+        public async Task AssetGeneratedCsvContainsExpectedCsv(
+            Stream stream,
+            string[][] csv)
+        {
+            stream.Position = 0;
+
+            var lines = await GetLines(stream).ToListAsync();
+
+            lines.Should().BeEquivalentTo(csv);
+        }
+
+        public async IAsyncEnumerable<string[]> GetLines(Stream stream)
+        {
+            var reader = new StreamReader(stream);
+            while (true)
+            {
+                var line = await reader.ReadLineAsync();
+
+                if (line is null)
+                {
+                    break;
+                }
+
+                yield return line.Split(",");
+            }
         }
 
         public void AssertExpectedRowsCount(int rowsCount)

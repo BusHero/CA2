@@ -7,12 +7,6 @@ public interface IRandomCsvGenerator
     IRandomCsvGenerator WithRowsCount(int rows);
     
     IRandomCsvGenerator WithColumn(string[] column);
-    
-    IRandomCsvGenerator WithColumn(int numberOfValues);
-    
-    IRandomCsvGenerator WithColumns(int[] columns);
-    
-    IRandomCsvGenerator WithColumns(string[][] columns);
 }
 
 public sealed class RandomCsvGenerator : IRandomCsvGenerator
@@ -46,26 +40,4 @@ public sealed class RandomCsvGenerator : IRandomCsvGenerator
 
         return this;
     }
-
-    public IRandomCsvGenerator WithColumn(int numberOfValues)
-    {
-        var column = Enumerable
-            .Range(0, numberOfValues)
-            .Select(x => x.ToString())
-            .ToArray();
-
-        return WithColumn(column);
-    }
-
-    public IRandomCsvGenerator WithColumns(int[] columns)
-        => columns
-            .Aggregate(
-                this as IRandomCsvGenerator,
-                (gen, column) => gen.WithColumn(column));
-
-    public IRandomCsvGenerator WithColumns(string[][] columns) 
-        => columns
-            .Aggregate(
-                this as IRandomCsvGenerator, 
-                (gen, column) => gen.WithColumn(column));
 }

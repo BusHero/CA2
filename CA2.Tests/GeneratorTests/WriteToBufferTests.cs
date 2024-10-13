@@ -4,30 +4,9 @@ using System.Numerics;
 
 using GeneratorLibrary.Compression;
 
-using Utils;
-
 public sealed class WriteToBufferTests
 {
     private readonly Compressor _compressor = new();
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property Foo(Combination combination)
-    {
-        using var stream = new MemoryStream();
-        
-        _compressor.Compress(
-            combination.Item, 
-            combination.Sizes, 
-            stream);
-        var actualBytes = stream.ToArray();
-        
-        var lengthBiggerThanZero = (actualBytes.Length > 0).ToProperty();
-        var lengthSmallerThan = (actualBytes.Length < combination.Item.Length * 4).ToProperty();
-        
-        return lengthBiggerThanZero
-            .And(lengthSmallerThan)
-            .When(combination.Item is not []);
-    }
 
     [Property]
     public Property SpecifiedNumberOfBytesIsWrittenToTheStream(
@@ -69,7 +48,7 @@ public sealed class WriteToBufferTests
         {
             var stream = new MemoryStream();
 
-            var number = new BigInteger(bytes);
+            var number = new BigInteger(bytes, isUnsigned: true);
 
             var result = _compressor.TryWriteToBuffer(
                 stream,

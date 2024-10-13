@@ -7,14 +7,16 @@ using System.IO.Abstractions.TestingHelpers;
 
 using AutoFixture;
 
+using FluentAssertions.Execution;
+
 using GeneratorLibrary;
 
 public sealed class CcaGeneratorTests
 {
     private readonly FixtureBuilder _builder = new();
 
-    [Fact]
-    public async Task CcaFileGetsGenerated()
+    [Theory, AutoData]
+    public async Task CcaFileGetsGenerated(int[] sizes)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
@@ -22,37 +24,41 @@ public sealed class CcaGeneratorTests
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
         var sut = fixture.Sut;
-        await sut.GenerateCcaFile(csvFilename);
+        await sut.GenerateCcaFile(csvFilename, sizes);
 
         fixture.AssetFileExists(ccaFilename);
     }
 
-    [Fact]
-    public async Task CcaFileContainsExpectedContent()
+    [Theory, AutoData]
+    public async Task CcaFileContainsExpectedContent(int[] sizes)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
             .WithRandomCompressedCsv(out var expectedContent)
             .Build();
-        
+
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
-        await fixture.Sut.GenerateCcaFile(csvFilename);
+        await fixture.Sut.GenerateCcaFile(csvFilename, sizes);
 
         fixture.AssetFileExists(ccaFilename, expectedContent);
     }
 
-    [Fact]
-    public async Task RightCsvGotCompressed()
+    [Theory, AutoData]
+    public async Task RightCsvGotCompressed(int[] sizes)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename, out var csv)
             .WithRandomCompressedCsv()
             .Build();
 
-        await fixture.Sut.GenerateCcaFile(csvFilename);
+        await fixture.Sut.GenerateCcaFile(csvFilename, sizes);
 
-        fixture.AssertRightCsvWasCompressed(csv);
+        using (new AssertionScope())
+        {
+            fixture.AssertRightCsvWasCompressed(csv);
+            fixture.AssetRightSizes(sizes);
+        }
     }
 
     private sealed class FixtureBuilder
@@ -124,26 +130,32 @@ public sealed class CcaGeneratorTests
         public void AssetFileExists(string filename)
             => fileSystem.File.Exists(filename).Should().BeTrue();
 
-        public void AssertRightCsvWasCompressed(string[][] csv) 
+        public void AssertRightCsvWasCompressed(string[][] csv)
             => compressor.CompressedCsvFiles.Should().ContainEquivalentOf(csv);
+
+        public void AssetRightSizes(int[] sizes)
+            => compressor.Sizes.Should().ContainEquivalentOf(sizes);
     }
-    
-    private sealed class SpyCompressor: ICsvCompressor
+
+    private sealed class SpyCompressor : ICsvCompressor
     {
         private byte[] _result = [];
 
         public List<string[][]> CompressedCsvFiles { get; } = [];
+        public List<int[]> Sizes { get; } = [];
 
-        public void WithCompressionResult(byte[] result) 
+        public void WithCompressionResult(byte[] result)
             => _result = result;
 
         public async Task CompressAsync(
-            string[][] csv, 
-            Stream stream, 
+            string[][] csv,
+            int[] sizes,
+            Stream stream,
             CancellationToken cancellationToken = default)
         {
             CompressedCsvFiles.Add(csv);
-            
+            Sizes.Add(sizes);
+
             await stream.WriteAsync(_result, cancellationToken);
         }
     }

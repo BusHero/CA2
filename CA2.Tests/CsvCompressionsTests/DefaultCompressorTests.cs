@@ -11,16 +11,6 @@ public sealed class DefaultCompressorTests
 {
     private readonly Compressor compressor = new();
 
-    [Theory, AutoData]
-    public async Task CsvOptimizer(string[][] csv)
-    {
-        using var stream = new MemoryStream();
-
-        var compressor = new DefaultCompressor();
-
-        await compressor.CompressAsync(csv, stream);
-    }
-
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public void StreamContainsExpectedNumberOfBytes(RealCombination combination)
     {
@@ -63,8 +53,10 @@ public sealed class DefaultCompressorTests
             .HaveLength(rowsCount.Get * realColumns.CalculateMaximumNumber().GetByteCount());
     }
 
-    private int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
-    {
-        return values.Get.Select(x => x.Get).Select(x => 2 < x ? x : 2).ToArray();
-    }
+    private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
+        => values
+            .Get
+            .Select(x => x.Get)
+            .Select(x => 2 < x ? x : 2)
+            .ToArray();
 }

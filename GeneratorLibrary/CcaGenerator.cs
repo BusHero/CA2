@@ -8,14 +8,14 @@ public class CcaGenerator(
     IFileSystem fileSystem,
     ICsvCompressor csvCompressor)
 {
-    public async Task GenerateCcaFile(string csvFile)
+    public async Task GenerateCcaFile(string csvFile, int[] sizes)
     {
         var ccaFilename = GetCcaFilename(csvFile);
 
         var csv = GetCsv(csvFile);
         await using var file = fileSystem.File.Create(ccaFilename);
         
-        await csvCompressor.CompressAsync(csv, file);
+        await csvCompressor.CompressAsync(csv, sizes, file);
     }
     
     // public void GenerateCcaFile(string inputFile)

@@ -1,10 +1,12 @@
 namespace GeneratorLibrary.Compression;
 
 using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 
 using GeneratorLibrary.Optimization;
 
-public sealed class Compressor : IDecompressor, ICompressor
+public sealed class Compressor : IDecompressor, ICompressor, ICsvCompressor
 {
     public BigInteger Compress(
         int[] row,
@@ -154,7 +156,7 @@ public sealed class Compressor : IDecompressor, ICompressor
     public int[][] Decompress(int[] sizes, Stream stream)
     {
         var count = GetNumberOfBytesForCombination(sizes);
-        
+
         var bytes = new byte[count];
         var result = new List<int[]>();
         while (stream.Read(bytes, 0, bytes.Length) > 0)
@@ -167,7 +169,7 @@ public sealed class Compressor : IDecompressor, ICompressor
 
     public void Compress(int[][] items, int[] sizes, Stream stream)
     {
-        foreach(var item in items)
+        foreach (var item in items)
         {
             Compress(item, sizes, stream);
         }
@@ -178,5 +180,18 @@ public sealed class Compressor : IDecompressor, ICompressor
         var report = CsvOptimizer.Optimize(csv);
 
         this.Compress(report.Csv, sizes, stream);
+    }
+
+    public Task CompressAsync(
+        string[][] csv,
+        int[] sizes,
+        Stream stream,
+        CancellationToken cancellationToken = default)
+    {
+        var report = CsvOptimizer.Optimize(csv);
+
+        Compress(report.Csv, sizes, stream);
+
+        return Task.CompletedTask;
     }
 }

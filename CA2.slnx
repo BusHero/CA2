@@ -1,0 +1,13 @@
+﻿<Solution>
+  <Folder Name="/MiscFiles/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CA2.sln.DotSettings.user" />
+    <File Path="global.json" />
+  </Folder>
+  <Project Path="CA2.IntegrationTests\CA2.IntegrationTests.csproj" Type="Classic C#" />
+  <Project Path="CA2.Tests\CA2.Tests.csproj" />
+  <Project Path="CA2\CA2.csproj" />
+  <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />
+  <Project Path="RandomCsvGenerator\RandomCsvGenerator.csproj" Type="Classic C#" />
+</Solution>

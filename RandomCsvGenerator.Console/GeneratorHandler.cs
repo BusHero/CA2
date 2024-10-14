@@ -1,6 +1,6 @@
-namespace RandomCsvGenerator;
-
 using GeneratorLibrary.CsvGenerators;
+
+namespace RandomCsvGenerator.Console;
 
 public static class GeneratorHandler
 {
@@ -10,7 +10,7 @@ public static class GeneratorHandler
         int rowsCount,
         string[][] columns)
     {
-        var csv = new RandomCsvGenerator()
+        var csv = new GeneratorLibrary.CsvGenerators.RandomCsvGenerator()
             .WithColumns(columns)
             .WithRowsCount(rowsCount)
             .Generate();
@@ -24,7 +24,7 @@ public static class GeneratorHandler
         string[][] strings)
     {
         // Use a logger instead.
-        Console.WriteLine($"Write to {outputFile}");
+        System.Console.WriteLine($"Write to {outputFile}");
 
         var rows = strings
             .Select(x => string.Join(',', x))
@@ -32,7 +32,7 @@ public static class GeneratorHandler
 
         foreach (var row in rows)
         {
-            Console.WriteLine(row);
+            System.Console.WriteLine(row);
         }
 
         await File.WriteAllLinesAsync(outputFile, rows);

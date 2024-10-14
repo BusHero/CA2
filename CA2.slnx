@@ -9,5 +9,5 @@
   <Project Path="CA2.Tests\CA2.Tests.csproj" />
   <Project Path="CA2\CA2.csproj" />
   <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />
-  <Project Path="RandomCsvGenerator\RandomCsvGenerator.csproj" Type="Classic C#" />
+  <Project Path="RandomCsvGenerator.Console\RandomCsvGenerator.Console.csproj" Type="Classic C#" />
 </Solution>

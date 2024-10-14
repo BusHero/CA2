@@ -1,6 +1,5 @@
-﻿using CustomFluentAssertions;
-
-namespace CA2.Tests.TestUtilsTests;
+﻿
+namespace CustomFluentAssertions.Tests;
 
 public sealed class UniformlyDistributedTests
 {

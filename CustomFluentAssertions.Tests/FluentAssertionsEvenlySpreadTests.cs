@@ -1,8 +1,6 @@
-﻿using CustomFluentAssertions;
+﻿using Xunit.Sdk;
 
-namespace CA2.Tests.TestUtilsTests;
-
-using Xunit.Sdk;
+namespace CustomFluentAssertions.Tests;
 
 public sealed class FluentAssertionsEvenlySpreadTests
 {

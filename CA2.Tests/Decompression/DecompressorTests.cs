@@ -1,3 +1,5 @@
+using TestUtils;
+
 namespace CA2.Tests.Decompression;
 
 using GeneratorLibrary.Compression;

@@ -1,11 +1,11 @@
-namespace CA2.Tests.Utils;
-
 using System.Diagnostics.CodeAnalysis;
 
-internal static class Extensions
+namespace TestUtils;
+
+public static class Extensions
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    internal static T[,] Pivot<T>(this T[,] csv)
+    public static T[,] Pivot<T>(this T[,] csv)
     {
         var result = new T[csv.GetLength(1), csv.GetLength(0)];
 
@@ -20,7 +20,7 @@ internal static class Extensions
         return result;
     }
 
-    internal static T[][] Pivot<T>(this T[][] csv)
+    public static T[][] Pivot<T>(this T[][] csv)
     {
         var result = Enumerable
             .Range(0, csv[0].Length)

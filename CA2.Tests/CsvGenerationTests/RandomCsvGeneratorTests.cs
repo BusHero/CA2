@@ -1,10 +1,8 @@
-using CustomFluentAssertions;
-
 namespace CA2.Tests.CsvGenerationTests;
 
+using CustomFluentAssertions;
 using GeneratorLibrary.CsvGenerators;
-
-using Utils;
+using TestUtils;
 
 public sealed class RandomCsvGeneratorTests
 {

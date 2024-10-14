@@ -2,7 +2,7 @@
 
 using System.Numerics;
 
-using Utils;
+using TestUtils;
 
 public sealed class CalculateSizesTests
 {
@@ -13,7 +13,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .ToArray();
 
-        var generatedSequence = TestUtils.CalculateSizes(actualSizes);
+        var generatedSequence = actualSizes.CalculateSizes();
 
         var property = () => generatedSequence[^1] == 1;
 
@@ -32,7 +32,7 @@ public sealed class CalculateSizesTests
 
         return Prop.ForAll(arb, sizes =>
         {
-            var generatedSequence = TestUtils.CalculateSizes(sizes);
+            var generatedSequence = sizes.CalculateSizes();
 
             var property = generatedSequence[0] == sizes[^1];
 
@@ -48,7 +48,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .ToArray();
 
-        var generatedSequence = TestUtils.CalculateSizes(actualSizes);
+        var generatedSequence = actualSizes.CalculateSizes();
 
         return generatedSequence
             .OrderDescending()
@@ -63,7 +63,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .ToArray();
 
-        var generatedSequence = TestUtils.CalculateSizes(actualSizes);
+        var generatedSequence = actualSizes.CalculateSizes();
 
         var property = generatedSequence.Length == sizes.Item.Length;
 
@@ -78,7 +78,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .ToArray();
 
-        var generatedSequence = TestUtils.CalculateSizes(actualSizes);
+        var generatedSequence = actualSizes.CalculateSizes();
 
         var property = () => generatedSequence[0] == sizes.Item.Skip(1)
             .Select(x => x.Item)
@@ -96,7 +96,7 @@ public sealed class CalculateSizesTests
             .Select(x => x.Item)
             .ToArray();
 
-        var generatedSequence = TestUtils.CalculateSizes(actualSizes);
+        var generatedSequence = actualSizes.CalculateSizes();
 
         var property = () => generatedSequence
             .SkipLast(1)
@@ -118,7 +118,7 @@ public sealed class CalculateSizesTests
 
         return Prop.ForAll(arb, sizes =>
         {
-            var generatedSequence = TestUtils.CalculateSizes(sizes);
+            var generatedSequence = sizes.CalculateSizes();
 
             var property = () => generatedSequence
                 .SkipLast(1)

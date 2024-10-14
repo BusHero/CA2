@@ -54,6 +54,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CustomFluentAssertions\CustomFluentAssertions.csproj" />
         <ProjectReference Include="..\GeneratorLibrary\GeneratorLibrary.csproj" />
+        <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

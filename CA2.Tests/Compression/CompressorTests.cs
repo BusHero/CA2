@@ -5,6 +5,8 @@ using System.Numerics;
 using GeneratorLibrary.Compression;
 using GeneratorLibrary.CsvGenerators;
 
+using TestUtils;
+
 using Utils;
 
 public sealed class CompressorTests

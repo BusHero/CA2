@@ -2,7 +2,7 @@
 
 using System.Numerics;
 
-using Utils;
+using TestUtils;
 
 public sealed class CalculateMaximumNumberTests
 {
@@ -21,7 +21,6 @@ public sealed class CalculateMaximumNumberTests
     public void MaximumNumberIsCalculatedCorrectly(int[] sizes, BigInteger expectedResult)
     {
         var result = sizes.CalculateMaximumNumber();
-
         result.Should().Be(expectedResult);
     }
 }

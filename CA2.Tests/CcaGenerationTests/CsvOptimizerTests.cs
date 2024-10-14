@@ -1,9 +1,9 @@
 namespace CA2.Tests.CcaGenerationTests;
 
-using GeneratorLibrary.Optimization;
 using GeneratorLibrary.CsvGenerators;
+using GeneratorLibrary.Optimization;
 
-using Utils;
+using TestUtils;
 
 public sealed class CsvOptimizerTests
 {
@@ -160,7 +160,7 @@ public sealed class CsvOptimizerTests
 
                 var second = t.Second
                     .Order();
-                
+
                 return first.SequenceEqual(second);
             })
             .ToProperty();

@@ -1,6 +1,6 @@
-namespace CA2.Tests.CsvGenerationTests;
+using CustomFluentAssertions;
 
-using FluentAssertionExtensions;
+namespace CA2.Tests.CsvGenerationTests;
 
 using GeneratorLibrary.CsvGenerators;
 

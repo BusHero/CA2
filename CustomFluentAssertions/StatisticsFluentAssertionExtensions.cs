@@ -1,9 +1,9 @@
-﻿namespace CA2.Tests.FluentAssertionExtensions;
-
-using FluentAssertions.Collections;
+﻿using FluentAssertions.Collections;
 using FluentAssertions.Execution;
 
-internal static class StatisticsFluentAssertionExtensions
+namespace CustomFluentAssertions;
+
+public static class StatisticsFluentAssertionExtensions
 {
     public static AndConstraint<GenericCollectionAssertions<int>> BeEvenlySpread(
         this GenericCollectionAssertions<int> assertion,

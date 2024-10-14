@@ -1,14 +1,5 @@
 namespace GeneratorLibrary.CsvGenerators;
 
-public interface IRandomCsvGenerator
-{
-    string[][] Generate();
-    
-    IRandomCsvGenerator WithRowsCount(int rows);
-    
-    IRandomCsvGenerator WithColumn(string[] column);
-}
-
 public sealed class RandomCsvGenerator : IRandomCsvGenerator
 {
     private int _rows;

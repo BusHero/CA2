@@ -20,7 +20,7 @@ public sealed class CalculateMaximumNumberTests
     [Theory, MemberData(nameof(Sizes))]
     public void MaximumNumberIsCalculatedCorrectly(int[] sizes, BigInteger expectedResult)
     {
-        var result = TestUtils.CalculateMaximumNumber(sizes);
+        var result = sizes.CalculateMaximumNumber();
 
         result.Should().Be(expectedResult);
     }

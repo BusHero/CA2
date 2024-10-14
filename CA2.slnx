@@ -13,5 +13,6 @@
   <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" Type="Classic C#" />
   <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" Type="Classic C#" />
   <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />
+  <Project Path="TestUtils.Tests\TestUtils.Tests.csproj" Type="Classic C#" />
   <Project Path="TestUtils\TestUtils.csproj" Type="Classic C#" />
 </Solution>

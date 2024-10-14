@@ -1,8 +1,6 @@
+namespace CA2.Tests.Utils;
+
 using CustomFluentAssertions;
-
-namespace CA2.Tests.TestUtilsTests;
-
-using Utils;
 
 public sealed class CombinationsGeneratorTests
 {

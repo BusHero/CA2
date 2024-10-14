@@ -1,8 +1,6 @@
-﻿namespace CA2.Tests.TestUtilsTests;
+﻿using System.Numerics;
 
-using System.Numerics;
-
-using TestUtils;
+namespace TestUtils.Tests;
 
 public sealed class CalculateSizesTests
 {

@@ -1,5 +1,3 @@
-namespace CA2.Tests.CsvGenerationTests;
-
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -8,6 +6,8 @@ using AutoFixture;
 using FluentAssertions.Execution;
 
 using GeneratorLibrary.CsvGenerators;
+
+namespace CsvGenerator.Tests;
 
 public sealed class CsvGeneratorToFileTests
 {
@@ -178,7 +178,7 @@ public sealed class CsvGeneratorToFileTests
 
     private class FixtureBuilder
     {
-        public static FixtureBuilder CreateDefaultBuilder() 
+        public static FixtureBuilder CreateDefaultBuilder()
             => new FixtureBuilder()
                 .WithRandomCsv();
 
@@ -286,6 +286,7 @@ public sealed class CsvGeneratorToFileTests
         public async IAsyncEnumerable<string[]> GetLines(Stream stream)
         {
             var reader = new StreamReader(stream);
+
             while (true)
             {
                 var line = await reader.ReadLineAsync();

@@ -1,6 +1,6 @@
-﻿namespace CA2.Tests.CsvGenerationTests;
+﻿using GeneratorLibrary.CsvGenerators;
 
-using GeneratorLibrary.CsvGenerators;
+namespace CsvGenerator.Tests;
 
 internal sealed class SpyCsvGenerator : IRandomCsvGenerator
 {

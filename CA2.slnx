@@ -8,8 +8,8 @@
   <Project Path="CA2.IntegrationTests\CA2.IntegrationTests.csproj" Type="Classic C#" />
   <Project Path="CA2.Tests\CA2.Tests.csproj" />
   <Project Path="CA2\CA2.csproj" />
+  <Project Path="CsvGenerator.Console\CsvGenerator.Console.csproj" Type="Classic C#" />
   <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" Type="Classic C#" />
   <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" Type="Classic C#" />
   <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />
-  <Project Path="RandomCsvGenerator.Console\RandomCsvGenerator.Console.csproj" Type="Classic C#" />
 </Solution>

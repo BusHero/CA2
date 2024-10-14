@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace RandomCsvGenerator.Console;
+namespace CsvGenerator.Console;
 
 internal static class Root
 {

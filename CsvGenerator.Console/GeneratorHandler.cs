@@ -1,6 +1,6 @@
 using GeneratorLibrary.CsvGenerators;
 
-namespace RandomCsvGenerator.Console;
+namespace CsvGenerator.Console;
 
 public static class GeneratorHandler
 {

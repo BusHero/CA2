@@ -1,7 +1,6 @@
 using System.CommandLine;
 
-using RandomCsvGenerator;
-using RandomCsvGenerator.Console;
+using CsvGenerator.Console;
 
 var rootCommand = Root.GetRootCommand();
 

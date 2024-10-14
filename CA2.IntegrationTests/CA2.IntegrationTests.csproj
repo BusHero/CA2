@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RandomCsvGenerator.Console\RandomCsvGenerator.Console.csproj" />
+      <ProjectReference Include="..\CsvGenerator.Console\CsvGenerator.Console.csproj" />
     </ItemGroup>
 
     <ItemGroup>

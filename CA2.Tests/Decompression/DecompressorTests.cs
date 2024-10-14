@@ -1,8 +1,8 @@
-using CA2.Tests.Utils;
-
-namespace CA2.Tests.DecompressionTests;
+namespace CA2.Tests.Decompression;
 
 using GeneratorLibrary.Compression;
+
+using Utils;
 
 public class DecompressorTests
 {
@@ -11,7 +11,7 @@ public class DecompressorTests
     {
         var sut = new Compressor();
 
-        var compressedNumber = sut.Compress(
+        var compressedNumber = Compressor.Compress(
             combination.Item,
             combination.Sizes);
 

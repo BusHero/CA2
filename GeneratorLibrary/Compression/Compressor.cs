@@ -3,11 +3,11 @@ namespace GeneratorLibrary.Compression;
 using System.Numerics;
 using System.Threading.Tasks;
 
-using GeneratorLibrary.Optimization;
+using Optimization;
 
 public sealed class Compressor : IDecompressor, ICompressor
 {
-    public BigInteger Compress(
+    public static BigInteger Compress(
         int[] row,
         int[] sizes)
     {
@@ -30,9 +30,7 @@ public sealed class Compressor : IDecompressor, ICompressor
         }
 
         if (row
-            .Zip(
-                sizes,
-                (value, size) => size <= value)
+            .Zip(sizes, (value, size) => size <= value)
             .Any(x => x))
         {
             throw new InvalidOperationException("value is bigger than size");
@@ -61,21 +59,21 @@ public sealed class Compressor : IDecompressor, ICompressor
             .result;
     }
 
-    public long GetNumberOfBitsForCombination(int[] sizes)
+    public static long GetNumberOfBitsForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetBitLength();
 
-    private int GetNumberOfBytesForCombination(int[] sizes)
+    private static int GetNumberOfBytesForCombination(int[] sizes)
         => sizes
             .Aggregate(
                 BigInteger.One,
                 (x, y) => x * y)
             .GetByteCount();
 
-    public byte[] CompressToBytes(int[] combinationItem, int[] combinationSizes)
+    private static byte[] CompressToBytes(int[] combinationItem, int[] combinationSizes)
     {
         var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
 
@@ -89,14 +87,13 @@ public sealed class Compressor : IDecompressor, ICompressor
         return buffer;
     }
 
-    public async Task<bool> TryWriteToBufferAsync(
-        Stream stream,
+    private static async Task TryWriteToBufferAsync(Stream stream,
         BigInteger[] numbers,
         int sizeItem)
     {
         if (numbers is [])
         {
-            return true;
+            return;
         }
 
         var byteCount = numbers
@@ -105,7 +102,7 @@ public sealed class Compressor : IDecompressor, ICompressor
 
         if (sizeItem < byteCount)
         {
-            return false;
+            return;
         }
 
         foreach (var number in numbers)
@@ -117,11 +114,9 @@ public sealed class Compressor : IDecompressor, ICompressor
                 out _);
             await stream.WriteAsync(bytes);
         }
-
-        return true;
     }
 
-    public async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
+    private async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
     {
         var number = Compress(combinationItem, combinationSizes);
         var size = GetNumberOfBytesForCombination(combinationSizes);
@@ -133,6 +128,7 @@ public sealed class Compressor : IDecompressor, ICompressor
     {
         var result = new int[sizes.Length];
         var intermediateResult = compressedValue;
+
         for (var i = sizes.Length - 1; i >= 0; i--)
         {
             result[i] = (int)(intermediateResult % sizes[i]);
@@ -155,6 +151,7 @@ public sealed class Compressor : IDecompressor, ICompressor
 
         var bytes = new byte[count];
         var result = new List<int[]>();
+
         while (stream.Read(bytes, 0, bytes.Length) > 0)
         {
             result.Add(Decompress(bytes, sizes));

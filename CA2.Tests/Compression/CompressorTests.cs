@@ -59,7 +59,7 @@ public sealed class CompressorTests
     [Theory, AutoData]
     public void ValuesIsNullThrows(int[] sizes)
     {
-        var func = () => _compressor.Compress(
+        var func = () => Compressor.Compress(
             null!,
             sizes);
 
@@ -70,7 +70,7 @@ public sealed class CompressorTests
     [Theory, AutoData]
     public void SizesIsNullThrows(int[] values)
     {
-        var func = () => _compressor.Compress(
+        var func = () => Compressor.Compress(
             values,
             null!);
 
@@ -84,7 +84,7 @@ public sealed class CompressorTests
         int[] values = [1, 1, 1];
         int[] sizes = [4, 4];
 
-        var func = () => _compressor.Compress(
+        var func = () => Compressor.Compress(
             values,
             sizes);
 
@@ -98,7 +98,7 @@ public sealed class CompressorTests
         int[] values = [-1, 1, 1];
         int[] sizes = [4, 4, 4];
 
-        var func = () => _compressor.Compress(
+        var func = () => Compressor.Compress(
             values,
             sizes);
 
@@ -111,7 +111,7 @@ public sealed class CompressorTests
     [InlineData(1)]
     public void SizesContainElementsSmallerOrEqualTo1_ThrowInvalidOperationException(int size)
     {
-        var prop = () => _compressor.Compress(
+        var prop = () => Compressor.Compress(
             [0],
             [size]);
 
@@ -124,7 +124,7 @@ public sealed class CompressorTests
     [InlineData(11, 10)]
     public void ValuesContainElementsBiggerThanSizes_ThrowInvalidOperationException(int value, int size)
     {
-        var property = () => _compressor.Compress(
+        var property = () => Compressor.Compress(
             [value],
             [size]);
 
@@ -138,7 +138,7 @@ public sealed class CompressorTests
         Combination combination,
         int expectedResult)
     {
-        var number = _compressor.Compress(
+        var number = Compressor.Compress(
             combination.Item,
             combination.Sizes);
 
@@ -161,7 +161,7 @@ public sealed class CompressorTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = _compressor.Compress(
+                    var number = Compressor.Compress(
                         numbers,
                         sizes);
 
@@ -188,7 +188,7 @@ public sealed class CompressorTests
                 {
                     var sizes = GetSizes(numbers.Length);
 
-                    var number = _compressor.Compress(numbers, sizes);
+                    var number = Compressor.Compress(numbers, sizes);
 
                     var powerOfTwo = BigInteger.Pow(2, numbers.Length);
 
@@ -214,7 +214,7 @@ public sealed class CompressorTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = _compressor.Compress(
+                var number = Compressor.Compress(
                     numbers,
                     sizes);
 
@@ -240,7 +240,7 @@ public sealed class CompressorTests
             {
                 var sizes = GetSizes(numbers.Length);
 
-                var number = _compressor.Compress(numbers, sizes);
+                var number = Compressor.Compress(numbers, sizes);
 
                 var biggestPossibleNumber = BigInteger.Pow(2, numbers.Length) - 1;
                 var property = number == biggestPossibleNumber;
@@ -252,11 +252,11 @@ public sealed class CompressorTests
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property NumberIsSmallerThanMaximumPossibleSize(Combination combination)
     {
-        var result = _compressor.Compress(
+        var result = Compressor.Compress(
             combination.Item,
             combination.Sizes);
 
-        var maximumPossibleNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
+        var maximumPossibleNumber = combination.Sizes.CalculateMaximumNumber();
 
         var property = result <= maximumPossibleNumber;
 
@@ -315,82 +315,6 @@ public sealed class CompressorTests
         var rows = _compressor.Decompress(realSizes, stream);
 
         rows.Should().HaveCount(rows1.Get);
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
-    {
-        var bytes = _compressor
-            .CompressToBytes(combination.Item, combination.Sizes);
-
-        var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
-        var bytesCount = biggestNumber.GetByteCount();
-
-        return (bytesCount == bytes.Length).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property CanConvertBytesBackToBigNumber(Combination combination)
-    {
-        var number = _compressor.Compress(
-            combination.Item,
-            combination.Sizes);
-
-        var bytes = _compressor
-            .CompressToBytes(combination.Item, combination.Sizes);
-        var newNumber = new BigInteger(bytes);
-
-        return (newNumber == number)
-            .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property CompressStream_ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
-    {
-        using var stream = new MemoryStream();
-
-        _compressor
-            .CompressAsync(combination.Item, combination.Sizes, stream).Wait();
-        var bytes = stream.ToArray();
-
-        var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
-        var bytesCount = biggestNumber.GetByteCount();
-
-        return (bytesCount == bytes.Length).ToProperty();
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property CompressStream_CanConvertBytesBackToBigNumber(Combination combination)
-    {
-        using var stream = new MemoryStream();
-
-        var number = _compressor.Compress(
-            combination.Item,
-            combination.Sizes);
-
-        _compressor
-            .CompressAsync(combination.Item, combination.Sizes, stream).Wait();
-        var bytes = stream.ToArray();
-
-        var newNumber = new BigInteger(bytes);
-
-        return (newNumber == number)
-            .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
-    }
-
-    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
-    public Property CompressStream_CanDecompress(Combination combination)
-    {
-        using var stream = new MemoryStream();
-
-        _compressor.CompressAsync(combination.Item, combination.Sizes, stream).Wait();
-
-        stream.Position = 0;
-
-        var item = _compressor.Decompress(combination.Sizes, stream);
-
-        return (item.Length == 1)
-            .And(item[0].SequenceEqual(combination.Item));
     }
 
     private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)

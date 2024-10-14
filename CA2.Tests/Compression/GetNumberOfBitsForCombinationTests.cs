@@ -8,13 +8,11 @@ using Utils;
 
 public sealed class GetNumberOfBitsForCombinationTests
 {
-    private readonly Compressor _compressor = new();
-
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property ResultIsBiggerThanZero(
         Combination combination)
     {
-        var bytesPerCombination = _compressor.GetNumberOfBitsForCombination(combination.Sizes);
+        var bytesPerCombination = Compressor.GetNumberOfBitsForCombination(combination.Sizes);
 
         var property = 0 < bytesPerCombination;
 
@@ -26,7 +24,7 @@ public sealed class GetNumberOfBitsForCombinationTests
     {
         var property = () =>
         {
-            var bitsPerCombination = _compressor.GetNumberOfBitsForCombination(combination.Sizes);
+            var bitsPerCombination = Compressor.GetNumberOfBitsForCombination(combination.Sizes);
 
             var maxNumber = CalculateMaximumNumber(combination.Sizes);
 
@@ -43,7 +41,7 @@ public sealed class GetNumberOfBitsForCombinationTests
     public Property ValueReturnedIsEnoughToStoreASingleNumber(
         PositiveInt nbr)
     {
-        var bitsPerCombination = _compressor.GetNumberOfBitsForCombination([nbr.Get]);
+        var bitsPerCombination = Compressor.GetNumberOfBitsForCombination([nbr.Get]);
 
         var lengthOfBitString = nbr.Get.ToString("b").Length;
 

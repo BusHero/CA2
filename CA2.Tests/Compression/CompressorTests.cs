@@ -1,8 +1,9 @@
-namespace CA2.Tests.CompressionTests;
+namespace CA2.Tests.Compression;
 
 using System.Numerics;
 
 using GeneratorLibrary.Compression;
+using GeneratorLibrary.CsvGenerators;
 
 using Utils;
 
@@ -263,6 +264,150 @@ public sealed class CompressorTests
             .Label($"{result} is smaller than {maximumPossibleNumber}");
     }
 
+    [Property]
+    public void StreamContainsExpectedNumberOfBytes(NonEmptyArray<PositiveInt> sizes, PositiveInt rows)
+    {
+        var generator = new RandomCsvGenerator();
+
+        using var stream = new MemoryStream();
+        var realSizes = GetRealColumns(sizes);
+        var csv = GetCsv(rows, generator, realSizes);
+
+        _compressor.CompressAsync(csv, realSizes, stream).Wait();
+        stream.Position = 0;
+
+        stream
+            .Should()
+            .HaveLength(realSizes.CalculateMaximumNumber().GetByteCount() * rows.Get);
+    }
+
+    [Property]
+    public void AllRowsShouldHaveExpectedNumberOfItems(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
+    {
+        var generator = new RandomCsvGenerator();
+        var realSizes = GetRealColumns(sizes);
+
+        using var stream = new MemoryStream();
+
+        var csv = GetCsv(rows1, generator, realSizes);
+
+        _compressor.CompressAsync(csv, realSizes, stream).Wait();
+        stream.Position = 0;
+
+        var rows = _compressor.Decompress(realSizes, stream);
+
+        rows.Should().AllSatisfy(x => x.Should().HaveSameCount(sizes.Get));
+    }
+
+    [Property]
+    public void StreamContainsExpectedNumberOfRows(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
+    {
+        var generator = new RandomCsvGenerator();
+        var realSizes = GetRealColumns(sizes);
+
+        using var stream = new MemoryStream();
+
+        var csv = GetCsv(rows1, generator, realSizes);
+
+        _compressor.CompressAsync(csv, realSizes, stream).Wait();
+        stream.Position = 0;
+
+        var rows = _compressor.Decompress(realSizes, stream);
+
+        rows.Should().HaveCount(rows1.Get);
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
+    {
+        var bytes = _compressor
+            .CompressToBytes(combination.Item, combination.Sizes);
+
+        var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
+        var bytesCount = biggestNumber.GetByteCount();
+
+        return (bytesCount == bytes.Length).ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CanConvertBytesBackToBigNumber(Combination combination)
+    {
+        var number = _compressor.Compress(
+            combination.Item,
+            combination.Sizes);
+
+        var bytes = _compressor
+            .CompressToBytes(combination.Item, combination.Sizes);
+        var newNumber = new BigInteger(bytes);
+
+        return (newNumber == number)
+            .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_ArrayProducedIsEnoughToStoreTheBiggestNumber(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        _compressor
+            .CompressAsync(combination.Item, combination.Sizes, stream).Wait();
+        var bytes = stream.ToArray();
+
+        var biggestNumber = TestUtils.CalculateMaximumNumber(combination.Sizes);
+        var bytesCount = biggestNumber.GetByteCount();
+
+        return (bytesCount == bytes.Length).ToProperty();
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_CanConvertBytesBackToBigNumber(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        var number = _compressor.Compress(
+            combination.Item,
+            combination.Sizes);
+
+        _compressor
+            .CompressAsync(combination.Item, combination.Sizes, stream).Wait();
+        var bytes = stream.ToArray();
+
+        var newNumber = new BigInteger(bytes);
+
+        return (newNumber == number)
+            .Label($"{number} == {newNumber}(0x{string.Join("", bytes.Select(x => x.ToString("x")))})");
+    }
+
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
+    public Property CompressStream_CanDecompress(Combination combination)
+    {
+        using var stream = new MemoryStream();
+
+        _compressor.CompressAsync(combination.Item, combination.Sizes, stream).Wait();
+
+        stream.Position = 0;
+
+        var item = _compressor.Decompress(combination.Sizes, stream);
+
+        return (item.Length == 1)
+            .And(item[0].SequenceEqual(combination.Item));
+    }
+
+    private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
+        => values
+            .Get
+            .Select(x => x.Get)
+            .Select(x => 2 < x ? x : 2)
+            .ToArray();
+
+    private static string[][] GetCsv(
+        PositiveInt rows,
+        RandomCsvGenerator generator,
+        int[] realSizes)
+        => generator
+            .WithColumns(realSizes)
+            .WithRowsCount(rows.Get)
+            .Generate();
 
     private static int[] GetSizes(int numbersLength)
         => Enumerable

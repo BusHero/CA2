@@ -1,4 +1,4 @@
-namespace CA2.Tests.GeneratorTests;
+namespace CA2.Tests.Compression;
 
 using System.Numerics;
 
@@ -14,10 +14,10 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _compressor.TryWriteToBuffer(
+        _compressor.TryWriteToBufferAsync(
             stream,
             [BigInteger.One],
-            size.Item);
+            size.Item).Wait();
 
         var array = stream.ToArray();
 
@@ -32,10 +32,11 @@ public sealed class WriteToBufferTests
         var stream = new MemoryStream();
 
         return _compressor
-            .TryWriteToBuffer(
+            .TryWriteToBufferAsync(
                 stream,
                 [BigInteger.One],
                 size.Item)
+            .Result
             .ToProperty();
     }
 
@@ -50,10 +51,10 @@ public sealed class WriteToBufferTests
 
             var number = new BigInteger(bytes, isUnsigned: true);
 
-            var result = _compressor.TryWriteToBuffer(
+            var result = _compressor.TryWriteToBufferAsync(
                 stream,
                 [number],
-                size.Item);
+                size.Item).Result;
 
             return !result;
         };
@@ -67,10 +68,10 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _compressor.TryWriteToBuffer(
+        _compressor.TryWriteToBufferAsync(
             stream,
             [number],
-            number.GetByteCount());
+            number.GetByteCount()).Wait();
 
         var newNumber = new BigInteger(stream.ToArray());
 
@@ -89,10 +90,10 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        _compressor.TryWriteToBuffer(
+        _compressor.TryWriteToBufferAsync(
             stream,
             numbers.Item,
-            bytesPerNumber);
+            bytesPerNumber).Wait();
 
         var bufferSize = stream.ToArray()
             .Length;
@@ -114,10 +115,10 @@ public sealed class WriteToBufferTests
             .Max(BigInteger.Abs)
             .GetByteCount();
 
-        _compressor.TryWriteToBuffer(
+        _compressor.TryWriteToBufferAsync(
             stream,
             numbers.Item,
-            bytesPerNumber);
+            bytesPerNumber).Wait();
 
         stream.Position = 0;
         var buffer = new byte[bytesPerNumber];
@@ -140,10 +141,10 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        _compressor.TryWriteToBuffer(
+        _compressor.TryWriteToBufferAsync(
             stream,
             [],
-            size.Item);
+            size.Item).Wait();
 
         var bufferSize = stream.ToArray()
             .Length;
@@ -157,10 +158,10 @@ public sealed class WriteToBufferTests
     {
         var stream = new MemoryStream();
 
-        return _compressor.TryWriteToBuffer(
+        return _compressor.TryWriteToBufferAsync(
                 stream,
                 [],
-                size.Item)
+                size.Item).Result
             .ToProperty();
     }
 }

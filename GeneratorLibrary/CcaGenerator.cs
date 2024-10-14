@@ -6,7 +6,7 @@ namespace GeneratorLibrary;
 
 public class CcaGenerator(
     IFileSystem fileSystem,
-    ICsvCompressor csvCompressor)
+    ICompressor csvCompressor)
 {
     public async Task GenerateCcaFile(string csvFile, int[] sizes)
     {
@@ -17,27 +17,6 @@ public class CcaGenerator(
         
         await csvCompressor.CompressAsync(csv, sizes, file);
     }
-    
-    // public void GenerateCcaFile(string inputFile)
-    // {
-    //     var csv = GetCsv(inputFile);
-    //     var outputFile = GetOutputFile(inputFile);
-    //
-    //     var report = CsvOptimizer.Optimize(csv);
-    //
-    //
-    //     using var stream = fileSystem.File.Create(outputFile);
-    //     var foo = Generator.GetNumberOfBytesForCombination(report.Sizes);
-    //
-    //     var result = report.Csv
-    //         .Select(x => Generator.Generate(x, report.Sizes))
-    //         .ToArray();
-    //
-    //     Generator.TryWriteToBuffer(
-    //         stream,
-    //         result,
-    //         foo);
-    // }
 
     private string[][] GetCsv(string inputFile)
     {

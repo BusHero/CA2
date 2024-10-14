@@ -1,12 +1,11 @@
 namespace GeneratorLibrary.Compression;
 
 using System.Numerics;
-using System.Threading;
 using System.Threading.Tasks;
 
 using GeneratorLibrary.Optimization;
 
-public sealed class Compressor : IDecompressor, ICompressor, ICsvCompressor
+public sealed class Compressor : IDecompressor, ICompressor
 {
     public BigInteger Compress(
         int[] row,
@@ -90,13 +89,11 @@ public sealed class Compressor : IDecompressor, ICompressor, ICsvCompressor
         return buffer;
     }
 
-    public bool TryWriteToBuffer(
+    public async Task<bool> TryWriteToBufferAsync(
         Stream stream,
         BigInteger[] numbers,
         int sizeItem)
     {
-        var writer = new BinaryWriter(stream);
-
         if (numbers is [])
         {
             return true;
@@ -118,19 +115,18 @@ public sealed class Compressor : IDecompressor, ICompressor, ICsvCompressor
             number.TryWriteBytes(
                 bytes,
                 out _);
-
-            writer.Write(bytes);
+            await stream.WriteAsync(bytes);
         }
 
         return true;
     }
 
-    public void Compress(int[] combinationItem, int[] combinationSizes, Stream stream)
+    public async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
     {
         var number = Compress(combinationItem, combinationSizes);
         var size = GetNumberOfBytesForCombination(combinationSizes);
 
-        TryWriteToBuffer(stream, [number], size);
+        await TryWriteToBufferAsync(stream, [number], size);
     }
 
     public int[] Decompress(BigInteger compressedValue, int[] sizes)
@@ -167,31 +163,18 @@ public sealed class Compressor : IDecompressor, ICompressor, ICsvCompressor
         return [.. result];
     }
 
-    public void Compress(int[][] items, int[] sizes, Stream stream)
+    private async Task CompressAsync(int[][] items, int[] sizes, Stream stream)
     {
         foreach (var item in items)
         {
-            Compress(item, sizes, stream);
+            await CompressAsync(item, sizes, stream);
         }
     }
 
-    public void Compress(string[][] csv, int[] sizes, Stream stream)
+    public async Task CompressAsync(string[][] csv, int[] sizes, Stream stream)
     {
         var report = CsvOptimizer.Optimize(csv);
 
-        this.Compress(report.Csv, sizes, stream);
-    }
-
-    public Task CompressAsync(
-        string[][] csv,
-        int[] sizes,
-        Stream stream,
-        CancellationToken cancellationToken = default)
-    {
-        var report = CsvOptimizer.Optimize(csv);
-
-        Compress(report.Csv, sizes, stream);
-
-        return Task.CompletedTask;
+        await CompressAsync(report.Csv, sizes, stream);
     }
 }

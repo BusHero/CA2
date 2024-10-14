@@ -137,7 +137,7 @@ public sealed class CcaGeneratorTests
             => compressor.Sizes.Should().ContainEquivalentOf(sizes);
     }
 
-    private sealed class SpyCompressor : ICsvCompressor
+    private sealed class SpyCompressor : ICompressor
     {
         private byte[] _result = [];
 
@@ -147,16 +147,17 @@ public sealed class CcaGeneratorTests
         public void WithCompressionResult(byte[] result)
             => _result = result;
 
-        public async Task CompressAsync(
+        public Task CompressAsync(
             string[][] csv,
             int[] sizes,
-            Stream stream,
-            CancellationToken cancellationToken = default)
+            Stream stream)
         {
             CompressedCsvFiles.Add(csv);
             Sizes.Add(sizes);
 
-            await stream.WriteAsync(_result, cancellationToken);
+            stream.Write(_result);
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CA2.Tests.GeneratorTests;
+namespace CA2.Tests.Compression;
 
 using System.Numerics;
 

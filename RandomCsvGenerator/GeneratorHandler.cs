@@ -1,4 +1,6 @@
-﻿namespace RandomCsvGenerator;
+namespace RandomCsvGenerator;
+
+using GeneratorLibrary.CsvGenerators;
 
 public static class GeneratorHandler
 {
@@ -8,7 +10,7 @@ public static class GeneratorHandler
         int rowsCount,
         string[][] columns)
     {
-        var csv = new GeneratorLibrary.CsvGenerators.RandomCsvGenerator()
+        var csv = new RandomCsvGenerator()
             .WithColumns(columns)
             .WithRowsCount(rowsCount)
             .Generate();

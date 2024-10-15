@@ -73,20 +73,6 @@ public sealed class Compressor : IDecompressor, ICompressor
                 (x, y) => x * y)
             .GetByteCount();
 
-    private static byte[] CompressToBytes(int[] combinationItem, int[] combinationSizes)
-    {
-        var buffer = new byte[GetNumberOfBytesForCombination(combinationSizes)];
-
-        Compress(
-                combinationItem,
-                combinationSizes)
-            .TryWriteBytes(
-                buffer,
-                out _);
-
-        return buffer;
-    }
-
     private static async Task TryWriteToBufferAsync(Stream stream,
         BigInteger[] numbers,
         int sizeItem)

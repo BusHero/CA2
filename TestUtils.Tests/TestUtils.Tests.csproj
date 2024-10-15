@@ -16,7 +16,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="FluentAssertions" Version="6.12.1" />
-        <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
+        <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -31,10 +31,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="Xunit"/>
-        <Using Include="FluentAssertions"/>
-        <Using Include="FsCheck"/>
-        <Using Include="FsCheck.Xunit"/>
+        <Using Include="Xunit" />
+        <Using Include="FluentAssertions" />
+        <Using Include="FsCheck" />
+        <Using Include="FsCheck.Xunit" />
     </ItemGroup>
 
     <ItemGroup>

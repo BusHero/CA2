@@ -2,8 +2,9 @@ namespace CA2.Tests.Compression;
 
 using System.Numerics;
 
+using CsvGenerator;
+
 using GeneratorLibrary.Compression;
-using GeneratorLibrary.CsvGenerators;
 
 using TestUtils;
 

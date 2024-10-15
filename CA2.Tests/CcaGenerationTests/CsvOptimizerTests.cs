@@ -1,6 +1,7 @@
 namespace CA2.Tests.CcaGenerationTests;
 
-using GeneratorLibrary.CsvGenerators;
+using CsvGenerator;
+
 using GeneratorLibrary.Optimization;
 
 using TestUtils;

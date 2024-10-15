@@ -1,5 +1,3 @@
-﻿using GeneratorLibrary.CsvGenerators;
-
 namespace CsvGenerator.Tests;
 
 internal sealed class SpyCsvGenerator : IRandomCsvGenerator

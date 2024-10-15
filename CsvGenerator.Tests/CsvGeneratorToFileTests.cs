@@ -5,8 +5,6 @@ using AutoFixture;
 
 using FluentAssertions.Execution;
 
-using GeneratorLibrary.CsvGenerators;
-
 namespace CsvGenerator.Tests;
 
 public sealed class CsvGeneratorToFileTests

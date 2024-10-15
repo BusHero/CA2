@@ -1,4 +1,4 @@
-﻿namespace GeneratorLibrary.CsvGenerators;
+namespace CsvGenerator;
 
 public static class CsvGeneratorExtensions
 {
@@ -18,9 +18,9 @@ public static class CsvGeneratorExtensions
                 generator,
                 (gen, column) => gen.WithColumn(column));
 
-    public static IRandomCsvGenerator WithColumns(this IRandomCsvGenerator generator, string[][] columns) 
+    public static IRandomCsvGenerator WithColumns(this IRandomCsvGenerator generator, string[][] columns)
         => columns
             .Aggregate(
-                generator, 
+                generator,
                 (gen, column) => gen.WithColumn(column));
 }

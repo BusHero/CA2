@@ -1,7 +1,5 @@
 using CustomFluentAssertions;
 
-using GeneratorLibrary.CsvGenerators;
-
 using TestUtils;
 
 namespace CsvGenerator.Tests;

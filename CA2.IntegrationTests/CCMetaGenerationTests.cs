@@ -2,8 +2,7 @@ using System.IO.Abstractions;
 
 using CliWrap;
 
-using GeneratorLibrary;
-using GeneratorLibrary.CsvGenerators;
+using CsvGenerator;
 
 using Xunit.Abstractions;
 

@@ -35,15 +35,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="Xunit"/>
-        <Using Include="AutoFixture.Xunit2"/>
-        <Using Include="FluentAssertions"/>
-        <Using Include="NSubstitute"/>
-        <Using Include="FsCheck"/>
-        <Using Include="FsCheck.Xunit"/>
+        <Using Include="Xunit" />
+        <Using Include="AutoFixture.Xunit2" />
+        <Using Include="FluentAssertions" />
+        <Using Include="NSubstitute" />
+        <Using Include="FsCheck" />
+        <Using Include="FsCheck.Xunit" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\CsvGenerator\CsvGenerator.csproj" />
       <ProjectReference Include="..\CustomFluentAssertions\CustomFluentAssertions.csproj" />
       <ProjectReference Include="..\GeneratorLibrary\GeneratorLibrary.csproj" />
       <ProjectReference Include="..\TestUtils\TestUtils.csproj" />

@@ -1,18 +1,20 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/MiscFiles/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="CA2.sln.DotSettings.user" />
     <File Path="global.json" />
   </Folder>
-  <Project Path="CA2.IntegrationTests\CA2.IntegrationTests.csproj" Type="Classic C#" />
+  <Project Path="CA2.IntegrationTests\CA2.IntegrationTests.csproj" />
   <Project Path="CA2.Tests\CA2.Tests.csproj" />
   <Project Path="CA2\CA2.csproj" />
-  <Project Path="CsvGenerator.Console\CsvGenerator.Console.csproj" Type="Classic C#" />
-  <Project Path="CsvGenerator.Tests\CsvGenerator.Tests.csproj" Type="Classic C#" />
-  <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" Type="Classic C#" />
-  <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" Type="Classic C#" />
+  <Project Path="CsvGenerator.Console\CsvGenerator.Console.csproj" />
+  <Project Path="CsvGenerator.Tests\CsvGenerator.Tests.csproj" />
+  <Project Path="CsvGenerator\CsvGenerator.csproj" Type="Classic C#" />
+  <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" />
+  <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" />
   <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />
-  <Project Path="TestUtils.Tests\TestUtils.Tests.csproj" Type="Classic C#" />
-  <Project Path="TestUtils\TestUtils.csproj" Type="Classic C#" />
+  <Project Path="TestUtils.Tests\TestUtils.Tests.csproj" />
+  <Project Path="TestUtils\TestUtils.csproj" />
+</Solution>tils\TestUtils.csproj" Type="Classic C#" />
 </Solution>

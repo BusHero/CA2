@@ -1,18 +1,18 @@
 using System.IO.Abstractions;
 
-namespace GeneratorLibrary.CsvGenerators;
+namespace CsvGenerator;
 
 public class CsvGeneratorToFile(
     IFileSystem fileSystem,
     IRandomCsvGeneratorFactory factory)
 {
-    public async Task GenerateAsync(Stream writer, int rowsCount, string[][] columns) 
+    public async Task GenerateAsync(Stream writer, int rowsCount, string[][] columns)
         => await GenerateAsync(new StreamWriter(writer), rowsCount, columns);
 
     public async Task GenerateAsync(
-        string destinationFolder, 
-        string filename, 
-        int rowsCount, 
+        string destinationFolder,
+        string filename,
+        int rowsCount,
         string[][] columns)
     {
         fileSystem.Directory.CreateDirectory(destinationFolder);
@@ -30,7 +30,7 @@ public class CsvGeneratorToFile(
             .WithColumns(columns)
             .Generate()
             .Select(x => string.Join(',', x));
-        
+
         foreach (var row in csv)
         {
             await writer.WriteLineAsync(row);

@@ -14,7 +14,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CsvGenerator\CsvGenerator.csproj" />
-        <ProjectReference Include="..\GeneratorLibrary\GeneratorLibrary.csproj" />
     </ItemGroup>
 
 </Project>

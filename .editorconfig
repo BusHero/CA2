@@ -210,6 +210,8 @@ resharper_enforce_if_statement_braces_highlighting = error
 resharper_enforce_while_statement_braces_highlighting = error
 resharper_remove_redundant_braces_highlighting = error
 resharper_suggest_discard_declaration_var_style_highlighting = error
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
 
 [*.cs]
 csharp_using_directive_placement = inside_namespace:suggestion
@@ -264,3 +266,6 @@ resharper_trailing_comma_in_singleline_lists = true
 
 # ReSharper inspection severities
 resharper_arrange_default_value_when_type_not_evident_highlighting = suggestion
+csharp_style_throw_expression = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_prefer_simple_default_expression = true:suggestion

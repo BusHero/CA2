@@ -6,6 +6,7 @@
     <File Path="global.json" />
   </Folder>
   <Folder Name="/CSV/">
+    <Project Path="CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj" Type="Classic C#" />
     <Project Path="CsvGenerator.Console\CsvGenerator.Console.csproj" />
     <Project Path="CsvGenerator.Tests\CsvGenerator.Tests.csproj" />
     <Project Path="CsvGenerator\CsvGenerator.csproj" />

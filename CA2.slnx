@@ -1,9 +1,6 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-    <File Path=".gitignore" />
-    <File Path="CA2.sln.DotSettings.user" />
-    <File Path="global.json" />
+  <Folder Name="/CA2/">
+    <Project Path="CA2.Console\CA2.Console.csproj" />
   </Folder>
   <Folder Name="/CSV/">
     <Project Path="CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj" Type="Classic C#" />
@@ -11,9 +8,14 @@
     <Project Path="CsvGenerator.Tests\CsvGenerator.Tests.csproj" />
     <Project Path="CsvGenerator\CsvGenerator.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CA2.sln.DotSettings.user" />
+    <File Path="global.json" />
+  </Folder>
   <Project Path="CA2.IntegrationTests\CA2.IntegrationTests.csproj" />
   <Project Path="CA2.Tests\CA2.Tests.csproj" />
-  <Project Path="CA2\CA2.csproj" />
   <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" />
   <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" />
   <Project Path="GeneratorLibrary\GeneratorLibrary.csproj" />

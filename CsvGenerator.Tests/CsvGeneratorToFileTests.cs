@@ -1,6 +1,3 @@
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-
 using AutoFixture;
 
 using FluentAssertions.Execution;
@@ -29,158 +26,12 @@ public sealed class CsvGeneratorToFileTests
         await fixture.AssetGeneratedCsvContainsExpectedCsv(stream, csv);
     }
 
-    [Theory, AutoData]
-    public async Task FileIsCreated(
-        string filename,
-        int rowsCount,
-        string[][] columns)
-    {
-        var fixture = _builder
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            ".",
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssetFileExists($"{filename}.csv");
-    }
-
-    [Theory, AutoData]
-    public async Task FileInSpecifiedFolderIsCreated(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns)
-    {
-        var fixture = _builder
-            .WithDirectory(parent)
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssetFileExists(parent, $"{filename}.csv");
-    }
-
-    [Theory, AutoData]
-    public async Task Generate_NonExistingFolder_IsCreated(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns)
-    {
-        var fixture = _builder.Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssetFileExists(parent, $"{filename}.csv");
-    }
-
-    [Theory, AutoData]
-    public async Task Generate_ExistingDestinationFilename_DontThrow(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns)
-    {
-        var fixture = _builder
-            .WithFile(parent, filename)
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssetFileExists(parent, $"{filename}.csv");
-    }
-
-    [Theory, AutoData]
-    public async Task Generate_ExpectedCsvIsGenerated(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns,
-        string[][] csv)
-    {
-        var fixture = _builder
-            .WithFile(parent, filename)
-            .WithRandomCsv(csv)
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        await fixture.AssetGeneratedCsvContainsExpectedCsv(
-            parent,
-            $"{filename}.csv",
-            csv);
-    }
-
-    [Theory, AutoData]
-    public async Task Generate_ExpectedRowsCount(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns,
-        string[][] csv)
-    {
-        var fixture = _builder
-            .WithFile(parent, filename)
-            .WithRandomCsv(csv)
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssertExpectedRowsCount(rowsCount);
-    }
-
-    [Theory, AutoData]
-    public async Task Generate_ExpectedColumns(
-        string parent,
-        string filename,
-        int rowsCount,
-        string[][] columns,
-        string[][] csv)
-    {
-        var fixture = _builder
-            .WithFile(parent, filename)
-            .WithRandomCsv(csv)
-            .Build();
-
-        await fixture.Sut.GenerateAsync(
-            parent,
-            filename,
-            rowsCount,
-            columns);
-
-        fixture.AssertExpectedColumns(columns);
-    }
-
     private class FixtureBuilder
     {
         public static FixtureBuilder CreateDefaultBuilder()
             => new FixtureBuilder()
                 .WithRandomCsv();
 
-        private readonly Dictionary<string, MockFileData> _fileData = [];
         private readonly SpyCsvGenerator _csvGenerator = new();
         private readonly IFixture _fixture;
 
@@ -189,35 +40,15 @@ public sealed class CsvGeneratorToFileTests
 
         public Fixture Build()
         {
-            var fileSystem = new MockFileSystem(_fileData);
             var csvGeneratorFactory = Substitute.For<IRandomCsvGeneratorFactory>();
             csvGeneratorFactory.Create().Returns(_csvGenerator);
 
             var sut = new CsvFileGenerator(
-                fileSystem,
                 csvGeneratorFactory);
 
             return new Fixture(
                 sut,
-                fileSystem,
                 _csvGenerator);
-        }
-
-        public FixtureBuilder WithDirectory(string folder)
-        {
-            _fileData[folder] = new MockDirectoryData();
-
-            return this;
-        }
-
-        public FixtureBuilder WithFile(string parent, string filename)
-            => WithFile(Path.Combine(parent, filename));
-
-        private FixtureBuilder WithFile(string filename)
-        {
-            _fileData[filename] = new MockFileData(string.Empty);
-
-            return this;
         }
 
         private FixtureBuilder WithRandomCsv()
@@ -239,36 +70,9 @@ public sealed class CsvGeneratorToFileTests
 
     private class Fixture(
         CsvFileGenerator sut,
-        IFileSystem fileSystem,
         SpyCsvGenerator csvGenerator)
     {
         public CsvFileGenerator Sut { get; } = sut;
-
-        public void AssetFileExists(string parent, string filename)
-            => AssetFileExists(Path.Combine(parent, filename));
-
-        public void AssetFileExists(string filename)
-            => fileSystem
-                .File
-                .Exists(filename)
-                .Should()
-                .BeTrue();
-
-        public async Task AssetGeneratedCsvContainsExpectedCsv(
-            string parent,
-            string filename,
-            string[][] csv)
-        {
-            var actualLines = (await fileSystem
-                    .File
-                    .ReadAllLinesAsync(Path.Combine(parent, filename)))
-                .Select(x => x.Split(','))
-                .ToList();
-
-            actualLines
-                .Should()
-                .BeEquivalentTo(csv);
-        }
 
         public async Task AssetGeneratedCsvContainsExpectedCsv(
             Stream stream,

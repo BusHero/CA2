@@ -1,5 +1,3 @@
-using System.IO.Abstractions;
-
 using CliWrap;
 
 using CsvGenerator;
@@ -8,14 +6,13 @@ using Xunit.Abstractions;
 
 namespace CA2.IntegrationTests;
 
-public class CcMetaGenerationTests(
-    ITestOutputHelper output)
+public class CcMetaGenerationTests(ITestOutputHelper output)
 {
     [Fact]
     public async Task RustGeneratorTest()
     {
         var filename = await GenerateRandomCsvFile();
-        
+
         await Cli.Wrap(""".\bins\cca.exe""")
             .WithArguments(args => args
                 .Add("--no-header")
@@ -31,13 +28,16 @@ public class CcMetaGenerationTests(
     private async Task<string> GenerateRandomCsvFile()
     {
         var generator = new CsvFileGenerator(
-            new FileSystem(),
             new DefaultRandomCsvGeneratorFactory());
 
-        var filename = GenerateFilename("csv");
-        await generator.GenerateAsync(
+        var filename = Path.Combine(
             "csvs",
-            filename,
+            $"csv_{DateTime.Now:yyyy'-'MM'-'dd'T'hh'.'mm'.'ss'.'fff}");
+
+        using var stream = File.CreateText(filename);
+
+        await generator.GenerateAsync(
+            stream,
             100,
             [
                 ["foo", "bar", "baz"],
@@ -45,9 +45,6 @@ public class CcMetaGenerationTests(
                 ["foo", "bar"],
             ]);
 
-        return Path.Combine("csvs", $"{filename}.csv");
+        return filename;
     }
-
-    private static string GenerateFilename(string prefix)
-        => $"{prefix}_{DateTime.Now:yyyy'-'MM'-'dd'T'hh'.'mm'.'ss'.'fff}";
 }

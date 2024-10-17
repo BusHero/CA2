@@ -1,25 +1,7 @@
-using System.IO.Abstractions;
-
 namespace CsvGenerator;
 
-public class CsvFileGenerator(
-    IFileSystem fileSystem,
-    IRandomCsvGeneratorFactory factory)
+public class CsvFileGenerator(IRandomCsvGeneratorFactory factory) : ICsvFileGenerator
 {
-    public async Task GenerateAsync(
-        string destinationFolder,
-        string filename,
-        int rowsCount,
-        string[][] columns)
-    {
-        fileSystem.Directory.CreateDirectory(destinationFolder);
-
-        using var stream = fileSystem.File.CreateText(
-            Path.Combine(destinationFolder, $"{filename}.csv"));
-
-        await GenerateAsync(stream, rowsCount, columns);
-    }
-
     public async Task GenerateAsync(StreamWriter writer, int rowsCount, string[][] columns)
     {
         var csv = factory

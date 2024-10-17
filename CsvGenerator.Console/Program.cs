@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using Cocona;
 
 using CsvGenerator;
+using CsvGenerator.Console.Tests;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,22 +19,7 @@ public sealed class Program
 
         var app = builder.Build();
 
-        app.AddCommand(async (
-            CsvFileGenerator service,
-            IFileSystem fileSystem,
-            int rows,
-            [Option] string[] columns,
-            string filename,
-            string? destination) =>
-        {
-            var realColumns = columns.Select(x => x.Split(',').ToArray()).ToArray();
-
-            await service.GenerateAsync(
-                destination ?? fileSystem.Directory.GetCurrentDirectory(), 
-                filename, 
-                rows, 
-                realColumns);
-        });
+        app.AddCommands<CsvGeneratorCommand>();
 
         await app.RunAsync();
     }

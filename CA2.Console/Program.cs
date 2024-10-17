@@ -7,29 +7,20 @@ using GeneratorLibrary.Compression;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CA2.Console;
+var builder = CoconaApp.CreateBuilder(args);
 
-public class Program
+builder.Services.AddTransient<IFileSystem, FileSystem>();
+builder.Services.AddTransient<ICompressor, Compressor>();
+builder.Services.AddTransient<CcaGenerator>();
+
+var app = builder.Build();
+
+app.AddCommand(async (
+    string input,
+    [Option("column", ['c'])]int[] columns,
+    [FromService] CcaGenerator ccaGenerator) =>
 {
-    public static async Task Main(string[] args)
-    {
-        var builder = CoconaApp.CreateBuilder(args);
+    await ccaGenerator.GenerateCcaFile(input, columns);
+});
 
-        builder.Services.AddTransient<IFileSystem, FileSystem>();
-        builder.Services.AddTransient<ICompressor, Compressor>();
-        builder.Services.AddTransient<CcaGenerator>();
-
-        var app = builder.Build();
-
-        app.AddCommand(async (
-            string filename,
-            int[] columns,
-            [FromService] CcaGenerator ccaGenerator) =>
-        {
-            await ccaGenerator.GenerateCcaFile(filename, columns);
-            System.Console.WriteLine(filename);
-        });
-
-        await app.RunAsync();
-    }
-}
+await app.RunAsync();

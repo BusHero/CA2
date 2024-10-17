@@ -16,14 +16,14 @@ public class CsvGeneratorCommandTests
         string filename,
         string destination)
     {
-
         var realColumns = columns.Select(x => string.Join(",", x)).ToArray();
         var csvFileGenerator = new MockCsvGenerator(expectedCsv);
 
         var fileSystem = new MockFileSystem();
-        var command = new CsvGeneratorCommand(csvFileGenerator, fileSystem);
 
-        await command.Command(
+        await CsvGeneratorCommand.Command(
+            csvFileGenerator: csvFileGenerator,
+            fileSystem: fileSystem,
             rows: rows,
             columns: realColumns,
             filename: filename,

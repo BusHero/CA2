@@ -13,13 +13,13 @@ public sealed class Program
     {
         var builder = CoconaApp.CreateBuilder(args);
 
-        builder.Services.AddTransient<CsvFileGenerator>();
+        builder.Services.AddTransient<ICsvFileGenerator, CsvFileGenerator>();
         builder.Services.AddTransient<IRandomCsvGeneratorFactory, DefaultRandomCsvGeneratorFactory>();
         builder.Services.AddTransient<IFileSystem, FileSystem>();
 
         var app = builder.Build();
 
-        app.AddCommands<CsvGeneratorCommand>();
+        app.AddCommand(CsvGeneratorCommand.Command);
 
         await app.RunAsync();
     }

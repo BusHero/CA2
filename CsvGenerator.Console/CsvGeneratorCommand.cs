@@ -3,15 +3,20 @@ namespace CsvGenerator.Console.Tests;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 
-public sealed class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem fileSystem)
+using Cocona;
+
+public static class CsvGeneratorCommand
 {
-    public async Task Command(
+    public static async Task Command(
+        [FromService] ICsvFileGenerator csvFileGenerator,
+        [FromService] IFileSystem fileSystem,
         int rows,
         string[] columns,
         string filename,
         string? destination = null)
     {
         System.Console.WriteLine("Here we go");
+
         var realColumns = columns
             .Select(x => x.Split(',').ToArray())
             .ToArray();

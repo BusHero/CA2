@@ -2,11 +2,16 @@ using CliWrap;
 
 using CsvGenerator;
 
+using Microsoft.Extensions.Logging.Abstractions;
+
+using NSubstitute;
+
 using Xunit.Abstractions;
 
 namespace CA2.IntegrationTests;
 
-public class CcMetaGenerationTests(ITestOutputHelper output)
+public class CcMetaGenerationTests(
+    ITestOutputHelper output)
 {
     [Fact]
     public async Task RustGeneratorTest()
@@ -25,16 +30,15 @@ public class CcMetaGenerationTests(ITestOutputHelper output)
             .ExecuteAsync();
     }
 
-    private async Task<string> GenerateRandomCsvFile()
+    private static async Task<string> GenerateRandomCsvFile()
     {
-        var generator = new CsvFileGenerator(
-            new DefaultRandomCsvGeneratorFactory());
+        var generator = new CsvFileGenerator(new DefaultRandomCsvGeneratorFactory());
 
         var filename = Path.Combine(
             "csvs",
             $"csv_{DateTime.Now:yyyy'-'MM'-'dd'T'hh'.'mm'.'ss'.'fff}");
 
-        using var stream = File.CreateText(filename);
+        await using var stream = File.CreateText(filename);
 
         await generator.GenerateAsync(
             stream,

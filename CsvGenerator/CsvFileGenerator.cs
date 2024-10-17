@@ -1,8 +1,12 @@
 namespace CsvGenerator;
 
-public class CsvFileGenerator(IRandomCsvGeneratorFactory factory) : ICsvFileGenerator
+public class CsvFileGenerator(
+    IRandomCsvGeneratorFactory factory) : ICsvFileGenerator
 {
-    public async Task GenerateAsync(StreamWriter writer, int rowsCount, string[][] columns)
+    public async Task GenerateAsync(
+        TextWriter writer, 
+        int rowsCount, 
+        string[][] columns)
     {
         var csv = factory
             .Create()

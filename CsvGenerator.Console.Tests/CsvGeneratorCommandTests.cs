@@ -54,7 +54,7 @@ public class MockCsvGenerator(string csv) : ICsvFileGenerator
 
     public int? RowsCount { get; private set; }
 
-    public async Task GenerateAsync(StreamWriter writer, int rowsCount, string[][] columns)
+    public async Task GenerateAsync(TextWriter writer, int rowsCount, string[][] columns)
     {
         RowsCount = rowsCount;
         Columns = columns;

@@ -1,7 +1,5 @@
 using AutoFixture;
 
-using FluentAssertions.Execution;
-
 namespace CsvGenerator.Tests;
 
 public sealed class CsvGeneratorToFileTests
@@ -43,12 +41,9 @@ public sealed class CsvGeneratorToFileTests
             var csvGeneratorFactory = Substitute.For<IRandomCsvGeneratorFactory>();
             csvGeneratorFactory.Create().Returns(_csvGenerator);
 
-            var sut = new CsvFileGenerator(
-                csvGeneratorFactory);
+            var sut = new CsvFileGenerator(csvGeneratorFactory);
 
-            return new Fixture(
-                sut,
-                _csvGenerator);
+            return new Fixture(sut);
         }
 
         private FixtureBuilder WithRandomCsv()
@@ -69,8 +64,7 @@ public sealed class CsvGeneratorToFileTests
     }
 
     private class Fixture(
-        CsvFileGenerator sut,
-        SpyCsvGenerator csvGenerator)
+        CsvFileGenerator sut)
     {
         public CsvFileGenerator Sut { get; } = sut;
 
@@ -85,7 +79,7 @@ public sealed class CsvGeneratorToFileTests
             lines.Should().BeEquivalentTo(csv);
         }
 
-        public async IAsyncEnumerable<string[]> GetLines(Stream stream)
+        private static async IAsyncEnumerable<string[]> GetLines(Stream stream)
         {
             var reader = new StreamReader(stream);
 
@@ -99,33 +93,6 @@ public sealed class CsvGeneratorToFileTests
                 }
 
                 yield return line.Split(",");
-            }
-        }
-
-        public void AssertExpectedRowsCount(int rowsCount)
-            => csvGenerator.RowsCount.Should().Be(rowsCount);
-
-        public void AssertExpectedColumns(string[][] columns)
-        {
-            using (new AssertionScope())
-            {
-                csvGenerator
-                    .Columns
-                    .Should()
-                    .HaveSameCount(columns);
-
-                var actualColumns = csvGenerator
-                    .Columns
-                    .Select(x => x switch
-                    {
-                        SpyCsvGenerator.ValuesColumnDefinition { Values: var values } => values,
-                        _ => default,
-                    })
-                    .ToArray();
-
-                actualColumns
-                    .Should()
-                    .BeEquivalentTo(columns);
             }
         }
     }

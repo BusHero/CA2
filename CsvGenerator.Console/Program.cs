@@ -2,10 +2,9 @@ using System.IO.Abstractions;
 
 using Cocona;
 
-using CsvGenerator;
-using CsvGenerator.Console.Tests;
-
 using Microsoft.Extensions.DependencyInjection;
+
+namespace CsvGenerator.Console;
 
 public sealed class Program
 {

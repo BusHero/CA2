@@ -193,7 +193,7 @@ public sealed class CsvGeneratorToFileTests
             var csvGeneratorFactory = Substitute.For<IRandomCsvGeneratorFactory>();
             csvGeneratorFactory.Create().Returns(_csvGenerator);
 
-            var sut = new CsvGeneratorToFile(
+            var sut = new CsvFileGenerator(
                 fileSystem,
                 csvGeneratorFactory);
 
@@ -238,11 +238,11 @@ public sealed class CsvGeneratorToFileTests
     }
 
     private class Fixture(
-        CsvGeneratorToFile sut,
+        CsvFileGenerator sut,
         IFileSystem fileSystem,
         SpyCsvGenerator csvGenerator)
     {
-        public CsvGeneratorToFile Sut { get; } = sut;
+        public CsvFileGenerator Sut { get; } = sut;
 
         public void AssetFileExists(string parent, string filename)
             => AssetFileExists(Path.Combine(parent, filename));

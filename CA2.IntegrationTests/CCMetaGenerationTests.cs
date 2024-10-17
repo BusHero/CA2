@@ -30,7 +30,7 @@ public class CcMetaGenerationTests(
 
     private async Task<string> GenerateRandomCsvFile()
     {
-        var generator = new CsvGeneratorToFile(
+        var generator = new CsvFileGenerator(
             new FileSystem(),
             new DefaultRandomCsvGeneratorFactory());
 

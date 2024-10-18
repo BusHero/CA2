@@ -3,8 +3,6 @@ namespace GeneratorLibrary.Compression;
 using System.Numerics;
 using System.Threading.Tasks;
 
-using Optimization;
-
 public sealed class Compressor : IDecompressor, ICompressor
 {
     public static BigInteger Compress(
@@ -73,7 +71,8 @@ public sealed class Compressor : IDecompressor, ICompressor
                 (x, y) => x * y)
             .GetByteCount();
 
-    private static async Task TryWriteToBufferAsync(Stream stream,
+    private static async Task TryWriteToBufferAsync(
+        Stream stream,
         BigInteger[] numbers,
         int sizeItem)
     {
@@ -156,8 +155,46 @@ public sealed class Compressor : IDecompressor, ICompressor
 
     public async Task CompressAsync(string[][] csv, int[] sizes, Stream stream)
     {
-        var report = CsvOptimizer.Optimize(csv);
+        var report = Optimize(csv);
 
-        await CompressAsync(report.Csv, sizes, stream);
+        await CompressAsync(report, sizes, stream);
+    }
+
+    private static int[][] Optimize(string[][] csv)
+    {
+        var values = Enumerable
+            .Range(0, csv[0].Length)
+            .Select(_ => new List<string>())
+            .ToList();
+
+        foreach (var t in csv)
+        {
+            for (var j = 0; j < t.Length; j++)
+            {
+                var indexOf = values[j].IndexOf(t[j]);
+
+                if (indexOf != -1)
+                {
+                    continue;
+                }
+
+                values[j].Add(t[j]);
+            }
+        }
+
+        var result = Enumerable
+            .Range(0, csv.Length)
+            .Select(_ => new int[csv[0].Length])
+            .ToArray();
+
+        for (var i = 0; i < csv.Length; i++)
+        {
+            for (var j = 0; j < csv[i].Length; j++)
+            {
+                result[i][j] = values[j].IndexOf(csv[i][j]);
+            }
+        }
+
+        return result;
     }
 }

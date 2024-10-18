@@ -154,7 +154,10 @@ public sealed class Compressor : IDecompressor, ICompressor
         }
     }
 
-    public async Task CompressAsync(string[][] csv, int[] sizes, Stream stream)
+    public async Task CompressAsync(
+        string[][] csv, 
+        int[] sizes, 
+        Stream stream)
     {
         var report = Optimize(csv);
 
@@ -203,6 +206,7 @@ public sealed class Compressor : IDecompressor, ICompressor
     public async Task CompressAsync(
         string[][] csv,
         int[] columns,
+        byte interactionStrength,
         Stream ccaStream,
         Stream metaStream)
 #pragma warning restore IDE0060 // Remove unused parameter
@@ -210,7 +214,14 @@ public sealed class Compressor : IDecompressor, ICompressor
         using var writer = new BinaryWriter(metaStream);
 
         writer.Write(Encoding.ASCII.GetBytes(" CCA"));
-        writer.Write(2);
+        writer.Write((short)2);
+        writer.Write((long)csv.Length);
+        writer.Write(interactionStrength);
+        foreach (var column in columns)
+        {
+            writer.Write((short)column);
+        }
+        writer.Write(byte.MinValue);
 
         await Task.CompletedTask;
     }

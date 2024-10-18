@@ -1,6 +1,7 @@
 namespace GeneratorLibrary.Compression;
 
 using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
 
 public sealed class Compressor : IDecompressor, ICompressor
@@ -196,5 +197,20 @@ public sealed class Compressor : IDecompressor, ICompressor
         }
 
         return result;
+    }
+
+#pragma warning disable IDE0060 // Remove unused parameter
+    public async Task CompressAsync(
+        string[][] csv,
+        int[] columns,
+        Stream ccaStream,
+        Stream metaStream)
+#pragma warning restore IDE0060 // Remove unused parameter
+    {
+        using var writer = new BinaryWriter(metaStream);
+
+        writer.Write(Encoding.ASCII.GetBytes(" CCA"));
+
+        await Task.CompletedTask;
     }
 }

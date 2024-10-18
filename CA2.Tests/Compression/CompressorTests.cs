@@ -1,6 +1,8 @@
 namespace CA2.Tests.Compression;
 
 using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 
 using CsvGenerator;
 
@@ -268,15 +270,18 @@ public sealed class CompressorTests
     }
 
     [Property]
-    public void StreamContainsExpectedNumberOfBytes(NonEmptyArray<PositiveInt> sizes, PositiveInt rows)
+    public void StreamContainsExpectedNumberOfBytes(
+        NonEmptyArray<PositiveInt> sizes,
+        PositiveInt rows)
     {
-        var generator = new RandomCsvGenerator();
-
         using var stream = new MemoryStream();
-        var realSizes = GetRealColumns(sizes);
-        var csv = GetCsv(rows, generator, realSizes);
 
-        _compressor.CompressAsync(csv, realSizes, stream).Wait();
+        var realSizes = GetRealColumns(sizes);
+
+        _compressor.CompressAsync(
+            GetCsv(rows, realSizes),
+            realSizes,
+            stream).Wait();
         stream.Position = 0;
 
         stream
@@ -287,14 +292,14 @@ public sealed class CompressorTests
     [Property]
     public void AllRowsShouldHaveExpectedNumberOfItems(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
     {
-        var generator = new RandomCsvGenerator();
         var realSizes = GetRealColumns(sizes);
 
         using var stream = new MemoryStream();
 
-        var csv = GetCsv(rows1, generator, realSizes);
-
-        _compressor.CompressAsync(csv, realSizes, stream).Wait();
+        _compressor.CompressAsync(
+            GetCsv(rows1, realSizes),
+            realSizes,
+            stream).Wait();
         stream.Position = 0;
 
         var rows = _compressor.Decompress(realSizes, stream);
@@ -305,19 +310,38 @@ public sealed class CompressorTests
     [Property]
     public void StreamContainsExpectedNumberOfRows(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
     {
-        var generator = new RandomCsvGenerator();
         var realSizes = GetRealColumns(sizes);
 
         using var stream = new MemoryStream();
 
-        var csv = GetCsv(rows1, generator, realSizes);
+        _compressor.CompressAsync(
+            GetCsv(rows1, realSizes),
+            realSizes,
+            stream).Wait();
 
-        _compressor.CompressAsync(csv, realSizes, stream).Wait();
         stream.Position = 0;
 
         var rows = _compressor.Decompress(realSizes, stream);
 
         rows.Should().HaveCount(rows1.Get);
+    }
+
+    [Theory, AutoData]
+    public async Task MetadataStreamContainsData(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
+    {
+        await using var metaStream = new MemoryStream();
+
+        var csv = GetCsv(rows1, sizes);
+
+        await _compressor.CompressAsync(
+            csv,
+            GetRealColumns(sizes),
+            Stream.Null,
+            metaStream);
+
+        var bytes = metaStream.ToArray();
+
+        bytes.Should().StartWith(Encoding.ASCII.GetBytes(" CCA"));
     }
 
     private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
@@ -329,9 +353,13 @@ public sealed class CompressorTests
 
     private static string[][] GetCsv(
         PositiveInt rows,
-        RandomCsvGenerator generator,
+        NonEmptyArray<PositiveInt> sizes)
+        => GetCsv(rows, GetRealColumns(sizes));
+
+    private static string[][] GetCsv(
+        PositiveInt rows,
         int[] realSizes)
-        => generator
+        => new RandomCsvGenerator()
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate();

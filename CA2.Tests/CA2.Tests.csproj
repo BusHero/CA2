@@ -40,7 +40,6 @@
         <Using Include="FsCheck.Xunit" />
         <Using Include="AutoFixture.Xunit2" />
         <Using Include="FluentAssertions" />
-        <Using Include="NSubstitute" />
     </ItemGroup>
 
     <ItemGroup>

@@ -155,8 +155,8 @@ public sealed class Compressor : IDecompressor, ICompressor
     }
 
     public async Task CompressAsync(
-        string[][] csv, 
-        int[] sizes, 
+        string[][] csv,
+        int[] sizes,
         Stream stream)
     {
         var report = Optimize(csv);
@@ -202,27 +202,43 @@ public sealed class Compressor : IDecompressor, ICompressor
         return result;
     }
 
-#pragma warning disable IDE0060 // Remove unused parameter
     public async Task CompressAsync(
         string[][] csv,
         int[] columns,
         byte interactionStrength,
         Stream ccaStream,
         Stream metaStream)
-#pragma warning restore IDE0060 // Remove unused parameter
     {
-        using var writer = new BinaryWriter(metaStream);
+        await CompressAsync(
+            csv,
+            columns,
+            ccaStream);
+
+        WriteMetadataAsync(
+            csv.Length,
+            columns.Select(x => (short)x),
+            interactionStrength,
+            metaStream);
+
+        await Task.CompletedTask;
+    }
+
+    private void WriteMetadataAsync(
+        long numberOfRows,
+        IEnumerable<short> columns,
+        byte interactionStrength,
+        Stream metaStream)
+    {
+        var writer = new BinaryWriter(metaStream);
 
         writer.Write(Encoding.ASCII.GetBytes(" CCA"));
         writer.Write((short)2);
-        writer.Write((long)csv.Length);
+        writer.Write(numberOfRows);
         writer.Write(interactionStrength);
         foreach (var column in columns)
         {
-            writer.Write((short)column);
+            writer.Write(column);
         }
         writer.Write(byte.MinValue);
-
-        await Task.CompletedTask;
     }
 }

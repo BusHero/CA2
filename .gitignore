@@ -473,4 +473,6 @@ $RECYCLE.BIN/
 
 *.csv
 *.cca
+*.ccmeta
 *.zip
+bins/

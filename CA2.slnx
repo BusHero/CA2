@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/CA2/">
+    <Project Path="CA2.Console.Tests\CA2.Console.Tests.csproj" Type="Classic C#" />
     <Project Path="CA2.Console\CA2.Console.csproj" />
   </Folder>
   <Folder Name="/CSV/">

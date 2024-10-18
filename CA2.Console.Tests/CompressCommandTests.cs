@@ -1,7 +1,3 @@
-using GeneratorLibrary.Compression;
-
-namespace CA2.Tests.CcaGenerationTests;
-
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -9,14 +5,16 @@ using AutoFixture;
 
 using FluentAssertions.Execution;
 
-using GeneratorLibrary;
+using GeneratorLibrary.Compression;
 
-public sealed class CcaGeneratorTests
+namespace CA2.Console.Tests;
+
+public sealed class CompressCommandTests
 {
     private readonly FixtureBuilder _builder = new();
 
     [Theory, AutoData]
-    public async Task CcaFileGetsGenerated(int[] sizes)
+    public async Task CcaFileGetsGenerated(int[] sizes, byte strength)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
@@ -24,13 +22,13 @@ public sealed class CcaGeneratorTests
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
         var sut = fixture.Sut;
-        await sut.GenerateCcaFile(csvFilename, sizes);
+        await sut.Command(csvFilename, null, sizes, strength);
 
         fixture.AssetFileExists(ccaFilename);
     }
 
     [Theory, AutoData]
-    public async Task CcaFileContainsExpectedContent(int[] sizes)
+    public async Task CcaFileContainsExpectedContent(int[] sizes, byte strength)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
@@ -39,20 +37,20 @@ public sealed class CcaGeneratorTests
 
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
-        await fixture.Sut.GenerateCcaFile(csvFilename, sizes);
+        await fixture.Sut.Command(csvFilename, null, sizes, strength);
 
         fixture.AssetFileExists(ccaFilename, expectedContent);
     }
 
     [Theory, AutoData]
-    public async Task RightCsvGotCompressed(int[] sizes)
+    public async Task RightCsvGotCompressed(int[] sizes, byte strength)
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename, out var csv)
             .WithRandomCompressedCsv()
             .Build();
 
-        await fixture.Sut.GenerateCcaFile(csvFilename, sizes);
+        await fixture.Sut.Command(csvFilename, null, sizes, strength);
 
         using (new AssertionScope())
         {
@@ -71,7 +69,7 @@ public sealed class CcaGeneratorTests
         {
             var fileSystem = new MockFileSystem(_files);
 
-            var sut = new CcaGenerator(fileSystem, _compressor);
+            var sut = new CompressCommand(fileSystem, _compressor);
 
             return new Fixture(
                 sut,
@@ -109,11 +107,11 @@ public sealed class CcaGeneratorTests
     }
 
     private sealed class Fixture(
-        CcaGenerator sut,
+        CompressCommand sut,
         IFileSystem fileSystem,
         SpyCompressor compressor)
     {
-        public CcaGenerator Sut { get; } = sut;
+        public CompressCommand Sut { get; } = sut;
 
         public void AssetFileExists(string ccaFilename, byte[] expectedContent)
         {
@@ -142,6 +140,7 @@ public sealed class CcaGeneratorTests
         private byte[] _result = [];
 
         public List<string[][]> CompressedCsvFiles { get; } = [];
+
         public List<int[]> Sizes { get; } = [];
 
         public void WithCompressionResult(byte[] result)
@@ -150,12 +149,14 @@ public sealed class CcaGeneratorTests
         public Task CompressAsync(
             string[][] csv,
             int[] sizes,
-            Stream stream)
+            byte interactionStrength,
+            Stream ccaStream,
+            Stream metaStream)
         {
             CompressedCsvFiles.Add(csv);
             Sizes.Add(sizes);
 
-            stream.Write(_result);
+            ccaStream.Write(_result);
 
             return Task.CompletedTask;
         }

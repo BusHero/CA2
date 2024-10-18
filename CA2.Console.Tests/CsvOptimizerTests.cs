@@ -1,10 +1,10 @@
-namespace CA2.Tests.CcaGenerationTests;
-
 using CsvGenerator;
 
 using GeneratorLibrary.Optimization;
 
 using TestUtils;
+
+namespace CA2.Console.Tests;
 
 public sealed class CsvOptimizerTests
 {

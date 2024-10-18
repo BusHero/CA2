@@ -204,19 +204,19 @@ public sealed class Compressor : IDecompressor, ICompressor
 
     public async Task CompressAsync(
         string[][] csv,
-        int[] columns,
+        int[] sizes,
         byte interactionStrength,
         Stream ccaStream,
         Stream metaStream)
     {
         await CompressAsync(
             csv,
-            columns,
+            sizes,
             ccaStream);
 
         WriteMetadataAsync(
             csv.Length,
-            columns.Select(x => (short)x),
+            sizes.Select(x => (short)x),
             interactionStrength,
             metaStream);
 

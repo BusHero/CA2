@@ -15,12 +15,6 @@ builder.Services.AddTransient<CcaGenerator>();
 
 var app = builder.Build();
 
-app.AddCommand(async (
-    string input,
-    [Option("column", ['c'])]int[] columns,
-    [FromService] CcaGenerator ccaGenerator) =>
-{
-    await ccaGenerator.GenerateCcaFile(input, columns);
-});
+app.AddCommands<CompressCommand>();
 
 await app.RunAsync();

@@ -15,6 +15,6 @@ builder.Services.AddTransient<IFileSystem, FileSystem>();
 
 var app = builder.Build();
 
-app.AddCommand(CsvGeneratorCommand.Command);
+app.AddCommands<CsvGeneratorCommand>();
 
 await app.RunAsync();

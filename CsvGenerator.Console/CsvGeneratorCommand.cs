@@ -4,13 +4,11 @@ using Cocona;
 
 namespace CsvGenerator.Console;
 
-public static class CsvGeneratorCommand
+public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem fileSystem)
 {
-    public static async Task Command(
-        [FromService] ICsvFileGenerator csvFileGenerator,
-        [FromService] IFileSystem fileSystem,
+    public async Task Command(
         int rows,
-        string[] columns,
+        [Option("column", ['c'])] string[] columns,
         string? filename,
         string? destination)
     {

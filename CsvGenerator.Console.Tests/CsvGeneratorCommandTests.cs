@@ -18,12 +18,11 @@ public class CsvGeneratorCommandTests
     {
         var realColumns = columns.Select(x => string.Join(",", x)).ToArray();
         var csvFileGenerator = new MockCsvGenerator(expectedCsv);
-
         var fileSystem = new MockFileSystem();
 
-        await CsvGeneratorCommand.Command(
-            csvFileGenerator: csvFileGenerator,
-            fileSystem: fileSystem,
+        var command = new CsvGeneratorCommand(csvFileGenerator, fileSystem);
+
+        await command.Command(
             rows: rows,
             columns: realColumns,
             filename: filename,

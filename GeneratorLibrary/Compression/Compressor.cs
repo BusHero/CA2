@@ -210,6 +210,7 @@ public sealed class Compressor : IDecompressor, ICompressor
         using var writer = new BinaryWriter(metaStream);
 
         writer.Write(Encoding.ASCII.GetBytes(" CCA"));
+        writer.Write(2);
 
         await Task.CompletedTask;
     }

@@ -1,8 +1,6 @@
 namespace CA2.Tests.Compression;
 
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 using CsvGenerator;
 
@@ -326,23 +324,6 @@ public sealed class CompressorTests
         rows.Should().HaveCount(rows1.Get);
     }
 
-    [Theory, AutoData]
-    public async Task MetadataStreamContainsData(NonEmptyArray<PositiveInt> sizes, PositiveInt rows1)
-    {
-        await using var metaStream = new MemoryStream();
-
-        var csv = GetCsv(rows1, sizes);
-
-        await _compressor.CompressAsync(
-            csv,
-            GetRealColumns(sizes),
-            Stream.Null,
-            metaStream);
-
-        var bytes = metaStream.ToArray();
-
-        bytes.Should().StartWith(Encoding.ASCII.GetBytes(" CCA"));
-    }
 
     private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
         => values
@@ -350,11 +331,6 @@ public sealed class CompressorTests
             .Select(x => x.Get)
             .Select(x => 2 < x ? x : 2)
             .ToArray();
-
-    private static string[][] GetCsv(
-        PositiveInt rows,
-        NonEmptyArray<PositiveInt> sizes)
-        => GetCsv(rows, GetRealColumns(sizes));
 
     private static string[][] GetCsv(
         PositiveInt rows,

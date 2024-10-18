@@ -7,10 +7,10 @@ namespace CsvGenerator.Console;
 public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem fileSystem)
 {
     public async Task Command(
-        int rows,
+        [Option('r')]int rows,
         [Option("column", ['c'])] string[] columns,
-        string? filename,
-        string? destination)
+        [Option('o')]string? filename,
+        [Option('d')]string? destination)
     {
         var realColumns = columns
             .Select(x => x.Split(',').ToArray())

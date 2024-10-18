@@ -47,7 +47,8 @@ public class CompressCommand(
     {
         var text = await reader.ReadToEndAsync();
 
-        var csv = text.Split(System.Environment.NewLine)
+        var csv = text.Split(Environment.NewLine)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(line => line.Split(',').ToArray())
             .ToArray();
 

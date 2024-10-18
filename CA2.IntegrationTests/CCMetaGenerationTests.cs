@@ -2,10 +2,6 @@ using CliWrap;
 
 using CsvGenerator;
 
-using Microsoft.Extensions.Logging.Abstractions;
-
-using NSubstitute;
-
 using Xunit.Abstractions;
 
 namespace CA2.IntegrationTests;

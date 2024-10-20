@@ -4,7 +4,7 @@ using System.Numerics;
 
 using CsvGenerator;
 
-using GeneratorLibrary.Compression;
+using CA2.Compression;
 
 using TestUtils;
 

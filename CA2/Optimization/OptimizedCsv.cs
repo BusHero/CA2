@@ -1,4 +1,4 @@
-﻿namespace GeneratorLibrary.Optimization;
+﻿namespace CA2.Optimization;
 
 public sealed record OptimizedCsv(
     int[][] Csv,

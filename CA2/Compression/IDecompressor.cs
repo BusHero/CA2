@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace GeneratorLibrary.Compression;
+namespace CA2.Compression;
 
 public interface IDecompressor
 {

@@ -4,7 +4,7 @@ using CA2.Console;
 
 using Cocona;
 
-using GeneratorLibrary.Compression;
+using CA2.Compression;
 
 using Microsoft.Extensions.DependencyInjection;
 

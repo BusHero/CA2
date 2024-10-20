@@ -1,6 +1,6 @@
 using CsvGenerator;
 
-using GeneratorLibrary.Optimization;
+using CA2.Optimization;
 
 using TestUtils;
 

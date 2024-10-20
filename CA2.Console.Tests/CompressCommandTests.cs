@@ -5,7 +5,7 @@ using AutoFixture;
 
 using FluentAssertions.Execution;
 
-using GeneratorLibrary.Compression;
+using CA2.Compression;
 
 namespace CA2.Console.Tests;
 

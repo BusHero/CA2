@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GeneratorLibrary\GeneratorLibrary.csproj" />
+      <ProjectReference Include="..\CA2\CA2.csproj" />
     </ItemGroup>
 
     <ItemGroup>

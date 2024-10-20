@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using CsvGenerator;
 
-using GeneratorLibrary.Compression;
+using CA2.Compression;
 
 public sealed class MetadataTests
 {

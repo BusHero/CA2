@@ -2,7 +2,7 @@ using System.IO.Abstractions;
 
 using Cocona;
 
-using GeneratorLibrary.Compression;
+using CA2.Compression;
 
 namespace CA2.Console;
 

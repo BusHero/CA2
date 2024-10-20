@@ -1,4 +1,4 @@
-namespace GeneratorLibrary.Compression;
+namespace CA2.Compression;
 
 using System.IO;
 

@@ -41,7 +41,7 @@ public sealed class CsvGeneratorToFileTests
             var csvGeneratorFactory = Substitute.For<IRandomCsvGeneratorFactory>();
             csvGeneratorFactory.Create().Returns(_csvGenerator);
 
-            var sut = new CsvFileGenerator(csvGeneratorFactory);
+            var sut = new CsvGenerator(csvGeneratorFactory);
 
             return new Fixture(sut);
         }
@@ -64,9 +64,9 @@ public sealed class CsvGeneratorToFileTests
     }
 
     private class Fixture(
-        CsvFileGenerator sut)
+        CsvGenerator sut)
     {
-        public CsvFileGenerator Sut { get; } = sut;
+        public CsvGenerator Sut { get; } = sut;
 
         public async Task AssetGeneratedCsvContainsExpectedCsv(
             Stream stream,

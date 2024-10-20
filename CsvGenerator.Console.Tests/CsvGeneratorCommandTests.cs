@@ -47,7 +47,7 @@ public class CsvGeneratorCommandTests
     }
 }
 
-public class MockCsvGenerator(string csv) : ICsvFileGenerator
+public class MockCsvGenerator(string csv) : ICsvGenerator
 {
     public string[][]? Columns { get; private set; }
 

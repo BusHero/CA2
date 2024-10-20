@@ -4,7 +4,7 @@ using Cocona;
 
 namespace CsvGenerator.Console;
 
-public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem fileSystem)
+public class CsvGeneratorCommand(ICsvGenerator csvGenerator, IFileSystem fileSystem)
 {
     public async Task Command(
         [Option('r')]int rows,
@@ -19,11 +19,11 @@ public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem
         await ((filename, destination) switch
         {
             (null, null) => WriteToConsole(
-                csvFileGenerator, 
+                csvGenerator, 
                 rows, 
                 realColumns),
             _ => WriteToFile(
-                csvFileGenerator, 
+                csvGenerator, 
                 fileSystem, 
                 rows, 
                 filename!, 
@@ -32,7 +32,7 @@ public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem
         });
     }
 
-    private static async Task WriteToFile(ICsvFileGenerator csvFileGenerator,
+    private static async Task WriteToFile(ICsvGenerator csvGenerator,
         IFileSystem fileSystem,
         int rows,
         string filename,
@@ -44,16 +44,16 @@ public class CsvGeneratorCommand(ICsvFileGenerator csvFileGenerator, IFileSystem
             filename,
             destination);
 
-        await csvFileGenerator.GenerateAsync(
+        await csvGenerator.GenerateAsync(
             stream,
             rows,
             realColumns);
     }
 
-    private static async Task WriteToConsole(ICsvFileGenerator csvFileGenerator,
+    private static async Task WriteToConsole(ICsvGenerator csvGenerator,
         int rows,
         string[][] realColumns)
-        => await csvFileGenerator.GenerateAsync(
+        => await csvGenerator.GenerateAsync(
             System.Console.Out,
             rows,
             realColumns);

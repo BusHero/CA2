@@ -1,7 +1,7 @@
 namespace CsvGenerator;
 
-public class CsvFileGenerator(
-    IRandomCsvGeneratorFactory factory) : ICsvFileGenerator
+public class CsvGenerator(
+    IRandomCsvGeneratorFactory factory) : ICsvGenerator
 {
     public async Task GenerateAsync(
         TextWriter writer, 

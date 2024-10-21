@@ -15,7 +15,7 @@ public sealed class MetadataTests
     private readonly Range CA_VERSION_RANGE = 4..6;
     private readonly Range NUMBER_OF_ROWS_RANGE = 6..14;
     private readonly Range INTERACTION_STRENGTH_RANGE = 14..15;
-    private readonly Range PARAMETER_SIZES_RANGE = 15..^1;
+    private readonly Range PARAMETER_SIZES_RANGE = 15..^2;
 
     [Theory, AutoData]
     public async Task MetadataStreamContainsMagicBytes(

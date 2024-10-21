@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 public sealed class Compressor : IDecompressor, ICompressor
 {
+    private const string CCA_MAGIC_SEQUENCE = " CCA";
+    private static readonly byte[] CCA_MAGIC_SEQUENCE_BYTES = Encoding.ASCII.GetBytes(CCA_MAGIC_SEQUENCE);
+
     public static BigInteger Compress(
         int[] row,
         int[] sizes)
@@ -214,7 +217,7 @@ public sealed class Compressor : IDecompressor, ICompressor
             sizes,
             ccaStream);
 
-        WriteMetadataAsync(
+        WriteMetadata(
             csv.Length,
             sizes.Select(x => (short)x),
             interactionStrength,
@@ -223,7 +226,7 @@ public sealed class Compressor : IDecompressor, ICompressor
         await Task.CompletedTask;
     }
 
-    private void WriteMetadataAsync(
+    private static void WriteMetadata(
         long numberOfRows,
         IEnumerable<short> columns,
         byte interactionStrength,
@@ -231,7 +234,7 @@ public sealed class Compressor : IDecompressor, ICompressor
     {
         var writer = new BinaryWriter(metaStream);
 
-        writer.Write(Encoding.ASCII.GetBytes(" CCA"));
+        writer.Write(CCA_MAGIC_SEQUENCE_BYTES);
         writer.Write((short)2);
         writer.Write(numberOfRows);
         writer.Write(interactionStrength);
@@ -239,6 +242,6 @@ public sealed class Compressor : IDecompressor, ICompressor
         {
             writer.Write(column);
         }
-        writer.Write(byte.MinValue);
+        writer.Write(ushort.MinValue);
     }
 }

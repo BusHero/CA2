@@ -2,7 +2,7 @@ using AutoFixture;
 
 namespace CsvGenerator.Tests;
 
-public sealed class CsvGeneratorToFileTests
+public sealed class CsvGeneratorTests
 {
     private readonly FixtureBuilder _builder
         = FixtureBuilder.CreateDefaultBuilder();

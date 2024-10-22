@@ -127,4 +127,15 @@ public sealed class RandomCsvGeneratorTests
             .All(x => x.Length == valuesForColumn.Item.Length)
             .ToProperty();
     }
+
+    [Fact]
+    public void Foo()
+    {
+        using var stream = new MemoryStream();
+        
+        new RandomCsvGenerator()
+            .WithRowsCount(10000)
+            .WithColumns([10])
+            .Generate(stream);
+    }
 }

@@ -14,7 +14,7 @@ public sealed class RandomCsvGenerator : IRandomCsvGenerator
                 .Select(i => GetRandomValueFromRange(_columns[i]))
                 .ToArray())
             .ToArray();
-
+    
     private string GetRandomValueFromRange(string[] range)
         => range[_random.Next(range.Length)];
 

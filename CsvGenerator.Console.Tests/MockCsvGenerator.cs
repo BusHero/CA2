@@ -2,7 +2,7 @@ namespace CsvGenerator.Console.Tests;
 
 using System.Collections.Generic;
 
-public class MockCsvGenerator(IEnumerable<string[]> csv) : ICsvGenerator
+public sealed class MockCsvGenerator(IEnumerable<string[]> csv) : ICsvGenerator
 {
     public List<string[]> Columns { get; private set; } = [];
 

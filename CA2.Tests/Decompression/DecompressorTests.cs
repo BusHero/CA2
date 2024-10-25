@@ -6,7 +6,7 @@ using CA2.Compression;
 
 using Utils;
 
-public class DecompressorTests
+public sealed class DecompressorTests
 {
     [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property DecompressingCompressedNumberReturnsSameCombination(Combination combination)

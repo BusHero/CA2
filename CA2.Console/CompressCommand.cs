@@ -6,7 +6,7 @@ using CA2.Compression;
 
 namespace CA2.Console;
 
-public class CompressCommand(
+public sealed class CompressCommand(
     IFileSystem fileSystem,
     ICompressor csvCompressor)
 {

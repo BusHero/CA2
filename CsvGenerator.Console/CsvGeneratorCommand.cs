@@ -4,7 +4,7 @@ using Cocona;
 
 namespace CsvGenerator.Console;
 
-public class CsvGeneratorCommand(ICsvGeneratorFactory csvGenerator, IFileSystem fileSystem)
+public sealed class CsvGeneratorCommand(ICsvGeneratorFactory csvGenerator, IFileSystem fileSystem)
 {
     public async Task Command(
         [Option('r')] int rows,

@@ -8,7 +8,7 @@ using FluentAssertions.Execution;
 
 using NSubstitute;
 
-public class CsvGeneratorCommandTests
+public sealed class CsvGeneratorCommandTests
 {
     [Theory, AutoData]
     public async Task CommandWorksAsync(

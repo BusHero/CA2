@@ -1,5 +1,7 @@
 namespace CsvGenerator.Tests;
 
+using System.IO;
+
 internal sealed class SpyCsvGenerator : IRandomCsvGenerator
 {
     private string[][]? _csv;
@@ -25,8 +27,10 @@ internal sealed class SpyCsvGenerator : IRandomCsvGenerator
     public void WithRandomCsv(string[][] csv)
         => _csv = csv;
 
-    public string[][] Generate()
+    public IEnumerable<string[]> Generate()
         => _csv!;
+
+    public void Generate(Stream stream) => throw new NotImplementedException();
 
     internal abstract record ColumnDefinition;
 

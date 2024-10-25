@@ -2,9 +2,7 @@ namespace CsvGenerator;
 
 public interface IRandomCsvGenerator
 {
-    string[][] Generate();
-
-    void Generate(Stream stream);
+    IEnumerable<string[]> Generate();
 
     IRandomCsvGenerator WithRowsCount(int rows);
 

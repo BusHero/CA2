@@ -23,4 +23,17 @@ public static class CsvRandomGeneratorExtensions
             .Aggregate(
                 generator,
                 (gen, column) => gen.WithColumn(column));
+
+    public static void Generate(this IRandomCsvGenerator generator, Stream stream)
+    {
+        var writer = new StreamWriter(stream);
+
+        var csv = generator
+            .Generate()
+            .Select(row => string.Join(',', row));
+
+        var content = string.Join(Environment.NewLine, csv);
+        writer.Write(content);
+        writer.Flush();
+    }
 }

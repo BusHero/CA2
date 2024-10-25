@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using CustomFluentAssertions;
 
 using TestUtils;
@@ -13,7 +15,8 @@ public sealed class RandomCsvGeneratorTests
 
         var csv = generator
             .WithRowsCount(rows.Get)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         return (csv.Length == rows.Item).ToProperty();
     }
@@ -69,7 +72,7 @@ public sealed class RandomCsvGeneratorTests
                 new RandomCsvGenerator().WithRowsCount(1000),
                 (gen, column) => gen.WithColumn(column));
 
-        var csv = generator.Generate();
+        var csv = generator.Generate().ToArray();
         var pivot = csv.Pivot();
 
         return pivot
@@ -89,7 +92,7 @@ public sealed class RandomCsvGeneratorTests
                 new RandomCsvGenerator().WithRowsCount(10000),
                 (gen, column) => gen.WithColumn(column));
 
-        var csv = generator.Generate();
+        var csv = generator.Generate().ToArray();
         var pivot = csv.Pivot();
 
         return pivot
@@ -105,7 +108,7 @@ public sealed class RandomCsvGeneratorTests
             .WithRowsCount(10000)
             .WithColumn(valuesForColumn.Item);
 
-        var csv = generator.Generate();
+        var csv = generator.Generate().ToArray();
         var pivot = csv.Pivot();
 
         return pivot[0]
@@ -128,14 +131,122 @@ public sealed class RandomCsvGeneratorTests
             .ToProperty();
     }
 
-    [Fact]
-    public void Foo()
+    [Property(Arbitrary = [typeof(Generators)])]
+    public void ValuesAreWrittenIntoStream(
+        PositiveInt seed,
+        PositiveInt rows,
+        NonEmptyArray<Column> columns)
     {
         using var stream = new MemoryStream();
-        
-        new RandomCsvGenerator()
-            .WithRowsCount(10000)
-            .WithColumns([10])
+
+        var realColumns = columns
+            .Get
+            .Select(x => x.Get)
+            .ToArray();
+        var csv1 = new RandomCsvGenerator(seed.Get)
+            .WithRowsCount(rows.Get)
+            .WithColumns(realColumns)
+            .Generate();
+        new RandomCsvGenerator(seed.Get)
+            .WithRowsCount(rows.Get)
+            .WithColumns(realColumns)
             .Generate(stream);
+        stream.Position = 0;
+        var csv2 = GetCsvFromStream(stream);
+
+        csv1.Should().BeEquivalentTo(csv2);
+    }
+
+    private string[][] GetCsvFromStream(Stream stream)
+    {
+        var streamReader = new StreamReader(stream);
+
+        var content = streamReader.ReadToEnd();
+        return content.Split(Environment.NewLine).Select(x => x.Split(',')).ToArray();
+    }
+
+    [Property]
+    public void SameSeedGeneratesSameValue(
+        int seed,
+        PositiveInt rows,
+        NonEmptyArray<PositiveInt> columns)
+    {
+        var realColumns = columns
+            .Get
+            .Select(x => x.Get)
+            .ToArray();
+
+        var csv1 = new RandomCsvGenerator(seed)
+            .WithRowsCount(rows.Get)
+            .WithColumns(realColumns)
+            .Generate();
+        var csv2 = new RandomCsvGenerator(seed)
+            .WithRowsCount(rows.Get)
+            .WithColumns(realColumns)
+            .Generate();
+
+        csv1.Should().BeEquivalentTo(csv2);
+    }
+
+    [Property(Arbitrary = [typeof(Generators)])]
+    public Property DifferentSeedsGenerateDifferentValues(
+        PositiveInt seed1,
+        PositiveInt seed2,
+        NonEmptyArray<Column> columns)
+    {
+        var realColumns = columns
+            .Get
+            .Select(x => x.Get)
+            .ToArray();
+
+        var csv1 = new RandomCsvGenerator(seed1.Get)
+            .WithRowsCount(100)
+            .WithColumns(realColumns)
+            .Generate();
+        var csv2 = new RandomCsvGenerator(seed2.Get)
+            .WithRowsCount(100)
+            .WithColumns(realColumns)
+            .Generate();
+
+        var jsonCsv1 = JsonSerializer.Serialize(csv1);
+        var jsonCsv2 = JsonSerializer.Serialize(csv2);
+
+        return (jsonCsv1 != jsonCsv2).When(seed1.Get != seed2.Get);
+    }
+
+    [Property(Arbitrary = [typeof(Generators)])]
+    public Property GeneratorsWithoutSeedsGenerateDifferentCsvs(
+        NonEmptyArray<Column> columns)
+    {
+        var realColumns = columns
+            .Get
+            .Select(x => x.Get)
+            .ToArray();
+
+        var csv1 = new RandomCsvGenerator()
+            .WithRowsCount(100)
+            .WithColumns(realColumns)
+            .Generate();
+        var csv2 = new RandomCsvGenerator()
+            .WithRowsCount(100)
+            .WithColumns(realColumns)
+            .Generate();
+
+        var jsonCsv1 = JsonSerializer.Serialize(csv1);
+        var jsonCsv2 = JsonSerializer.Serialize(csv2);
+
+        return (jsonCsv1 != jsonCsv2).ToProperty();
     }
 }
+
+public static class Generators
+{
+    public static Arbitrary<Column> Generator()
+        => Arb.Default.PositiveInt()
+            .Generator
+            .Select(x => 2 <= x.Get ? x.Get : 2)
+            .Select(x => new Column(x))
+            .ToArbitrary();
+}
+
+public record Column(int Get);

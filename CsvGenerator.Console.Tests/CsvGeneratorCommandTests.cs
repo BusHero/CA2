@@ -6,21 +6,27 @@ using System.Threading.Tasks;
 
 using FluentAssertions.Execution;
 
+using NSubstitute;
+
 public class CsvGeneratorCommandTests
 {
     [Theory, AutoData]
     public async Task CommandWorksAsync(
         int rows,
         string[][] columns,
-        string expectedCsv,
+        string[][] expectedCsv,
         string filename,
         string destination)
     {
         var realColumns = columns.Select(x => string.Join(",", x)).ToArray();
         var csvFileGenerator = new MockCsvGenerator(expectedCsv);
+        var factory = Substitute.For<ICsvGeneratorFactory>();
+
+        factory.Create().Returns(csvFileGenerator);
+
         var fileSystem = new MockFileSystem();
 
-        var command = new CsvGeneratorCommand(csvFileGenerator, fileSystem);
+        var command = new CsvGeneratorCommand(factory, fileSystem);
 
         await command.Command(
             rows: rows,
@@ -41,23 +47,11 @@ public class CsvGeneratorCommandTests
                 .BeEquivalentTo(columns);
 
             var realCsv = await fileSystem.File.ReadAllTextAsync(Path.Combine(destination, $"{filename}.csv"));
-
-            realCsv.Should().BeEquivalentTo(expectedCsv);
+            realCsv
+                .Split(Environment.NewLine)
+                .Select(x => x.Split(','))
+                .Should()
+                .BeEquivalentTo(expectedCsv);
         }
-    }
-}
-
-public class MockCsvGenerator(string csv) : ICsvGenerator
-{
-    public string[][]? Columns { get; private set; }
-
-    public int? RowsCount { get; private set; }
-
-    public async Task GenerateAsync(TextWriter writer, int rowsCount, string[][] columns)
-    {
-        RowsCount = rowsCount;
-        Columns = columns;
-
-        await writer.WriteAsync(csv);
     }
 }

@@ -4,7 +4,7 @@ using Cocona;
 
 namespace CsvGenerator.Console;
 
-public class CsvGeneratorCommand(ICsvGenerator csvGenerator, IFileSystem fileSystem)
+public class CsvGeneratorCommand(ICsvGeneratorFactory csvGenerator, IFileSystem fileSystem)
 {
     public async Task Command(
         [Option('r')] int rows,
@@ -16,28 +16,22 @@ public class CsvGeneratorCommand(ICsvGenerator csvGenerator, IFileSystem fileSys
             .Select(x => x.Split(',').ToArray())
             .ToArray();
 
+        var generator = csvGenerator
+            .Create()
+            .WithRowsCount(rows)
+            .WithColumns(realColumns);
+
         await ((filename, destination) switch
         {
-            (null, null) => WriteToConsole(
-                csvGenerator,
-                rows,
-                realColumns),
-            _ => WriteToFile(
-                csvGenerator,
-                fileSystem,
-                rows,
-                filename!,
-                destination,
-                realColumns),
+            (null, null) => WriteToConsole(generator),
+            _ => WriteToFile(generator, fileSystem, filename!, destination),
         });
     }
 
     private static async Task WriteToFile(ICsvGenerator csvGenerator,
         IFileSystem fileSystem,
-        int rows,
         string filename,
-        string? destination,
-        string[][] realColumns)
+        string? destination)
     {
         destination ??= fileSystem.Directory.GetCurrentDirectory();
 
@@ -46,17 +40,9 @@ public class CsvGeneratorCommand(ICsvGenerator csvGenerator, IFileSystem fileSys
         await using var stream = fileSystem.File.CreateText(
             Path.Combine(destination, $"{filename}.csv"));
 
-        await csvGenerator.GenerateAsync(
-            stream,
-            rows,
-            realColumns);
+        await csvGenerator.GenerateAsync(stream);
     }
 
-    private static async Task WriteToConsole(ICsvGenerator csvGenerator,
-        int rows,
-        string[][] realColumns)
-        => await csvGenerator.GenerateAsync(
-            System.Console.Out,
-            rows,
-            realColumns);
+    private static async Task WriteToConsole(ICsvGenerator csvGenerator)
+        => await csvGenerator.GenerateAsync(System.Console.Out);
 }

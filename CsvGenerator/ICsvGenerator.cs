@@ -1,12 +1,10 @@
 namespace CsvGenerator;
 
-using System.IO;
-using System.Threading.Tasks;
-
 public interface ICsvGenerator
 {
-    Task GenerateAsync(
-        TextWriter writer, 
-        int rowsCount, 
-        string[][] columns);
+    IEnumerable<string[]> Generate();
+
+    ICsvGenerator WithRowsCount(int rows);
+
+    ICsvGenerator WithColumn(string[] column);
 }

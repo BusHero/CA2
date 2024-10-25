@@ -8,10 +8,12 @@ namespace CsvGenerator.Tests;
 
 public sealed class RandomCsvGeneratorTests
 {
+    private readonly DefaultRandomCsvGeneratorFactory _factory = new DefaultRandomCsvGeneratorFactory();
+
     [Property]
     public Property ReportContainsSpecifiedNumberOfRows(PositiveInt rows)
     {
-        var generator = new RandomCsvGenerator();
+        var generator = _factory.Create();
 
         var csv = generator
             .WithRowsCount(rows.Get)
@@ -30,7 +32,7 @@ public sealed class RandomCsvGeneratorTests
             .Item
             .Select(x => x.Item)
             .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(rows.Get),
+                _factory.Create().WithRowsCount(rows.Get),
                 (gen, column) => gen.WithColumn(column));
 
         var csv = generator.Generate();
@@ -49,7 +51,7 @@ public sealed class RandomCsvGeneratorTests
             .Item
             .Select(x => x.Item)
             .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(rows.Item),
+                _factory.Create().WithRowsCount(rows.Item),
                 (gen, column) => gen.WithColumn(column));
 
         var csv = generator.Generate();
@@ -69,7 +71,7 @@ public sealed class RandomCsvGeneratorTests
             .Item
             .Select(x => x.Item.Select(y => y.Get).ToArray())
             .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(1000),
+                _factory.Create().WithRowsCount(1000),
                 (gen, column) => gen.WithColumn(column));
 
         var csv = generator.Generate().ToArray();
@@ -89,7 +91,7 @@ public sealed class RandomCsvGeneratorTests
             .Item
             .Select(x => x.Item.Select(y => y.Get).ToArray())
             .Aggregate(
-                new RandomCsvGenerator().WithRowsCount(10000),
+                _factory.Create().WithRowsCount(10000),
                 (gen, column) => gen.WithColumn(column));
 
         var csv = generator.Generate().ToArray();
@@ -104,7 +106,7 @@ public sealed class RandomCsvGeneratorTests
     [Property]
     public Property Column5(PositiveInt valuesForColumn)
     {
-        var generator = new RandomCsvGenerator()
+        var generator = _factory.Create()
             .WithRowsCount(10000)
             .WithColumn(valuesForColumn.Item);
 
@@ -120,7 +122,7 @@ public sealed class RandomCsvGeneratorTests
         NonEmptyArray<PositiveInt> valuesForColumn)
     {
         var columns = valuesForColumn.Item.Select(x => x.Item).ToArray();
-        var generator = new RandomCsvGenerator()
+        var generator = _factory.Create()
             .WithRowsCount(10000)
             .WithColumns(columns);
 
@@ -144,26 +146,31 @@ public sealed class RandomCsvGeneratorTests
             .Get
             .Select(x => x.Get)
             .ToArray();
-        var csv1 = new RandomCsvGenerator(seed.Get)
+        var csv1 = _factory.Create(seed.Get)
             .WithRowsCount(rows.Get)
             .WithColumns(realColumns)
             .Generate();
-        new RandomCsvGenerator(seed.Get)
+        _factory.Create(seed.Get)
             .WithRowsCount(rows.Get)
             .WithColumns(realColumns)
-            .Generate(writer);
+            .GenerateAsync(writer)
+            .Wait();
+
         stream.Position = 0;
-        var csv2 = GetCsvFromStream(stream);
+        using var reader = new StreamReader(stream);
+        var csv2 = GetCsvFromStream(reader);
 
         csv1.Should().BeEquivalentTo(csv2);
     }
 
-    private string[][] GetCsvFromStream(Stream stream)
+    private static string[][] GetCsvFromStream(StreamReader reader)
     {
-        var streamReader = new StreamReader(stream);
+        var content = reader.ReadToEnd();
 
-        var content = streamReader.ReadToEnd();
-        return content.Split(Environment.NewLine).Select(x => x.Split(',')).ToArray();
+        return content
+            .Split(Environment.NewLine)
+            .Select(x => x.Split(','))
+            .ToArray();
     }
 
     [Property]
@@ -177,11 +184,11 @@ public sealed class RandomCsvGeneratorTests
             .Select(x => x.Get)
             .ToArray();
 
-        var csv1 = new RandomCsvGenerator(seed)
+        var csv1 = _factory.Create(seed)
             .WithRowsCount(rows.Get)
             .WithColumns(realColumns)
             .Generate();
-        var csv2 = new RandomCsvGenerator(seed)
+        var csv2 = _factory.Create(seed)
             .WithRowsCount(rows.Get)
             .WithColumns(realColumns)
             .Generate();
@@ -200,11 +207,11 @@ public sealed class RandomCsvGeneratorTests
             .Select(x => x.Get)
             .ToArray();
 
-        var csv1 = new RandomCsvGenerator(seed1.Get)
+        var csv1 = _factory.Create(seed1.Get)
             .WithRowsCount(100)
             .WithColumns(realColumns)
             .Generate();
-        var csv2 = new RandomCsvGenerator(seed2.Get)
+        var csv2 = _factory.Create(seed2.Get)
             .WithRowsCount(100)
             .WithColumns(realColumns)
             .Generate();
@@ -224,11 +231,11 @@ public sealed class RandomCsvGeneratorTests
             .Select(x => x.Get)
             .ToArray();
 
-        var csv1 = new RandomCsvGenerator()
+        var csv1 = _factory.Create()
             .WithRowsCount(100)
             .WithColumns(realColumns)
             .Generate();
-        var csv2 = new RandomCsvGenerator()
+        var csv2 = _factory.Create()
             .WithRowsCount(100)
             .WithColumns(realColumns)
             .Generate();

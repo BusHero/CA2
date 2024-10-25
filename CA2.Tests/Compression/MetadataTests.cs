@@ -137,7 +137,8 @@ public sealed class MetadataTests
     private static string[][] GetCsv(
         PositiveInt rows,
         int[] realSizes)
-        => new RandomCsvGenerator()
+        => new DefaultRandomCsvGeneratorFactory()
+            .Create()
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate()

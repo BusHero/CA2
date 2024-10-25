@@ -1,8 +1,17 @@
-namespace CA2.Optimization;
+namespace CA2.Extractors;
 
-public static class CsvOptimizer
+public sealed class CsvExtractor : IExtractor
 {
-    public static OptimizedCsv Optimize(string[][] csv)
+    public async Task<int[][]> ExtractAsync(TextReader reader)
+    {
+        var csv = await GetCsv(reader);
+
+        var report = Optimize(csv);
+
+        return report;
+    }
+
+    private static int[][] Optimize(string[][] csv)
     {
         var values = Enumerable
             .Range(0, csv[0].Length)
@@ -37,8 +46,18 @@ public static class CsvOptimizer
             }
         }
 
-        return new OptimizedCsv(
-            result,
-            values);
+        return result;
+    }
+
+    private static async Task<string[][]> GetCsv(TextReader reader)
+    {
+        var text = await reader.ReadToEndAsync();
+
+        var csv = text.Split(Environment.NewLine)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(line => line.Split(',').ToArray())
+            .ToArray();
+
+        return csv;
     }
 }

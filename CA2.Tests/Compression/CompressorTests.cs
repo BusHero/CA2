@@ -270,19 +270,23 @@ public sealed class CompressorTests
     [Property]
     public void StreamContainsExpectedNumberOfBytes(
         NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows)
+        PositiveInt rows,
+        byte interactionStrength)
     {
-        using var stream = new MemoryStream();
+        using var ccaStream = new MemoryStream();
+        using var metaStream = new MemoryStream();
 
         var realSizes = GetRealColumns(sizes);
 
         _compressor.CompressAsync(
             GetCsv(rows, realSizes),
             realSizes,
-            stream).Wait();
-        stream.Position = 0;
+            interactionStrength,
+            ccaStream,
+            metaStream).Wait();
+        ccaStream.Position = 0;
 
-        stream
+        ccaStream
             .Should()
             .HaveLength(realSizes.CalculateMaximumNumber().GetByteCount() * rows.Get);
     }
@@ -292,15 +296,18 @@ public sealed class CompressorTests
     {
         var realSizes = GetRealColumns(sizes);
 
-        using var stream = new MemoryStream();
+        using var ccaStream = new MemoryStream();
+        using var metaStream = new MemoryStream();
 
         _compressor.CompressAsync(
             GetCsv(rows1, realSizes),
             realSizes,
-            stream).Wait();
-        stream.Position = 0;
+            10,
+            ccaStream,
+            metaStream).Wait();
+        ccaStream.Position = 0;
 
-        var rows = _compressor.Decompress(realSizes, stream);
+        var rows = _compressor.Decompress(realSizes, ccaStream);
 
         rows.Should().AllSatisfy(x => x.Should().HaveSameCount(sizes.Get));
     }
@@ -310,16 +317,19 @@ public sealed class CompressorTests
     {
         var realSizes = GetRealColumns(sizes);
 
-        using var stream = new MemoryStream();
+        using var ccaStream = new MemoryStream();
+        using var metaStream = new MemoryStream();
 
         _compressor.CompressAsync(
             GetCsv(rows1, realSizes),
             realSizes,
-            stream).Wait();
+            10,
+            ccaStream,
+            metaStream).Wait();
 
-        stream.Position = 0;
+        ccaStream.Position = 0;
 
-        var rows = _compressor.Decompress(realSizes, stream);
+        var rows = _compressor.Decompress(realSizes, ccaStream);
 
         rows.Should().HaveCount(rows1.Get);
     }
@@ -332,7 +342,7 @@ public sealed class CompressorTests
             .Select(x => 2 < x ? x : 2)
             .ToArray();
 
-    private static string[][] GetCsv(
+    private static int[][] GetCsv(
         PositiveInt rows,
         int[] realSizes)
         => new DefaultRandomCsvGeneratorFactory()
@@ -340,6 +350,7 @@ public sealed class CompressorTests
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate()
+            .Select(row => row.Select(x => int.Parse(x)).ToArray())
             .ToArray();
 
     private static int[] GetSizes(int numbersLength)

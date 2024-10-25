@@ -129,12 +129,12 @@ public sealed class MetadataTests
             .Select(x => 2 < x ? x : 2)
             .ToArray();
 
-    private static string[][] GetCsv(
+    private static int[][] GetCsv(
         PositiveInt rows,
         NonEmptyArray<PositiveInt> sizes)
         => GetCsv(rows, GetRealColumns(sizes));
 
-    private static string[][] GetCsv(
+    private static int[][] GetCsv(
         PositiveInt rows,
         int[] realSizes)
         => new DefaultRandomCsvGeneratorFactory()
@@ -142,5 +142,6 @@ public sealed class MetadataTests
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate()
+            .Select(row => row.Select(x => int.Parse(x)).ToArray())
             .ToArray();
 }

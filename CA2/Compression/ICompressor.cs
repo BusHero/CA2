@@ -5,9 +5,9 @@ using System.IO;
 public interface ICompressor
 {
     Task CompressAsync(
-        string[][] csv, 
-        int[] sizes, 
-        byte interactionStrength, 
-        Stream ccaStream, 
+        int[][] csv,
+        int[] sizes,
+        byte interactionStrength,
+        Stream ccaStream,
         Stream metaStream);
 }

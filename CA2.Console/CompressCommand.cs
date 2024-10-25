@@ -3,11 +3,13 @@ using System.IO.Abstractions;
 using Cocona;
 
 using CA2.Compression;
+using CA2.Extractors;
 
 namespace CA2.Console;
 
 public sealed class CompressCommand(
     IFileSystem fileSystem,
+    IExtractor extractor,
     ICompressor csvCompressor)
 {
     public async Task Command(
@@ -16,7 +18,7 @@ public sealed class CompressCommand(
         [Option("column", ['c'])] int[] columns,
         [Option('t')] byte strength)
     {
-        var csv = await GetCsv(input);
+        var csv =  await GetCsv(input);
 
         output ??= input ?? "test";
 
@@ -31,28 +33,16 @@ public sealed class CompressCommand(
             metaFile);
     }
 
-    private async Task<string[][]> GetCsv(string? inputFile)
+    private async Task<int[][]> GetCsv(string? inputFile)
     {
         if (inputFile == null)
         {
-            return await GetCsv(System.Console.In);
+            return await extractor.ExtractAsync(System.Console.In);
         }
 
         using var inputStream = fileSystem.File.OpenText(inputFile);
 
-        return await GetCsv(inputStream);
-    }
-
-    private static async Task<string[][]> GetCsv(TextReader reader)
-    {
-        var text = await reader.ReadToEndAsync();
-
-        var csv = text.Split(Environment.NewLine)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(line => line.Split(',').ToArray())
-            .ToArray();
-
-        return csv;
+        return await extractor.ExtractAsync(inputStream);
     }
 
     private string GetCcaFilename(string inputFile)

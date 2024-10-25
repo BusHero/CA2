@@ -19,7 +19,8 @@ public sealed class CsvOptimizerTests
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumn)
             .WithRowsCount(1_000)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
@@ -40,7 +41,8 @@ public sealed class CsvOptimizerTests
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumn)
             .WithRowsCount(1_000)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
@@ -60,7 +62,8 @@ public sealed class CsvOptimizerTests
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumn)
             .WithRowsCount(1_000)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
@@ -81,7 +84,8 @@ public sealed class CsvOptimizerTests
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumn)
             .WithRowsCount(1_000)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var result = CsvOptimizer.Optimize(csv);
         var pivot = result.Csv.Pivot();
@@ -102,7 +106,8 @@ public sealed class CsvOptimizerTests
             .Aggregate(
                 new RandomCsvGenerator().WithRowsCount(1_000),
                 (gen, column) => gen.WithColumn(column))
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var report = CsvOptimizer.Optimize(csv);
 
@@ -125,7 +130,8 @@ public sealed class CsvOptimizerTests
             .Aggregate(
                 new RandomCsvGenerator().WithRowsCount(1_000),
                 (gen, column) => gen.WithColumn(column))
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var report = CsvOptimizer.Optimize(csv);
 
@@ -148,7 +154,8 @@ public sealed class CsvOptimizerTests
             .Aggregate(
                 new RandomCsvGenerator().WithRowsCount(1_000),
                 (gen, column) => gen.WithColumn(column))
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var report = CsvOptimizer.Optimize(csv);
 
@@ -175,7 +182,8 @@ public sealed class CsvOptimizerTests
         var csv = new RandomCsvGenerator()
             .WithColumns(realColumns)
             .WithRowsCount(10000)
-            .Generate();
+            .Generate()
+            .ToArray();
 
         var report = CsvOptimizer.Optimize(csv);
 

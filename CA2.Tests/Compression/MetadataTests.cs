@@ -140,5 +140,6 @@ public sealed class MetadataTests
         => new RandomCsvGenerator()
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
-            .Generate();
+            .Generate()
+            .ToArray();
 }

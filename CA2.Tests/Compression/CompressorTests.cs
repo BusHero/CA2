@@ -338,7 +338,8 @@ public sealed class CompressorTests
         => new RandomCsvGenerator()
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
-            .Generate();
+            .Generate()
+            .ToArray();
 
     private static int[] GetSizes(int numbersLength)
         => Enumerable

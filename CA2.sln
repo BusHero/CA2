@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA2", "CA2\CA2.csproj", "{4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA2.Tests", "CA2.Tests\CA2.Tests.csproj", "{8368DE00-5F0D-486B-9656-60D0F3D09BEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneratorLibrary", "GeneratorLibrary\GeneratorLibrary.csproj", "{DDCF59FD-BD6F-4894-99BD-2B78FF9C896E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MiscFiles", "MiscFiles", "{F1F4EB0D-AE37-462E-A06A-FA91C0AC4BAA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{F1F4EB0D-AE37-462E-A06A-FA91C0AC4BAA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
@@ -17,29 +15,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MiscFiles", "MiscFiles", "{
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomCsvGenerator", "RandomCsvGenerator\RandomCsvGenerator.csproj", "{71858DEB-7EB7-419F-9933-604855677EA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA2.Console", "CA2.Console\CA2.Console.csproj", "{620396DC-F5EF-4721-9A35-167FD7367EC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA2.IntegrationTests", "CA2.IntegrationTests\CA2.IntegrationTests.csproj", "{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA2.Console.Tests", "CA2.Console.Tests\CA2.Console.Tests.csproj", "{4157D20D-5FE7-41D8-8AF0-902C53451276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA2.Console", "CA2.Console\CA2.Console.csproj", "{620396DC-F5EF-4721-9A35-167FD7367EC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator", "CsvGenerator\CsvGenerator.csproj", "{1D0DEBD9-68EA-49B1-8CA3-658FB8B02603}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA2.Console.Tests", "CA2.Console.Tests\CA2.Console.Tests.csproj", "{4157D20D-5FE7-41D8-8AF0-902C53451276}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator.Console", "CsvGenerator.Console\CsvGenerator.Console.csproj", "{3A03833A-C3C9-42E7-989F-5D7CA069940E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator", "CsvGenerator\CsvGenerator.csproj", "{1D0DEBD9-68EA-49B1-8CA3-658FB8B02603}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator.Console.Tests", "CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj", "{A72D2751-B57D-4529-A566-C5A64FF6B66E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator.Console", "CsvGenerator.Console\CsvGenerator.Console.csproj", "{3A03833A-C3C9-42E7-989F-5D7CA069940E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvGenerator.Tests", "CsvGenerator.Tests\CsvGenerator.Tests.csproj", "{4B45E44F-AAE5-4887-91E7-9C288890A8AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator.Console.Tests", "CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj", "{A72D2751-B57D-4529-A566-C5A64FF6B66E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFluentAssertions", "CustomFluentAssertions\CustomFluentAssertions.csproj", "{B3637A03-D563-4318-9E40-3DA3AB7202B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvGenerator.Tests", "CsvGenerator.Tests\CsvGenerator.Tests.csproj", "{4B45E44F-AAE5-4887-91E7-9C288890A8AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFluentAssertions.Tests", "CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj", "{A7E268E8-5121-467B-B0EE-F37CA8C99672}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFluentAssertions", "CustomFluentAssertions\CustomFluentAssertions.csproj", "{B3637A03-D563-4318-9E40-3DA3AB7202B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtils", "TestUtils\TestUtils.csproj", "{238AA7C2-C5AB-4C80-9477-ACE3E7417765}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFluentAssertions.Tests", "CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj", "{A7E268E8-5121-467B-B0EE-F37CA8C99672}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtils.Tests", "TestUtils.Tests\TestUtils.Tests.csproj", "{4EFD12B7-D3CF-4856-AFA4-85FC52EEEEBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils", "TestUtils\TestUtils.csproj", "{238AA7C2-C5AB-4C80-9477-ACE3E7417765}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CA2", "CA2", "{4839A986-B837-4E31-A438-26BC91CCF0D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils.Tests", "TestUtils.Tests\TestUtils.Tests.csproj", "{4EFD12B7-D3CF-4856-AFA4-85FC52EEEEBD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSV", "CSV", "{44E370BB-9CD7-429F-AB5B-50FDD5513AA2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FluentAssertions", "FluentAssertions", "{8D899D92-8D24-444C-87F4-FAADC8048089}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestUtils", "TestUtils", "{5A2316D6-A9C7-44CA-BE6E-6B7E1C62DF47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,18 +57,6 @@ Global
 		{8368DE00-5F0D-486B-9656-60D0F3D09BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8368DE00-5F0D-486B-9656-60D0F3D09BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8368DE00-5F0D-486B-9656-60D0F3D09BEB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDCF59FD-BD6F-4894-99BD-2B78FF9C896E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDCF59FD-BD6F-4894-99BD-2B78FF9C896E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDCF59FD-BD6F-4894-99BD-2B78FF9C896E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDCF59FD-BD6F-4894-99BD-2B78FF9C896E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71858DEB-7EB7-419F-9933-604855677EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71858DEB-7EB7-419F-9933-604855677EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71858DEB-7EB7-419F-9933-604855677EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71858DEB-7EB7-419F-9933-604855677EA6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE22D71F-B34F-4BFD-8F8F-AAA3FA68FAB9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{620396DC-F5EF-4721-9A35-167FD7367EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{620396DC-F5EF-4721-9A35-167FD7367EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{620396DC-F5EF-4721-9A35-167FD7367EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -110,6 +100,20 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4AE72C1B-7861-4663-8E39-A0F0FE673E98} = {4839A986-B837-4E31-A438-26BC91CCF0D0}
+		{8368DE00-5F0D-486B-9656-60D0F3D09BEB} = {4839A986-B837-4E31-A438-26BC91CCF0D0}
+		{620396DC-F5EF-4721-9A35-167FD7367EC8} = {4839A986-B837-4E31-A438-26BC91CCF0D0}
+		{4157D20D-5FE7-41D8-8AF0-902C53451276} = {4839A986-B837-4E31-A438-26BC91CCF0D0}
+		{1D0DEBD9-68EA-49B1-8CA3-658FB8B02603} = {44E370BB-9CD7-429F-AB5B-50FDD5513AA2}
+		{3A03833A-C3C9-42E7-989F-5D7CA069940E} = {44E370BB-9CD7-429F-AB5B-50FDD5513AA2}
+		{A72D2751-B57D-4529-A566-C5A64FF6B66E} = {44E370BB-9CD7-429F-AB5B-50FDD5513AA2}
+		{4B45E44F-AAE5-4887-91E7-9C288890A8AC} = {44E370BB-9CD7-429F-AB5B-50FDD5513AA2}
+		{B3637A03-D563-4318-9E40-3DA3AB7202B5} = {8D899D92-8D24-444C-87F4-FAADC8048089}
+		{A7E268E8-5121-467B-B0EE-F37CA8C99672} = {8D899D92-8D24-444C-87F4-FAADC8048089}
+		{238AA7C2-C5AB-4C80-9477-ACE3E7417765} = {5A2316D6-A9C7-44CA-BE6E-6B7E1C62DF47}
+		{4EFD12B7-D3CF-4856-AFA4-85FC52EEEEBD} = {5A2316D6-A9C7-44CA-BE6E-6B7E1C62DF47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7D2D18-DD95-4EA3-B6C5-0937F17F78EE}

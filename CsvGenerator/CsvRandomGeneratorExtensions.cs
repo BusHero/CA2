@@ -24,10 +24,10 @@ public static class CsvRandomGeneratorExtensions
                 generator,
                 (gen, column) => gen.WithColumn(column));
 
-    public static void Generate(this IRandomCsvGenerator generator, Stream stream)
+    public static void Generate(
+        this IRandomCsvGenerator generator, 
+        TextWriter writer)
     {
-        var writer = new StreamWriter(stream);
-
         var csv = generator
             .Generate()
             .Select(row => string.Join(',', row));

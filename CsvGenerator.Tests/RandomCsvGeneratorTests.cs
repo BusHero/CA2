@@ -138,6 +138,7 @@ public sealed class RandomCsvGeneratorTests
         NonEmptyArray<Column> columns)
     {
         using var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream);
 
         var realColumns = columns
             .Get
@@ -150,7 +151,7 @@ public sealed class RandomCsvGeneratorTests
         new RandomCsvGenerator(seed.Get)
             .WithRowsCount(rows.Get)
             .WithColumns(realColumns)
-            .Generate(stream);
+            .Generate(writer);
         stream.Position = 0;
         var csv2 = GetCsvFromStream(stream);
 

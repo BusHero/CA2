@@ -247,14 +247,4 @@ public sealed class RandomCsvGeneratorTests
     }
 }
 
-public static class Generators
-{
-    public static Arbitrary<Column> Generator()
-        => Arb.Default.PositiveInt()
-            .Generator
-            .Select(x => 2 <= x.Get ? x.Get : 2)
-            .Select(x => new Column(x))
-            .ToArbitrary();
-}
-
 public record Column(int Get);

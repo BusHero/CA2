@@ -9,7 +9,7 @@ using TestUtils;
 
 namespace ActsGenerator.Tests;
 
-public class ActsGeneratorTests
+public sealed class ActsGeneratorTests
 {
     public ActsGeneratorTests()
         => Arb.Register<Generators>();

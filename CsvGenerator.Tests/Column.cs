@@ -1,3 +1,3 @@
 ﻿namespace CsvGenerator.Tests;
 
-public record Column(int Get);
+public sealed record Column(int Get);

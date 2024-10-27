@@ -1,3 +1,7 @@
+using System.Text.Json;
+
+using FluentAssertions;
+
 using FsCheck;
 using FsCheck.Xunit;
 
@@ -96,6 +100,100 @@ public class ActsGeneratorTests
             .Select((row, i) => row.All(item => 0 <= item && item <= columns.Get[i].Get))
             .All(x => x)
             .ToProperty();
+    }
+
+    [Property]
+    public Property AddEmptyLineAtEnd(PositiveInt rows, ColumnSize column)
+    {
+        var acts = new ActsGenerator()
+            .WithRows(rows.Get)
+            .WithColumn(column.Get)
+            .AddEmptyLineAtEnd()
+            .Generate()
+            .ToArray();
+
+        var anAdditionalLine = (acts.Length == rows.Get + 2).ToProperty();
+
+        return anAdditionalLine.And(string.IsNullOrEmpty(acts[^1]));
+    }
+    
+    [Property]
+    public Property AddWhiteSpaceAddsWhiteSpaceAtEndOfEachRow(PositiveInt rows, ColumnSize column)
+    {
+        var acts = new ActsGenerator()
+            .WithRows(rows.Get)
+            .WithColumn(column.Get)
+            .AddWhiteSpace()
+            .Generate();
+        
+        return acts
+            .All(x => x[^1] == ' ')
+            .ToProperty();
+    }
+
+    [Property]
+    public void SameSeedGeneratesSameValue(
+        PositiveInt seed,
+        PositiveInt rows,
+        ColumnSize column)
+    {
+        var acts1 = new ActsGenerator(seed.Get)
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .Generate();
+        var acts2 = new ActsGenerator(seed.Get)
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .Generate();
+
+        acts1.Should().BeEquivalentTo(acts2);
+    }
+
+    [Property]
+    public Property DifferentSeedsGeneratesDifferentValues(
+        PositiveInt seed1,
+        PositiveInt seed2,
+        PositiveInt rows,
+        ColumnSize column)
+    {
+        var act = () =>
+        {
+            var acts1 = new ActsGenerator(seed1.Get)
+                .WithRows(GetTrials(column.Get))
+                .WithColumn(column.Get)
+                .Generate();
+            var acts2 = new ActsGenerator(seed2.Get)
+                .WithRows(GetTrials(column.Get))
+                .WithColumn(column.Get)
+                .Generate();
+
+            var json1 = JsonSerializer.Serialize(acts1);
+            var json2 = JsonSerializer.Serialize(acts2);
+
+            return json1 != json2;
+        };
+
+        return act.When(seed1.Get != seed2.Get);
+    }
+
+    [Property]
+    public Property GeneratorsWithoutSeedsGeneratesDifferentValues(
+        PositiveInt rows,
+        ColumnSize column)
+    {
+        var acts1 = new ActsGenerator()
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .Generate();
+        var acts2 = new ActsGenerator()
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .Generate();
+
+        var json1 = JsonSerializer.Serialize(acts1);
+        var json2 = JsonSerializer.Serialize(acts2);
+
+        return (json1 != json2).ToProperty();
     }
 
     private static ActsGenerator GetGenerator(NonEmptyArray<ColumnSize> columns)

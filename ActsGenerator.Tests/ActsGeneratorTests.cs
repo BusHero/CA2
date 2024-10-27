@@ -116,7 +116,22 @@ public class ActsGeneratorTests
 
         return anAdditionalLine.And(string.IsNullOrEmpty(acts[^1]));
     }
-    
+
+    [Property]
+    public Property IncludeMaskForIrrelevantValues(ColumnSize column)
+    {
+        var acts = new ActsGenerator()
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .IncludeMaskForIrrelevantValues()
+            .Generate()
+            .ToArray();
+
+        return acts
+            .Any(x => x.Contains('-'))
+            .ToProperty();
+    }
+
     [Property]
     public Property AddWhiteSpaceAddsWhiteSpaceAtEndOfEachRow(PositiveInt rows, ColumnSize column)
     {
@@ -125,7 +140,7 @@ public class ActsGeneratorTests
             .WithColumn(column.Get)
             .AddWhiteSpace()
             .Generate();
-        
+
         return acts
             .All(x => x[^1] == ' ')
             .ToProperty();
@@ -194,6 +209,30 @@ public class ActsGeneratorTests
         var json2 = JsonSerializer.Serialize(acts2);
 
         return (json1 != json2).ToProperty();
+    }
+
+    [Property]
+    private void GenerateToStream(ColumnSize column, PositiveInt seed)
+    {
+        using var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream);
+
+        var acts1 = new ActsGenerator(seed.Get)
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .Generate()
+            .ToArray();
+        new ActsGenerator(seed.Get)
+            .WithRows(GetTrials(column.Get))
+            .WithColumn(column.Get)
+            .GenerateAsync(writer)
+            .Wait();
+
+        stream.Position = 0;
+        using var reader = new StreamReader(stream);
+        var acts2 = reader.ReadToEndAsync().Result.Split(Environment.NewLine);
+
+        acts1.Should().BeEquivalentTo(acts2);
     }
 
     private static ActsGenerator GetGenerator(NonEmptyArray<ColumnSize> columns)

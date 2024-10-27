@@ -19,11 +19,12 @@ public sealed class CompressCommandTests
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
+            .WithExtractedContent(out _, out var format)
             .Build();
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
         var sut = fixture.Sut;
-        await sut.Command(csvFilename, null, sizes, strength);
+        await sut.Command(format, csvFilename, null, sizes, strength);
 
         fixture.AssetFileExists(ccaFilename);
     }
@@ -34,11 +35,12 @@ public sealed class CompressCommandTests
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename)
             .WithRandomCompressedCsv(out var expectedContent)
+            .WithExtractedContent(out _, out var format)
             .Build();
 
         var ccaFilename = $"{Path.GetFileNameWithoutExtension(csvFilename)}.cca";
 
-        await fixture.Sut.Command(csvFilename, null, sizes, strength);
+        await fixture.Sut.Command(format, csvFilename, null, sizes, strength);
 
         fixture.AssetFileExists(ccaFilename, expectedContent);
     }
@@ -48,11 +50,11 @@ public sealed class CompressCommandTests
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename, out _)
-            .WithRandomOptimizedCsv(out var optimizedCsv)
+            .WithExtractedContent(out var optimizedCsv, out var format)
             .WithRandomCompressedCsv()
             .Build();
 
-        await fixture.Sut.Command(csvFilename, null, sizes, strength);
+        await fixture.Sut.Command(format, csvFilename, null, sizes, strength);
 
         using (new AssertionScope())
         {
@@ -66,15 +68,40 @@ public sealed class CompressCommandTests
     {
         var fixture = _builder
             .WithRandomCsvFile(out var csvFilename, out var csv)
-            .WithRandomOptimizedCsv(out _)
+            .WithExtractedContent(out _, out var format)
             .WithRandomCompressedCsv()
             .Build();
 
-        await fixture.Sut.Command(csvFilename, null, sizes, strength);
+        await fixture.Sut.Command(format, csvFilename, null, sizes, strength);
 
         using (new AssertionScope())
         {
             fixture.AssertRightContentWasExtracted(csv);
+        }
+    }
+
+    [Theory, AutoData]
+    public async Task RightExtractorWasUsed(
+        int[] sizes,
+        byte strength)
+    {
+        var fixture = _builder
+            .WithRandomCsvFile(out var csvFilename, out _)
+            .WithExtractedContent(out var content, out var format)
+            .WithExtractedContent(out _, out _)
+            .WithRandomCompressedCsv()
+            .Build();
+
+        await fixture.Sut.Command(
+            format,
+            csvFilename,
+            null,
+            sizes,
+            strength);
+
+        using (new AssertionScope())
+        {
+            fixture.AssertRightContentWasCompressed(content);
         }
     }
 
@@ -83,7 +110,7 @@ public sealed class CompressCommandTests
         private readonly IFixture _fixture = new AutoFixture.Fixture();
         private readonly Dictionary<string, MockFileData> _files = [];
         private readonly SpyCompressor _compressor = new();
-        private SpyExtractor _extractor = new([]);
+        private readonly List<SpyExtractor> _extractors = [];
 
         public Fixture Build()
         {
@@ -91,14 +118,14 @@ public sealed class CompressCommandTests
 
             var sut = new CompressCommand(
                 fileSystem,
-                _extractor,
+                _extractors,
                 _compressor);
 
             return new Fixture(
                 sut,
                 fileSystem,
                 _compressor,
-                _extractor);
+                _extractors);
         }
 
         public FixtureBuilder WithRandomCsvFile(out string csvFilename)
@@ -128,12 +155,15 @@ public sealed class CompressCommandTests
             return this;
         }
 
-        public FixtureBuilder WithRandomOptimizedCsv(out int[][] optimizedCsv)
+        public FixtureBuilder WithExtractedContent(
+            out int[][] optimizedContent,
+            out string format)
         {
-            optimizedCsv = _fixture.Create<int[][]>();
+            optimizedContent = _fixture.Create<int[][]>();
+            format = _fixture.Create<string>();
 
-            _extractor = new SpyExtractor(optimizedCsv);
-
+            var extractor = new SpyExtractor(optimizedContent, format);
+            _extractors.Add(extractor);
             return this;
         }
     }
@@ -142,7 +172,7 @@ public sealed class CompressCommandTests
         CompressCommand sut,
         IFileSystem fileSystem,
         SpyCompressor compressor,
-        SpyExtractor extractor)
+        IReadOnlyCollection<SpyExtractor> extractors)
     {
         public CompressCommand Sut { get; } = sut;
 
@@ -162,21 +192,34 @@ public sealed class CompressCommandTests
             => fileSystem.File.Exists(filename).Should().BeTrue();
 
         public void AssertRightContentWasExtracted(string csv)
-            => extractor.CompressedCsvFiles.Should().ContainEquivalentOf(csv);
+        {
+            extractors
+                .First(x => x.WasCalled)
+                .CompressedCsvFiles
+                .Should()
+                .ContainEquivalentOf(csv);
+        }
 
         public void AssertRightSizesWereUsed(int[] sizes)
             => compressor.Sizes.Should().ContainEquivalentOf(sizes);
 
-        public void AssertRightContentWasCompressed(int[][] optimizedCsv) 
+        public void AssertRightContentWasCompressed(int[][] optimizedCsv)
             => compressor.CompressedCsvFiles.Should().ContainEquivalentOf(optimizedCsv);
     }
 
-    private sealed class SpyExtractor(int[][] optimizedCsv) : IExtractor
+    private sealed class SpyExtractor(
+        int[][] optimizedCsv,
+        string format) : IExtractor
     {
+        public string Format { get; } = format;
+
         public List<string> CompressedCsvFiles { get; } = [];
+
+        public bool WasCalled { get; private set; }
 
         public Task<int[][]> ExtractAsync(TextReader reader)
         {
+            WasCalled = true;
             var text = reader.ReadToEnd();
 
             CompressedCsvFiles.Add(text);

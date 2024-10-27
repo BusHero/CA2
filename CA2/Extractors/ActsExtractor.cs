@@ -2,6 +2,8 @@
 
 public sealed class ActsExtractor : IExtractor
 {
+    public string Format => "Acts";
+
     public async Task<int[][]> ExtractAsync(TextReader reader)
     {
         var rows = int.Parse(await reader.ReadLineAsync() ?? string.Empty);

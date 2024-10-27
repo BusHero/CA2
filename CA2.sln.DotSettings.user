@@ -12,5 +12,6 @@
     &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests.Foo&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests.ResultShouldNotBeNullOrEmpty&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::4157D20D-5FE7-41D8-8AF0-902C53451276::net8.0::CA2.Console.Tests.CompressCommandTests.RightExtractorWasUsed&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

@@ -9,16 +9,16 @@ namespace CA2.Console;
 
 public sealed class CompressCommand(
     IFileSystem fileSystem,
-    IExtractor extractor,
+    IReadOnlyCollection<IExtractor> extractors,
     ICompressor csvCompressor)
 {
-    public async Task Command(
+    public async Task Command(string format,
         [Option('i')] string? input,
         [Option('o')] string? output,
         [Option("column", ['c'])] int[] columns,
         [Option('t')] byte strength)
     {
-        var csv =  await GetCsv(input);
+        var csv =  await GetCsv(format, input);
 
         output ??= input ?? "test";
 
@@ -33,8 +33,12 @@ public sealed class CompressCommand(
             metaFile);
     }
 
-    private async Task<int[][]> GetCsv(string? inputFile)
+    private async Task<int[][]> GetCsv(
+        string format, 
+        string? inputFile)
     {
+        var extractor = extractors.First(x => string.Equals(x.Format, format, StringComparison.OrdinalIgnoreCase));
+        
         if (inputFile == null)
         {
             return await extractor.ExtractAsync(System.Console.In);

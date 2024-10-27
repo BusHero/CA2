@@ -2,6 +2,8 @@ namespace CA2.Extractors;
 
 public sealed class CsvExtractor : IExtractor
 {
+    public string Format => "CSV";
+    
     public async Task<int[][]> ExtractAsync(TextReader reader)
     {
         var csv = await GetCsv(reader);

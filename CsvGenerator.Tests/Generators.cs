@@ -2,7 +2,7 @@
 
 namespace CsvGenerator.Tests;
 
-public static class Generators
+public sealed class Generators
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static Arbitrary<Column> Generator()

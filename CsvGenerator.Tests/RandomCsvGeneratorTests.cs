@@ -8,7 +8,10 @@ namespace CsvGenerator.Tests;
 
 public sealed class RandomCsvGeneratorTests
 {
-    private readonly DefaultRandomCsvGeneratorFactory _factory = new DefaultRandomCsvGeneratorFactory();
+    public RandomCsvGeneratorTests()
+        => Arb.Register<Generators>();
+
+    private readonly DefaultRandomCsvGeneratorFactory _factory = new();
 
     [Property]
     public Property ReportContainsSpecifiedNumberOfRows(PositiveInt rows)
@@ -133,7 +136,7 @@ public sealed class RandomCsvGeneratorTests
             .ToProperty();
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property]
     public void ValuesAreWrittenIntoStream(
         PositiveInt seed,
         PositiveInt rows,
@@ -196,7 +199,7 @@ public sealed class RandomCsvGeneratorTests
         csv1.Should().BeEquivalentTo(csv2);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property]
     public Property DifferentSeedsGenerateDifferentValues(
         PositiveInt seed1,
         PositiveInt seed2,
@@ -222,8 +225,8 @@ public sealed class RandomCsvGeneratorTests
         return (jsonCsv1 != jsonCsv2).When(seed1.Get != seed2.Get);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
-    public Property GeneratorsWithoutSeedsGenerateDifferentCsvs(
+    [Property]
+    public Property GeneratorsWithoutSeedsGenerateDifferentCsv(
         NonEmptyArray<Column> columns)
     {
         var realColumns = columns
@@ -246,5 +249,3 @@ public sealed class RandomCsvGeneratorTests
         return (jsonCsv1 != jsonCsv2).ToProperty();
     }
 }
-
-public record Column(int Get);

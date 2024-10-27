@@ -9,5 +9,8 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::E3EA3CED-163A-4AD1-B207-7ACABFFAEB43::net8.0::ActsGenerator.Tests.ActsGeneratorTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::E3EA3CED-163A-4AD1-B207-7ACABFFAEB43::net8.0::ActsGenerator.Tests.GeneratorsTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests.Foo&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests.ResultShouldNotBeNullOrEmpty&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8368DE00-5F0D-486B-9656-60D0F3D09BEB::net8.0::CA2.Tests.Extractors.ActsExtractorTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

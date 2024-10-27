@@ -2,7 +2,7 @@
 
 using FsCheck;
 
-namespace ActsGenerator.Tests;
+namespace TestUtils;
 
 public sealed class Generators
 {

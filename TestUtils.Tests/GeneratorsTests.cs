@@ -1,7 +1,4 @@
-﻿using FsCheck;
-using FsCheck.Xunit;
-
-namespace ActsGenerator.Tests;
+﻿namespace TestUtils.Tests;
 
 public sealed class GeneratorsTests
 {

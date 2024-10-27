@@ -43,6 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ActsGenerator\ActsGenerator.csproj" />
         <ProjectReference Include="..\CsvGenerator\CsvGenerator.csproj" />
         <ProjectReference Include="..\CustomFluentAssertions\CustomFluentAssertions.csproj" />
         <ProjectReference Include="..\CA2\CA2.csproj" />

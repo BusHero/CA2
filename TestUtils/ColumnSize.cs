@@ -1,4 +1,4 @@
-﻿namespace ActsGenerator.Tests;
+﻿namespace TestUtils;
 
 public sealed record ColumnSize(
     int Get);

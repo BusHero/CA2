@@ -1,28 +1,28 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/CA2/">
-    <Project Path="CA2.Console.Tests\CA2.Console.Tests.csproj" Type="Classic C#" />
+    <Project Path="CA2.Console.Tests\CA2.Console.Tests.csproj" />
     <Project Path="CA2.Console\CA2.Console.csproj" />
     <Project Path="CA2.Tests\CA2.Tests.csproj" />
     <Project Path="CA2\CA2.csproj" />
   </Folder>
   <Folder Name="/CSV/">
-    <Project Path="CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj" Type="Classic C#" />
+    <Project Path="CsvGenerator.Console.Tests\CsvGenerator.Console.Tests.csproj" />
     <Project Path="CsvGenerator.Console\CsvGenerator.Console.csproj" />
     <Project Path="CsvGenerator.Tests\CsvGenerator.Tests.csproj" />
     <Project Path="CsvGenerator\CsvGenerator.csproj" />
   </Folder>
-  <Folder Name="/CustomFluentAssertions/">
+  <Folder Name="/FluentAssertions/">
     <Project Path="CustomFluentAssertions.Tests\CustomFluentAssertions.Tests.csproj" />
     <Project Path="CustomFluentAssertions\CustomFluentAssertions.csproj" />
-  </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-    <File Path=".gitignore" />
-    <File Path="CA2.sln.DotSettings.user" />
-    <File Path="global.json" />
   </Folder>
   <Folder Name="/TestUtils/">
     <Project Path="TestUtils.Tests\TestUtils.Tests.csproj" />
     <Project Path="TestUtils\TestUtils.csproj" />
+  </Folder>
+  <Folder Name="/_Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CA2.sln.DotSettings.user" />
+    <File Path="global.json" />
   </Folder>
 </Solution>

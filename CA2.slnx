@@ -1,4 +1,8 @@
 ﻿<Solution>
+  <Folder Name="/ACTS/">
+    <Project Path="ActsGenerator.Tests\ActsGenerator.Tests.csproj" Type="Classic C#" />
+    <Project Path="ActsGenerator\ActsGenerator.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/CA2/">
     <Project Path="CA2.Console.Tests\CA2.Console.Tests.csproj" />
     <Project Path="CA2.Console\CA2.Console.csproj" />

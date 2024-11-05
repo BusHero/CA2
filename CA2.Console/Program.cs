@@ -8,8 +8,10 @@ using CA2.Compression;
 using CA2.Extractors;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 var builder = CoconaApp.CreateBuilder(args);
+builder.Logging.AddDebug();
 
 builder.Services.AddTransient<IFileSystem, FileSystem>();
 builder.Services.AddTransient<ICompressor, Compressor>();

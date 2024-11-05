@@ -9,9 +9,11 @@ namespace CA2.Console;
 
 public sealed class CompressCommand(
     IFileSystem fileSystem,
-    IReadOnlyCollection<IExtractor> extractors,
+    IEnumerable<IExtractor> extractors,
     ICompressor csvCompressor)
 {
+    private readonly IReadOnlyCollection<IExtractor> extractors = extractors.ToList();
+
     public async Task Command(string format,
         [Option('i')] string? input,
         [Option('o')] string? output,

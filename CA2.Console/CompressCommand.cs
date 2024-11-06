@@ -12,7 +12,7 @@ public sealed class CompressCommand(
     IEnumerable<IExtractor> extractors,
     ICompressor csvCompressor)
 {
-    private readonly IReadOnlyCollection<IExtractor> extractors = extractors.ToList();
+    private readonly IReadOnlyCollection<IExtractor> _extractors = extractors.ToList();
 
     public async Task Command(string format,
         [Option('i')] string? input,
@@ -24,8 +24,13 @@ public sealed class CompressCommand(
 
         output ??= input ?? "test";
 
-        await using var ccaFile = fileSystem.File.Create(GetCcaFilename(output));
-        await using var metaFile = fileSystem.File.Create(GetCcaMetaFilename(output));
+        var parent = Path.GetDirectoryName(input)!;
+        
+        var ccaFullFilename = Path.Combine(parent, GetCcaFilename(output));
+        var ccaMetaFilename = Path.Combine(parent, GetCcaMetaFilename(output));
+        
+        await using var ccaFile = fileSystem.File.Create(ccaFullFilename);
+        await using var metaFile = fileSystem.File.Create(ccaMetaFilename);
 
         await csvCompressor.CompressAsync(
             csv,
@@ -39,7 +44,7 @@ public sealed class CompressCommand(
         string format, 
         string? inputFile)
     {
-        var extractor = extractors.First(x => string.Equals(x.Format, format, StringComparison.OrdinalIgnoreCase));
+        var extractor = _extractors.First(x => string.Equals(x.Format, format, StringComparison.OrdinalIgnoreCase));
         
         if (inputFile == null)
         {

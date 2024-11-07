@@ -1,11 +1,8 @@
-﻿using System.IO.Abstractions;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-using CA2.Compression;
-using CA2.Console;
-using CA2.Extractors;
+using CliWrap;
 
-namespace CompressStuff;
+namespace CompressStuff.Original;
 
 internal partial class Program
 {
@@ -15,14 +12,7 @@ internal partial class Program
     {
         var files = new DirectoryInfo(Path).GetFiles("*.csv");
 
-        var command = new CompressCommand(
-            new FileSystem(),
-            [
-                new ActsExtractor(),
-            ],
-            new Compressor());
-
-        await Parallel.ForEachAsync(files, async (file, _) =>
+        await Parallel.ForEachAsync(files, async (file, token) =>
         {
             var match = Filename().Match(file.Name);
             var t = byte.Parse(match.Groups["t"].Value);
@@ -31,12 +21,21 @@ internal partial class Program
 
             var columns = Enumerable
                 .Range(0, k)
-                .Select(_ => v)
+                .SelectMany(_ => new[] { "-v", v.ToString() })
                 .ToArray();
 
             try
             {
-                await command.Command("acts", file.FullName, null, columns, t);
+                await Cli.Wrap("""C:\Users\Petru\projects\rust\ca2\target\release\cca.exe""")
+                    .WithArguments(args => args
+                        .Add("--no-header")
+                        .Add("--ca").Add(file.FullName)
+                        .Add("-t").Add(t)
+                        .Add(columns))
+                    .WithStandardOutputPipe(PipeTarget.ToDelegate(Console.WriteLine))
+                    .WithStandardErrorPipe(PipeTarget.ToDelegate(Console.WriteLine))
+                    .ExecuteAsync(token);
+
                 Console.WriteLine($"\u2713 {file.Name}");
             }
             catch
@@ -46,6 +45,6 @@ internal partial class Program
         });
     }
 
-    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.txt""")]
+    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.csv""")]
     private static partial Regex Filename();
 }

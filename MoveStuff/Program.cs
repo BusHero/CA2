@@ -6,9 +6,10 @@ public sealed class Program
     
     public static void Main()
     {
-        var output = Path.Combine(Input, "ca2");
+        var output = Path.Combine(Input, "original");
         var directory = new DirectoryInfo(Input);
-        var files = directory.GetFiles("*.ccmeta").Select(f => f.FullName);
+        directory.Create();
+        var files = directory.GetFiles("*.cca").Select(f => f.FullName);
         Parallel.ForEach(files, (file, _) =>
         {
             File.Move(file, Path.Combine(output, Path.GetFileName(file)));

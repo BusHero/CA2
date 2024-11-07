@@ -479,3 +479,4 @@ bins/
 
 result/
 result-unarchive/
+!result.csv

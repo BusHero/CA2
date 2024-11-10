@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 public sealed class Compressor : IDecompressor, ICompressor
 {
-    private const string CCA_MAGIC_SEQUENCE = " CCA";
-    private static readonly byte[] CCA_MAGIC_SEQUENCE_BYTES = Encoding.ASCII.GetBytes(CCA_MAGIC_SEQUENCE);
+    private const string CcaMagicSequence = " CCA";
+    private static readonly byte[] CcaMagicSequenceBytes = Encoding.ASCII.GetBytes(CcaMagicSequence);
 
     public static BigInteger Compress(
         int[] row,
@@ -186,7 +186,7 @@ public sealed class Compressor : IDecompressor, ICompressor
     {
         var writer = new BinaryWriter(metaStream);
 
-        writer.Write(CCA_MAGIC_SEQUENCE_BYTES);
+        writer.Write(CcaMagicSequenceBytes);
         writer.Write((short)2);
         writer.Write(numberOfRows);
         writer.Write(interactionStrength);

@@ -37,7 +37,7 @@ internal partial class Program
             try
             {
                 await command.Command("acts", file.FullName, null, columns, t);
-                Console.WriteLine($"\u2713 {file.Name}");
+                Console.WriteLine($@"✓ {file.Name}");
             }
             catch
             {

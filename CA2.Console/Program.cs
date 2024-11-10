@@ -1,11 +1,10 @@
 using System.IO.Abstractions;
 
+using CA2.Compression;
 using CA2.Console;
+using CA2.Extractors;
 
 using Cocona;
-
-using CA2.Compression;
-using CA2.Extractors;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

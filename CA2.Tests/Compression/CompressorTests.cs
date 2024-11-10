@@ -2,9 +2,9 @@ namespace CA2.Tests.Compression;
 
 using System.Numerics;
 
-using CsvGenerator;
-
 using CA2.Compression;
+
+using CsvGenerator;
 
 using TestUtils;
 
@@ -350,7 +350,7 @@ public sealed class CompressorTests
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate()
-            .Select(row => row.Select(x => int.Parse(x)).ToArray())
+            .Select(row => row.Select(int.Parse).ToArray())
             .ToArray();
 
     private static int[] GetSizes(int numbersLength)

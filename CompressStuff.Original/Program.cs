@@ -36,7 +36,7 @@ internal partial class Program
                     .WithStandardErrorPipe(PipeTarget.ToDelegate(Console.WriteLine))
                     .ExecuteAsync(token);
 
-                Console.WriteLine($"\u2713 {file.Name}");
+                Console.WriteLine($@"✓ {file.Name}");
             }
             catch
             {

@@ -1,42 +1,42 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Web;
 
-var directory = """..\..\..\result""";
+const string directory = """..\..\..\result""";
 Directory.CreateDirectory(directory);
 
 Combination[] combinations =
 [
-    new Combination(2, 2, 3, 2000),
-    new Combination(3, 2, 4, 2000),
-    new Combination(4, 2, 5, 909),
-    new Combination(5, 2, 6, 191),
-    new Combination(6, 2, 7, 86),
+    new(2, 2, 3, 2000),
+    new(3, 2, 4, 2000),
+    new(4, 2, 5, 909),
+    new(5, 2, 6, 191),
+    new(6, 2, 7, 86),
     
-    new Combination(2, 3, 3, 2000),
-    new Combination(3, 3, 4, 2000),
-    new Combination(4, 3, 5, 500),
-    new Combination(5, 3, 6, 116),
-    new Combination(6, 3, 7, 51),
+    new(2, 3, 3, 2000),
+    new(3, 3, 4, 2000),
+    new(4, 3, 5, 500),
+    new(5, 3, 6, 116),
+    new(6, 3, 7, 51),
     
-    new Combination(2, 4, 3, 2000),
-    new Combination(3, 4, 4, 2000),
-    new Combination(4, 4, 5, 308),
-    new Combination(5, 4, 6, 81),
-    new Combination(6, 4, 7, 36),
+    new(2, 4, 3, 2000),
+    new(3, 4, 4, 2000),
+    new(4, 4, 5, 308),
+    new(5, 4, 6, 81),
+    new(6, 4, 7, 36),
     
-    new Combination(2, 5, 3, 2000),
-    new Combination(3, 5, 4, 1971),
-    new Combination(4, 5, 5, 208),
-    new Combination(5, 5, 6, 61),
-    new Combination(6, 5, 7, 25),
+    new(2, 5, 3, 2000),
+    new(3, 5, 4, 1971),
+    new(4, 5, 5, 208),
+    new(5, 5, 6, 61),
+    new(6, 5, 7, 25),
     
-    new Combination(2, 6, 3, 2000),
-    new Combination(3, 6, 4, 1306),
-    new Combination(4, 6, 5, 163),
-    new Combination(5, 6, 6, 46),
+    new(2, 6, 3, 2000),
+    new(3, 6, 4, 1306),
+    new(4, 6, 5, 163),
+    new(5, 6, 6, 46),
 ];
 
-var client = new HttpClient()
+var client = new HttpClient
 {
     BaseAddress = new Uri("https://math.nist.gov/coveringarrays/ipof/cas/"),
 };

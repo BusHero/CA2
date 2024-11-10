@@ -18,5 +18,5 @@ await Parallel.ForEachAsync(files, async (file, token) =>
         $"{Path.GetFileNameWithoutExtension(file.FullName)}.csv");
     await File.WriteAllLinesAsync(outputFilename, lines, token);
 
-    Console.WriteLine($"\u2713 {outputFilename}");
+    Console.WriteLine($@"✓ {outputFilename}");
 });

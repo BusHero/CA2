@@ -1,21 +1,20 @@
 namespace CA2.Tests.Compression;
 
-using System.Text;
 using System.Threading.Tasks;
 
-using CsvGenerator;
-
 using CA2.Compression;
+
+using CsvGenerator;
 
 public sealed class MetadataTests
 {
     private readonly Compressor _compressor = new();
 
-    private readonly Range MAGIC_BYTES_RANGE = 0..4;
-    private readonly Range CA_VERSION_RANGE = 4..6;
-    private readonly Range NUMBER_OF_ROWS_RANGE = 6..14;
-    private readonly Range INTERACTION_STRENGTH_RANGE = 14..15;
-    private readonly Range PARAMETER_SIZES_RANGE = 15..^2;
+    private static readonly Range MagicBytesRange = ..4;
+    private static readonly Range CaVersionRange = 4..6;
+    private static readonly Range NumberOfRowsRange = 6..14;
+    private static readonly Range InteractionStrengthRange = 14..15;
+    private static readonly Range ParameterSizesRange = 15..^2;
 
     [Theory, AutoData]
     public async Task MetadataStreamContainsMagicBytes(
@@ -34,9 +33,9 @@ public sealed class MetadataTests
 
         var bytes = metaStream.ToArray();
 
-        bytes[MAGIC_BYTES_RANGE]
-           .Should()
-           .BeEquivalentTo(Encoding.ASCII.GetBytes(" CCA"), x => x.WithStrictOrdering());
+        bytes[MagicBytesRange]
+            .Should()
+            .BeEquivalentTo(" CCA"u8.ToArray(), x => x.WithStrictOrdering());
     }
 
     [Theory, AutoData]
@@ -56,7 +55,7 @@ public sealed class MetadataTests
 
         var bytes = metaStream.ToArray();
 
-        var version = BitConverter.ToUInt16(bytes[CA_VERSION_RANGE]);
+        var version = BitConverter.ToUInt16(bytes[CaVersionRange]);
         version.Should().Be(2);
     }
 
@@ -77,13 +76,13 @@ public sealed class MetadataTests
 
         var bytes = metaStream.ToArray();
 
-        var numberOfRows = BitConverter.ToInt64(bytes[NUMBER_OF_ROWS_RANGE]);
+        var numberOfRows = BitConverter.ToInt64(bytes[NumberOfRowsRange]);
         numberOfRows.Should().Be(rows.Get);
     }
 
     [Theory, AutoData]
     public async Task MetadataStreamContainsInteractionStrength(
-        NonEmptyArray<PositiveInt> sizes, 
+        NonEmptyArray<PositiveInt> sizes,
         PositiveInt rows,
         byte interactionStrength)
     {
@@ -98,14 +97,14 @@ public sealed class MetadataTests
 
         var bytes = metaStream.ToArray();
 
-        bytes[INTERACTION_STRENGTH_RANGE][0]
+        bytes[InteractionStrengthRange][0]
             .Should()
             .Be(interactionStrength);
     }
 
     [Theory, AutoData]
     public async Task MetadataContainsParameterSizes(
-        NonEmptyArray<PositiveInt> sizes, 
+        NonEmptyArray<PositiveInt> sizes,
         PositiveInt rows,
         byte interactionStrength)
     {
@@ -118,7 +117,7 @@ public sealed class MetadataTests
             Stream.Null,
             metaStream);
 
-        var bytes = metaStream.ToArray()[PARAMETER_SIZES_RANGE];
+        var bytes = metaStream.ToArray()[ParameterSizesRange];
         bytes.Should().HaveCount(realColumns.Length);
     }
 
@@ -142,6 +141,6 @@ public sealed class MetadataTests
             .WithColumns(realSizes)
             .WithRowsCount(rows.Get)
             .Generate()
-            .Select(row => row.Select(x => int.Parse(x)).ToArray())
+            .Select(row => row.Select(int.Parse).ToArray())
             .ToArray();
 }

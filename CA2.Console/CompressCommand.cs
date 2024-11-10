@@ -1,9 +1,9 @@
 using System.IO.Abstractions;
 
-using Cocona;
-
 using CA2.Compression;
 using CA2.Extractors;
+
+using Cocona;
 
 namespace CA2.Console;
 
@@ -20,15 +20,15 @@ public sealed class CompressCommand(
         [Option("column", ['c'])] int[] columns,
         [Option('t')] byte strength)
     {
-        var csv =  await GetCsv(format, input);
+        var csv = await GetCsv(format, input);
 
         output ??= input ?? "test";
 
         var parent = Path.GetDirectoryName(input)!;
-        
+
         var ccaFullFilename = Path.Combine(parent, GetCcaFilename(output));
         var ccaMetaFilename = Path.Combine(parent, GetCcaMetaFilename(output));
-        
+
         await using var ccaFile = fileSystem.File.Create(ccaFullFilename);
         await using var metaFile = fileSystem.File.Create(ccaMetaFilename);
 
@@ -41,11 +41,11 @@ public sealed class CompressCommand(
     }
 
     private async Task<int[][]> GetCsv(
-        string format, 
+        string format,
         string? inputFile)
     {
         var extractor = _extractors.First(x => string.Equals(x.Format, format, StringComparison.OrdinalIgnoreCase));
-        
+
         if (inputFile == null)
         {
             return await extractor.ExtractAsync(System.Console.In);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public sealed class MockCsvGenerator(IEnumerable<string[]> csv) : ICsvGenerator
 {
-    public List<string[]> Columns { get; private set; } = [];
+    public List<string[]> Columns { get; } = [];
 
     public int? RowsCount { get; private set; }
 

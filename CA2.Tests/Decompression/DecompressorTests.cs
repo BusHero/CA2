@@ -1,8 +1,8 @@
-using TestUtils;
-
 namespace CA2.Tests.Decompression;
 
 using CA2.Compression;
+
+using TestUtils;
 
 using Utils;
 

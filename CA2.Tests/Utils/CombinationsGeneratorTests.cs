@@ -4,14 +4,14 @@ using CustomFluentAssertions;
 
 public sealed class CombinationsGeneratorTests
 {
-    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property FirstItemIsSmallerThanSecondItem(
         (int, int) x)
         => (x.Item1 < x.Item2).Label("First item is smaller than Second item")
             .And(0 <= x.Item1).Label("First item is bigger than 0")
             .And(2 <= x.Item2).Label("Second item is at least 2");
 
-    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property LetsTryThis(
         (int, int)[] items)
         => items.All(x => x.Item1 < x.Item2).Label("First item is smaller than Second item")
@@ -72,7 +72,7 @@ public sealed class CombinationsGeneratorTests
             .QuickCheckThrowOnFailure();
     }
 
-    [Property(Arbitrary = [typeof(CombinationsGenerator),])]
+    [Property(Arbitrary = [typeof(CombinationsGenerator)])]
     public Property Generator2(Combination combination)
     {
         var lengthOfItemsIsSameAsLengthOfSizes = combination.Item.Length == combination.Sizes.Length;

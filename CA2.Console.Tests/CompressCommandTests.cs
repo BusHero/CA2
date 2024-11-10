@@ -3,10 +3,10 @@ using System.IO.Abstractions.TestingHelpers;
 
 using AutoFixture;
 
-using FluentAssertions.Execution;
-
 using CA2.Compression;
 using CA2.Extractors;
+
+using FluentAssertions.Execution;
 
 namespace CA2.Console.Tests;
 

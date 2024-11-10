@@ -119,7 +119,7 @@ public sealed class MetadataTests
             metaStream);
 
         var bytes = metaStream.ToArray()[PARAMETER_SIZES_RANGE];
-        bytes.Should().HaveCount(realColumns.Length * 2);
+        bytes.Should().HaveCount(realColumns.Length);
     }
 
     private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)

@@ -355,7 +355,6 @@ public sealed class CompressorTests
 
     private static int[] GetSizes(int numbersLength)
         => Enumerable
-            .Range(0, numbersLength)
-            .Select(_ => 2)
+            .Repeat(2, numbersLength)
             .ToArray();
 }

@@ -171,7 +171,7 @@ public sealed class Compressor : IDecompressor, ICompressor
 
         WriteMetadata(
             csv.Length,
-            sizes.Select(x => (byte)x),
+            sizes.Select(x => (byte)x).ToList(),
             interactionStrength,
             metaStream);
 
@@ -180,7 +180,7 @@ public sealed class Compressor : IDecompressor, ICompressor
 
     private static void WriteMetadata(
         long numberOfRows,
-        IEnumerable<byte> columns,
+        IReadOnlyCollection<byte> columns,
         byte interactionStrength,
         Stream metaStream)
     {
@@ -190,10 +190,23 @@ public sealed class Compressor : IDecompressor, ICompressor
         writer.Write((short)2);
         writer.Write(numberOfRows);
         writer.Write(interactionStrength);
-        foreach (var column in columns)
+
+        var columnsCount = columns.Count;
+
+        while (columnsCount > 0)
         {
-            writer.Write(column);
+            if (columnsCount < 255)
+            {
+                writer.Write((byte)columnsCount);
+                writer.Write(columns.First());
+                break;
+            }
+            
+            writer.Write(byte.MaxValue);
+            writer.Write(columns.First());
+            columnsCount -= 255;
         }
+
         writer.Write(ushort.MinValue);
     }
 }

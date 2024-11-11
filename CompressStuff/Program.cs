@@ -30,8 +30,7 @@ internal partial class Program
             var v = int.Parse(match.Groups["v"].Value);
 
             var columns = Enumerable
-                .Range(0, k)
-                .Select(_ => v)
+                .Repeat(v, k)
                 .ToArray();
 
             try

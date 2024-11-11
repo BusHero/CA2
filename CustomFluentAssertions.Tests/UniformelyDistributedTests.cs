@@ -28,8 +28,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosAndFiftyOnesAreEvenlySpread()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 50).Select(_ => 1);
+        var enum1 = Enumerable.Repeat(0, 50);
+        var enum2 = Enumerable.Repeat(1, 50);
         var range = enum2.Concat(enum1);
 
         var result = range
@@ -41,8 +41,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosAndFiftyOnesAreEvenlySpread2()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 50).Select(_ => 1);
+        var enum1 = Enumerable.Repeat(0, 50);
+        var enum2 = Enumerable.Repeat(1, 50);
         var range = enum1.Concat(enum2);
 
         var result = range
@@ -54,7 +54,7 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosAndOneIsNotEvenlySpread()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => 0);
+        var enum1 = Enumerable.Repeat(0, 50);
         var range = enum1.Append(1);
 
         var result = range
@@ -68,8 +68,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosAnd49OnesAreEvenlySpread()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 49).Select(_ => 1);
+        var enum1 = Enumerable.Repeat(0, 50);
+        var enum2 = Enumerable.Repeat(1, 49);
         var range = enum1.Concat(enum2);
         var result = range
             .IsEvenlySpread(2, 0.05);
@@ -82,8 +82,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZeros100OnesAreNotEvenlySpread()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 100).Select(_ => 1);
+        var enum1 = Enumerable.Repeat(0, 50);
+        var enum2 = Enumerable.Repeat(1, 100);
 
         var range = enum1.Concat(enum2);
 
@@ -98,9 +98,9 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosFiftyOnesFiftyTwosAreEvenlySpread()
     {
-        var enum1 = Enumerable.Range(0, 100).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 100).Select(_ => 1);
-        var enum3 = Enumerable.Range(0, 100).Select(_ => 2);
+        var enum1 = Enumerable.Repeat(0, 100);
+        var enum2 = Enumerable.Repeat(1, 100);
+        var enum3 = Enumerable.Repeat(2, 100);
 
         var range = enum1.Concat(enum2).Concat(enum3);
 
@@ -115,8 +115,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void NonEvenlySpreadNumbersWithBigToleranceShouldPass()
     {
-        var enum1 = Enumerable.Range(0, 10).Select(_ => 0);
-        var enum2 = Enumerable.Range(0, 100).Select(_ => 1);
+        var enum1 = Enumerable.Repeat(0, 10);
+        var enum2 = Enumerable.Repeat(1, 100);
 
         var range = enum1.Concat(enum2).ToList();
 
@@ -131,8 +131,8 @@ public sealed class UniformlyDistributedTests
     [Fact]
     public void FiftyZerosAndFiftyOnesAreEvenlySpread3()
     {
-        var enum1 = Enumerable.Range(0, 50).Select(_ => "0");
-        var enum2 = Enumerable.Range(0, 50).Select(_ => "1");
+        var enum1 = Enumerable.Repeat("0", 50);
+        var enum2 = Enumerable.Repeat("1", 50);
         var range = enum2.Concat(enum1);
 
         var result = range

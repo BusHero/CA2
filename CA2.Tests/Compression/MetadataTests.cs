@@ -6,6 +6,8 @@ using CA2.Compression;
 
 using CsvGenerator;
 
+using TestUtils;
+
 public sealed class MetadataTests
 {
     private readonly Compressor _compressor = new();
@@ -102,23 +104,43 @@ public sealed class MetadataTests
             .Be(interactionStrength);
     }
 
-    [Theory, AutoData]
-    public async Task MetadataContainsParameterSizes(
-        NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows,
-        byte interactionStrength)
+    [Property(Arbitrary = [typeof(Generators)])]
+    public Property MetadataContainsColumnSize()
     {
-        await using var metaStream = new MemoryStream();
-        var realColumns = GetRealColumns(sizes);
-        await _compressor.CompressAsync(
-            GetCsv(rows, sizes),
-            realColumns,
-            interactionStrength,
-            Stream.Null,
-            metaStream);
+        var arb = Gen
+            .Elements(2, byte.MaxValue)
+            .Zip(
+                Gen.Elements(0b00000001, 0b01111111),
+                (elementsPerColumn, nbrOfColumns) => Enumerable
+                    .Repeat(elementsPerColumn, nbrOfColumns)
+                    .ToArray())
+            .Zip(Arb.Default.PositiveInt().Generator, (columns, rows) => (columns, rows: rows.Get))
+            .Zip(Arb.Default.Byte().Generator, (foo, strength) => (foo.columns, foo.rows, strength))
+            .ToArbitrary();
 
-        var bytes = metaStream.ToArray()[ParameterSizesRange];
-        bytes.Should().HaveCount(realColumns.Length);
+        return Prop.ForAll(arb, t =>
+        {
+            using var metaStream = new MemoryStream();
+
+            _compressor.CompressAsync(
+                GetCsv(t.rows, t.columns),
+                t.columns,
+                t.strength,
+                Stream.Null,
+                metaStream).Wait();
+
+            var bytes = metaStream.ToArray()[ParameterSizesRange];
+            var actualColumns = bytes
+                .Chunk(2)
+                .GroupBy(x => x[1])
+                .SelectMany(x => x
+                    .Select(y => y[0])
+                    .SelectMany(y => Enumerable.Repeat(x.Key, y)));
+
+            actualColumns
+                .Should()
+                .BeEquivalentTo(t.columns, x => x.WithStrictOrdering());
+        });
     }
 
     private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
@@ -136,10 +158,15 @@ public sealed class MetadataTests
     private static int[][] GetCsv(
         PositiveInt rows,
         int[] realSizes)
+        => GetCsv(rows.Get, realSizes);
+
+    private static int[][] GetCsv(
+        int rows,
+        int[] realSizes)
         => new DefaultRandomCsvGeneratorFactory()
             .Create()
             .WithColumns(realSizes)
-            .WithRowsCount(rows.Get)
+            .WithRowsCount(rows)
             .Generate()
             .Select(row => row.Select(int.Parse).ToArray())
             .ToArray();

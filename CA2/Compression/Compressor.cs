@@ -1,5 +1,6 @@
 namespace CA2.Compression;
 
+using System.Buffers.Binary;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -191,20 +192,14 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         writer.Write(numberOfRows);
         writer.Write(interactionStrength);
 
-        var columnsCount = columns.Count;
-
-        if (columnsCount <= 0x7f)
+        if (columns.Count <= 0x7f)
         {
-            writer.Write((byte)columnsCount);
+            writer.Write((byte)columns.Count);
         }
         else
         {
-            var updatedValue = columnsCount | 0x8000;
-            var bytes = BitConverter.GetBytes((ushort)updatedValue);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
+            var bytes = new byte[2];
+            BinaryPrimitives.WriteUInt16BigEndian(bytes, (ushort)(columns.Count | 0x8000));
             writer.Write(bytes);
         }
         writer.Write((byte)columns.First());

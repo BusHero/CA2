@@ -164,7 +164,7 @@ public sealed class MetadataTests
         var arb = Gen
             .Elements(Enumerable.Range(2, byte.MaxValue - 2))
             .Zip(
-                Gen.Elements(Enumerable.Range(0b00000001, 0b01111111 - 0b00000001)),
+                Gen.Elements(Enumerable.Range(0x01, 0x7f - 0x01)),
                 (elementsPerColumn, nbrOfColumns) => Enumerable
                     .Repeat(elementsPerColumn, nbrOfColumns)
                     .ToArray())
@@ -184,7 +184,7 @@ public sealed class MetadataTests
 
             var bytes = metaStream.ToArray()[ParameterSizesRange];
 
-            return (bytes[0] & 0b10000000) == 0;
+            return (bytes[0] & 0x80) == 0;
         });
     }
 

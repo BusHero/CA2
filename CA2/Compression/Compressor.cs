@@ -177,8 +177,8 @@ public sealed class Compressor : IDecompressor, ICompressor
 
         await Task.CompletedTask;
     }
-
-    private static void WriteMetadata(
+    
+    public void WriteMetadata(
         long numberOfRows,
         IReadOnlyCollection<byte> columns,
         byte interactionStrength,

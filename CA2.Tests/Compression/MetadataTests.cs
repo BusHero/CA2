@@ -6,7 +6,6 @@ using CA2.Compression;
 
 using CsvGenerator;
 
-using TestUtils;
 
 public sealed class MetadataTests
 {
@@ -104,8 +103,8 @@ public sealed class MetadataTests
             .Be(interactionStrength);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
-    public Property MetadataContainsColumnSize()
+    [Property]
+    public Property MetadataColumnFrom1To127()
     {
         var arb = Gen
             .Elements(2, byte.MaxValue)
@@ -122,24 +121,51 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor.CompressAsync(
-                GetCsv(t.rows, t.columns),
-                t.columns,
-                t.strength,
-                Stream.Null,
-                metaStream).Wait();
+            _compressor
+                .CompressAsync(
+                    GetCsv(t.rows, t.columns),
+                    t.columns,
+                    t.strength,
+                    Stream.Null,
+                    metaStream)
+                .Wait();
 
             var bytes = metaStream.ToArray()[ParameterSizesRange];
-            var actualColumns = bytes
-                .Chunk(2)
-                .GroupBy(x => x[1])
-                .SelectMany(x => x
-                    .Select(y => y[0])
-                    .SelectMany(y => Enumerable.Repeat(x.Key, y)));
 
-            actualColumns
-                .Should()
-                .BeEquivalentTo(t.columns, x => x.WithStrictOrdering());
+            return (bytes[0] & 0b10000000) == 0;
+        });
+    }
+    
+    [Property]
+    public Property MetadataColumnFrom128To()
+    {
+        var arb = Gen
+            .Elements(2, byte.MaxValue)
+            .Zip(
+                Gen.Elements(0b00000001, 0b01111111),
+                (elementsPerColumn, nbrOfColumns) => Enumerable
+                    .Repeat(elementsPerColumn, nbrOfColumns)
+                    .ToArray())
+            .Zip(Arb.Default.PositiveInt().Generator, (columns, rows) => (columns, rows: rows.Get))
+            .Zip(Arb.Default.Byte().Generator, (foo, strength) => (foo.columns, foo.rows, strength))
+            .ToArbitrary();
+
+        return Prop.ForAll(arb, t =>
+        {
+            using var metaStream = new MemoryStream();
+
+            _compressor
+                .CompressAsync(
+                    GetCsv(t.rows, t.columns),
+                    t.columns,
+                    t.strength,
+                    Stream.Null,
+                    metaStream)
+                .Wait();
+
+            var bytes = metaStream.ToArray()[ParameterSizesRange];
+
+            return (bytes[0] & 0b10000000) == 0;
         });
     }
 

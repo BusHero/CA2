@@ -97,9 +97,9 @@ public sealed class MetadataTests
     public Property MetadataColumnFrom1To127()
     {
         var arb = Gen
-            .Elements(2, byte.MaxValue)
+            .Elements(Enumerable.Range(2, byte.MaxValue - 2))
             .Zip(
-                Gen.Elements(0x01, 0x7f),
+                Gen.Elements(Enumerable.Range(0x02, 0x7f - 0x02)),
                 (elementsPerColumn, nbrOfColumns) => Enumerable
                     .Repeat(elementsPerColumn, nbrOfColumns)
                     .ToArray())
@@ -127,9 +127,9 @@ public sealed class MetadataTests
     public Property MetadataColumnFrom0x80To0x3fff()
     {
         var arb = Gen
-            .Elements(2, byte.MaxValue)
+            .Elements(Enumerable.Range(2, byte.MaxValue - 2))
             .Zip(
-                Gen.Elements(0x80, 0x3fff),
+                Gen.Elements(Enumerable.Range(0x80, 0x3fff - 0x80)),
                 (elementsPerColumn, nbrOfColumns) => Enumerable
                     .Repeat(elementsPerColumn, nbrOfColumns)
                     .ToArray())
@@ -162,9 +162,9 @@ public sealed class MetadataTests
     public Property MetadataColumnFrom128To()
     {
         var arb = Gen
-            .Elements(2, byte.MaxValue)
+            .Elements(Enumerable.Range(2, byte.MaxValue - 2))
             .Zip(
-                Gen.Elements(0b00000001, 0b01111111),
+                Gen.Elements(Enumerable.Range(0b00000001, 0b01111111 - 0b00000001)),
                 (elementsPerColumn, nbrOfColumns) => Enumerable
                     .Repeat(elementsPerColumn, nbrOfColumns)
                     .ToArray())

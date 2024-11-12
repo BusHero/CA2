@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-public sealed class Compressor : IDecompressor, ICompressor
+public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
 {
     private const string CcaMagicSequence = " CCA";
     private static readonly byte[] CcaMagicSequenceBytes = Encoding.ASCII.GetBytes(CcaMagicSequence);
@@ -169,18 +169,18 @@ public sealed class Compressor : IDecompressor, ICompressor
             sizes,
             ccaStream);
 
-        WriteMetadata(
+        Write(
             csv.Length,
-            sizes.Select(x => (byte)x).ToList(),
+            sizes,
             interactionStrength,
             metaStream);
 
         await Task.CompletedTask;
     }
     
-    public void WriteMetadata(
+    public void Write(
         long numberOfRows,
-        IReadOnlyCollection<byte> columns,
+        IReadOnlyCollection<int> columns,
         byte interactionStrength,
         Stream metaStream)
     {
@@ -193,19 +193,21 @@ public sealed class Compressor : IDecompressor, ICompressor
 
         var columnsCount = columns.Count;
 
-        while (columnsCount > 0)
+        if (columnsCount <= 0x7f)
         {
-            if (columnsCount < 255)
-            {
-                writer.Write((byte)columnsCount);
-                writer.Write(columns.First());
-                break;
-            }
-            
-            writer.Write(byte.MaxValue);
-            writer.Write(columns.First());
-            columnsCount -= 255;
+            writer.Write((byte)columnsCount);
         }
+        else
+        {
+            var updatedValue = columnsCount | 0x8000;
+            var bytes = BitConverter.GetBytes((ushort)updatedValue);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+            writer.Write(bytes);
+        }
+        writer.Write((byte)columns.First());
 
         writer.Write(ushort.MinValue);
     }

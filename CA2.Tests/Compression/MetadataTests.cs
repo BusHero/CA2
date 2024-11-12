@@ -1,11 +1,6 @@
 namespace CA2.Tests.Compression;
 
-using System.Threading.Tasks;
-
 using CA2.Compression;
-
-using CsvGenerator;
-
 
 public sealed class MetadataTests
 {
@@ -17,90 +12,85 @@ public sealed class MetadataTests
     private static readonly Range InteractionStrengthRange = 14..15;
     private static readonly Range ParameterSizesRange = 15..^2;
 
-    [Theory, AutoData]
-    public async Task MetadataStreamContainsMagicBytes(
-        NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows,
-        byte interactionStrength)
+    [Property]
+    public Property MetadataStreamContainsMagicBytes()
     {
-        await using var metaStream = new MemoryStream();
+        return Prop.ForAll(GetMetadataInputParameters(), t =>
+        {
+            using var metaStream = new MemoryStream();
 
-        await _compressor.CompressAsync(
-            GetCsv(rows, sizes),
-            GetRealColumns(sizes),
-            interactionStrength,
-            Stream.Null,
-            metaStream);
+            _compressor.Write(
+                t.rows,
+                t.columns.AsReadOnly(),
+                t.strength,
+                metaStream);
 
-        var bytes = metaStream.ToArray();
+            var magicNumberBytes = metaStream.ToArray()[MagicBytesRange];
 
-        bytes[MagicBytesRange]
-            .Should()
-            .BeEquivalentTo(" CCA"u8.ToArray(), x => x.WithStrictOrdering());
+            return magicNumberBytes.SequenceEqual(" CCA"u8.ToArray());
+        });
     }
 
-    [Theory, AutoData]
-    public async Task MetadataStreamContainsVersion(
-        NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows,
-        byte interactionStrength)
+    [Property]
+    public Property MetadataStreamContainsVersion()
     {
-        await using var metaStream = new MemoryStream();
+        return Prop.ForAll(GetMetadataInputParameters(), t =>
+        {
+            using var metaStream = new MemoryStream();
 
-        await _compressor.CompressAsync(
-            GetCsv(rows, sizes),
-            GetRealColumns(sizes),
-            interactionStrength,
-            Stream.Null,
-            metaStream);
+            _compressor.Write(
+                t.rows,
+                t.columns.AsReadOnly(),
+                t.strength,
+                metaStream);
 
-        var bytes = metaStream.ToArray();
+            var bytes = metaStream.ToArray();
 
-        var version = BitConverter.ToUInt16(bytes[CaVersionRange]);
-        version.Should().Be(2);
+            var version = BitConverter.ToUInt16(bytes[CaVersionRange]);
+
+            return version == 2;
+        });
+
     }
 
-    [Theory, AutoData]
-    public async Task MetadataStreamContainsNumberOfRows(
-        NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows,
-        byte interactionStrength)
+    [Property]
+    public Property MetadataStreamContainsNumberOfRows()
     {
-        await using var metaStream = new MemoryStream();
+        return Prop.ForAll(GetMetadataInputParameters(), t =>
+        {
+            using var metaStream = new MemoryStream();
 
-        await _compressor.CompressAsync(
-            GetCsv(rows, sizes),
-            GetRealColumns(sizes),
-            interactionStrength,
-            Stream.Null,
-            metaStream);
+            _compressor.Write(
+                t.rows,
+                t.columns.AsReadOnly(),
+                t.strength,
+                metaStream);
 
-        var bytes = metaStream.ToArray();
+            var bytes = metaStream.ToArray();
 
-        var numberOfRows = BitConverter.ToInt64(bytes[NumberOfRowsRange]);
-        numberOfRows.Should().Be(rows.Get);
+            var numberOfRows = BitConverter.ToInt64(bytes[NumberOfRowsRange]);
+
+            return numberOfRows == t.rows;
+        });
     }
 
-    [Theory, AutoData]
-    public async Task MetadataStreamContainsInteractionStrength(
-        NonEmptyArray<PositiveInt> sizes,
-        PositiveInt rows,
-        byte interactionStrength)
+    [Property]
+    public Property MetadataStreamContainsInteractionStrength()
     {
-        await using var metaStream = new MemoryStream();
-        var realColumns = GetRealColumns(sizes);
-        await _compressor.CompressAsync(
-            GetCsv(rows, sizes),
-            realColumns,
-            interactionStrength,
-            Stream.Null,
-            metaStream);
+        return Prop.ForAll(GetMetadataInputParameters(), t =>
+        {
+            using var metaStream = new MemoryStream();
 
-        var bytes = metaStream.ToArray();
+            _compressor.Write(
+                t.rows,
+                t.columns.AsReadOnly(),
+                t.strength,
+                metaStream);
 
-        bytes[InteractionStrengthRange][0]
-            .Should()
-            .Be(interactionStrength);
+            var bytes = metaStream.ToArray();
+
+            return bytes[InteractionStrengthRange][0] == t.strength;
+        });
     }
 
     [Property]
@@ -109,7 +99,37 @@ public sealed class MetadataTests
         var arb = Gen
             .Elements(2, byte.MaxValue)
             .Zip(
-                Gen.Elements(0b00000001, 0b01111111),
+                Gen.Elements(0x01, 0x7f),
+                (elementsPerColumn, nbrOfColumns) => Enumerable
+                    .Repeat(elementsPerColumn, nbrOfColumns)
+                    .ToArray())
+            .Zip(Arb.Default.PositiveInt().Generator, (columns, rows) => (columns, rows: rows.Get))
+            .Zip(Arb.Default.Byte().Generator, (foo, strength) => (foo.columns, foo.rows, strength))
+            .ToArbitrary();
+
+        return Prop.ForAll(arb, t =>
+        {
+            using var metaStream = new MemoryStream();
+
+            _compressor.Write(
+                t.rows,
+                t.columns,
+                t.strength,
+                metaStream);
+
+            var bytes = metaStream.ToArray()[ParameterSizesRange];
+
+            return Enumerable.Repeat((int)bytes[^1], bytes[0]).SequenceEqual(t.columns);
+        });
+    }
+
+    [Property]
+    public Property MetadataColumnFrom0x80To0x3fff()
+    {
+        var arb = Gen
+            .Elements(2, byte.MaxValue)
+            .Zip(
+                Gen.Elements(0x80, 0x3fff),
                 (elementsPerColumn, nbrOfColumns) => Enumerable
                     .Repeat(elementsPerColumn, nbrOfColumns)
                     .ToArray())
@@ -122,20 +142,22 @@ public sealed class MetadataTests
             using var metaStream = new MemoryStream();
 
             _compressor
-                .CompressAsync(
-                    GetCsv(t.rows, t.columns),
+                .Write(
+                    t.rows,
                     t.columns,
                     t.strength,
-                    Stream.Null,
-                    metaStream)
-                .Wait();
+                    metaStream);
 
             var bytes = metaStream.ToArray()[ParameterSizesRange];
+            var bytesForLength = bytes[..2];
+            Array.Reverse(bytesForLength);
 
-            return (bytes[0] & 0b10000000) == 0;
+            var length = BitConverter.ToInt16(bytesForLength) & 0x3fff;
+
+            return Enumerable.Repeat((int)bytes[^1], length).SequenceEqual(t.columns);
         });
     }
-    
+
     [Property]
     public Property MetadataColumnFrom128To()
     {
@@ -154,14 +176,11 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor
-                .CompressAsync(
-                    GetCsv(t.rows, t.columns),
-                    t.columns,
-                    t.strength,
-                    Stream.Null,
-                    metaStream)
-                .Wait();
+            _compressor .Write(
+                t.rows,
+                t.columns,
+                t.strength,
+                metaStream);
 
             var bytes = metaStream.ToArray()[ParameterSizesRange];
 
@@ -169,31 +188,16 @@ public sealed class MetadataTests
         });
     }
 
-    private static int[] GetRealColumns(NonEmptyArray<PositiveInt> values)
-        => values
-            .Get
-            .Select(x => x.Get)
-            .Select(x => 2 < x ? x : 2)
-            .ToArray();
+    private static Arbitrary<(IList<int> columns, int rows, byte strength)> GetMetadataInputParameters()
+    {
+        var columnGen = Gen.Elements(Enumerable.Range(2, 20000)).NonEmptyListOf();
+        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get);
+        var strengthGen = Gen.Elements(Enumerable.Range(2, byte.MaxValue - 2)).Select(x => (byte)x);
 
-    private static int[][] GetCsv(
-        PositiveInt rows,
-        NonEmptyArray<PositiveInt> sizes)
-        => GetCsv(rows, GetRealColumns(sizes));
+        var arb = columnGen
+            .Zip(rowsGen, strengthGen, (columns, rows, strength) => (columns, rows, strength))
+            .ToArbitrary();
 
-    private static int[][] GetCsv(
-        PositiveInt rows,
-        int[] realSizes)
-        => GetCsv(rows.Get, realSizes);
-
-    private static int[][] GetCsv(
-        int rows,
-        int[] realSizes)
-        => new DefaultRandomCsvGeneratorFactory()
-            .Create()
-            .WithColumns(realSizes)
-            .WithRowsCount(rows)
-            .Generate()
-            .Select(row => row.Select(int.Parse).ToArray())
-            .ToArray();
+        return arb;
+    }
 }

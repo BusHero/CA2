@@ -12,9 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		CA2.sln.DotSettings.user = CA2.sln.DotSettings.user
-		global.json = global.json
 		CA2.slnx = CA2.slnx
 		CA2.slnx.DotSettings.user = CA2.slnx.DotSettings.user
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CA2.Console", "CA2.Console\CA2.Console.csproj", "{620396DC-F5EF-4721-9A35-167FD7367EC8}"
@@ -47,23 +47,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestUtils", "TestUtils", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ACTS", "ACTS", "{885C1D6B-FF6E-46AD-8687-1B697AA6328C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActsGenerator.Tests", "ActsGenerator.Tests\ActsGenerator.Tests.csproj", "{E3EA3CED-163A-4AD1-B207-7ACABFFAEB43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActsGenerator.Tests", "ActsGenerator.Tests\ActsGenerator.Tests.csproj", "{E3EA3CED-163A-4AD1-B207-7ACABFFAEB43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActsGenerator", "ActsGenerator\ActsGenerator.csproj", "{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActsGenerator", "ActsGenerator\ActsGenerator.csproj", "{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{521AE5D2-6C5C-4619-A14C-59D2CF50085A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACTSDownloader", "ACTSDownloader\ACTSDownloader.csproj", "{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACTSDownloader", "ACTSDownloader\ACTSDownloader.csproj", "{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressStuff", "CompressStuff\CompressStuff.csproj", "{A0B9397E-AFEE-41AD-B9B1-B4D7C219C077}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompressStuff", "CompressStuff\CompressStuff.csproj", "{A0B9397E-AFEE-41AD-B9B1-B4D7C219C077}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoveStuff", "MoveStuff\MoveStuff.csproj", "{5E378020-7C8D-47D8-B21A-54CE1FE4CFB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoveStuff", "MoveStuff\MoveStuff.csproj", "{5E378020-7C8D-47D8-B21A-54CE1FE4CFB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActsToCsv", "ActsToCsv\ActsToCsv.csproj", "{6445AF63-7C12-418B-8D1F-3F9C3E988DC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActsToCsv", "ActsToCsv\ActsToCsv.csproj", "{6445AF63-7C12-418B-8D1F-3F9C3E988DC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressStuff.Original", "CompressStuff.Original\CompressStuff.Original.csproj", "{8B0FE2B2-F06D-4508-889E-C9B7FFC9D685}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompressStuff.Original", "CompressStuff.Original\CompressStuff.Original.csproj", "{8B0FE2B2-F06D-4508-889E-C9B7FFC9D685}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateBigCsv", "GenerateBigCsv\GenerateBigCsv.csproj", "{8F84BAEC-9584-4B44-9346-E199011B6692}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateBigCsv", "GenerateBigCsv\GenerateBigCsv.csproj", "{8F84BAEC-9584-4B44-9346-E199011B6692}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{0045A840-E4E3-4603-92F0-9D57BF692078}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,8 +73,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{521AE5D2-6C5C-4619-A14C-59D2CF50085A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{521AE5D2-6C5C-4619-A14C-59D2CF50085A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AE72C1B-7861-4663-8E39-A0F0FE673E98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4AE72C1B-7861-4663-8E39-A0F0FE673E98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AE72C1B-7861-4663-8E39-A0F0FE673E98}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -129,6 +129,8 @@ Global
 		{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{521AE5D2-6C5C-4619-A14C-59D2CF50085A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{521AE5D2-6C5C-4619-A14C-59D2CF50085A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -172,6 +174,12 @@ Global
 		{4EFD12B7-D3CF-4856-AFA4-85FC52EEEEBD} = {5A2316D6-A9C7-44CA-BE6E-6B7E1C62DF47}
 		{E3EA3CED-163A-4AD1-B207-7ACABFFAEB43} = {885C1D6B-FF6E-46AD-8687-1B697AA6328C}
 		{5FFB0B3F-25CA-479A-A087-4CD30DA3E5D9} = {885C1D6B-FF6E-46AD-8687-1B697AA6328C}
+		{D24A09DF-A4CA-4FA3-A466-6D7DED004AB4} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{A0B9397E-AFEE-41AD-B9B1-B4D7C219C077} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{5E378020-7C8D-47D8-B21A-54CE1FE4CFB9} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{6445AF63-7C12-418B-8D1F-3F9C3E988DC3} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{8B0FE2B2-F06D-4508-889E-C9B7FFC9D685} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{8F84BAEC-9584-4B44-9346-E199011B6692} = {0045A840-E4E3-4603-92F0-9D57BF692078}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7D2D18-DD95-4EA3-B6C5-0937F17F78EE}

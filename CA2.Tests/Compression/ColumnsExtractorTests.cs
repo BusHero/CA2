@@ -155,146 +155,61 @@ public sealed class ColumnsExtractorTests
         });
     }
 
-
-
-
     [Property]
-    public Property OnePairOfLengthPlusValue()
-    {
-        var columnsCountGen = Gen.Choose(0x01, 0x0f_ff_ff_ff);
-        var valueGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte);
-
-        var arb = columnsCountGen.Zip(valueGen, (length, values) => (length, bytes: ColumnsExtractor.GetBytes(length).Append(values).ToArray()))
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, t =>
+    public Property MultiplePairs(PositiveInt l) => Prop.ForAll(
+        GetColumnsCountGen(0x01, 0xff_ff, l.Get),
+        GetValuesGen(l.Get),
+        (lengths, values) =>
         {
-            var columns = ColumnsExtractor.Extract(t.bytes);
+            var bytes = GetColumns(lengths, values);
 
-            return (columns.Length == t.length).Label($"{columns.Length} == {t.length}");
-        });
-    }
-
-    [Property]
-    public Property MultiplePairs(PositiveInt l)
-    {
-        var columnsCountGen = Gen.Sized(size => Gen.Choose(0x01, 0xff_ff).Select(x => x % size)).ArrayOf(l.Get);
-        var valueGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ArrayOf(l.Get);
-
-        var arb = columnsCountGen.Zip(
-            valueGen,
-            (lenghts, values) =>
-            {
-                var bytes = lenghts
-                    .Zip(values, (length, value) => ColumnsExtractor.GetBytes(length).Append(value))
-                    .SelectMany(x => x)
-                    .ToArray();
-
-                return (lenghts, values, bytes);
-            })
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, t =>
-        {
-            var expected = t.lenghts
-                .Zip(t.values, (length, value) => (value, length))
+            var expected = lengths
+                .Zip(values, (length, value) => (value, length))
                 .OrderBy(x => x.value)
                 .ToArray();
 
-            var bytes = ColumnsExtractor.Extract(t.bytes);
+            var columns = ColumnsExtractor.Extract(bytes);
 
-            return bytes.All(t.values.Contains);
+            return columns.All(values.Contains);
         });
-    }
 
-    [Property]
-    public Property MultiplePairs2(PositiveInt l)
-    {
-        var columnsCountGen = Gen
-            .Choose(0x01, 0xff_ff)
-            .ArrayOf(l.Get);
-        var valueGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ArrayOf(l.Get)
-            .Where(x => x.Distinct().Count() == x.Length);
-            ;
-
-        var arb = columnsCountGen.Zip(
-            valueGen,
-            (lenghts, values) =>
-            {
-                var bytes = lenghts
-                    .Zip(values, (length, value) => ColumnsExtractor.GetBytes(length).Append(value))
-                    .SelectMany(x => x)
-                    .ToArray();
-
-                return (lenghts, values, bytes);
-            })
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, t =>
+    [Property(EndSize = 10)]
+    public Property MultiplePairs2(PositiveInt l) => Prop.ForAll(
+        GetColumnsCountGen(0x01, 0xff_ff, l.Get),
+        GetValuesGen(l.Get),
+        (lenghts, values) =>
         {
-            var expected = t.lenghts
-                .Zip(t.values, (length, value) => (value, length))
+            var columns = GetColumns(lenghts, values);
+
+            var expected = lenghts
+                .Zip(values, (length, value) => (value, length))
                 .OrderBy(x => x.value)
                 .ToArray();
 
-            var bytes = ColumnsExtractor.Extract(t.bytes);
+            var bytes = ColumnsExtractor.Extract(columns);
 
-            var result = t.lenghts
+            return lenghts
                 .Zip(
-                    t.values, 
+                    values,
                     (length, value) => bytes.Count(x => x == value) == length)
                 .All(x => x);
-
-            return result;
         });
-    }
-}
 
-public static class ColumnsExtractor
-{
-    internal static byte[] Extract(byte[] bytes)
-    {
-        var result = Enumerable.Empty<byte>();
+    private static Arbitrary<int[]> GetColumnsCountGen(int l, int h, int length) => Gen
+        .Choose(l, h)
+        .ArrayOf(length)
+        .ToArbitrary();
 
-        while (bytes.Length != 0)
-        {
-            var length = GetValue(bytes);
-            var numberOfBytes = CountBytes(length);
+    private static Arbitrary<byte[]> GetValuesGen(int length) => Gen
+        .Choose(0x02, 0xff)
+        .Select(Convert.ToByte)
+        .ArrayOf(length)
+        .Where(x => x.ToHashSet().Count == x.Length)
+        .ToArbitrary();
 
-            var sequence = Enumerable.Repeat(bytes[numberOfBytes], length);
-            result = result.Concat(sequence);
-            bytes = bytes[(numberOfBytes + 1)..];
-        }
 
-        return result.ToArray();
-    }
-
-    private static int CountBytes(int x) => x switch
-    {
-        <= 0x7f => 1,
-        <= 0x3fff => 2,
-        <= 0x1fffff => 3,
-        <= 0x0fffffff => 4,
-        _ => throw new InvalidOperationException(),
-    };
-
-    internal static byte[] GetBytes(int x)
-        => x switch
-        {
-            <= 0x7f => [(byte)x],
-            <= 0x3fff => [(byte)(x >> 8 | 0x80), (byte)(x & 0xff),],
-            <= 0x1fffff => [(byte)(x >> 16 | 0xc0), (byte)(x >> 8 & 0xff), (byte)(x & 0xff),],
-            <= 0x0fffffff => [(byte)(x >> 24 | 0xe0), (byte)(x >> 16 & 0xff), (byte)(x >> 8 & 0xff), (byte)(x & 0xff),],
-            _ => throw new InvalidOperationException(),
-        };
-
-    internal static int GetValue(byte[] bytes)
-        => bytes[0] switch
-        {
-            var b when (b & 0x80) == 0x00 => bytes[0],
-            var b when (b & 0xc0) == 0x80 => ((bytes[0] & 0x7f) << 8) | bytes[1],
-            var b when (b & 0xe0) == 0xc0 => ((bytes[0] & 0x3f) << 16) | (bytes[1] << 8) | bytes[2],
-            var b when (b & 0xf0) == 0xe0 => ((bytes[0] & 0x0f) << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3],
-            _ => throw new InvalidOperationException(),
-        };
+    private static byte[] GetColumns(int[] lenghts, byte[] values) => lenghts
+        .Zip(values, (length, value) => ColumnsExtractor.GetBytes(length).Append(value))
+        .SelectMany(x => x)
+        .ToArray();
 }

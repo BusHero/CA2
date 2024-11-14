@@ -3,8 +3,7 @@ namespace CA2.Tests.Compression;
 using System.Numerics;
 
 using CA2.Compression;
-
-using Utils;
+using CA2.Tests.Utils;
 
 public sealed class GetNumberOfBitsForCombinationTests
 {

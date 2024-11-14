@@ -3,12 +3,11 @@ namespace CA2.Tests.Compression;
 using System.Numerics;
 
 using CA2.Compression;
+using CA2.Tests.Utils;
 
 using CsvGenerator;
 
 using TestUtils;
-
-using Utils;
 
 public sealed class CompressorTests
 {

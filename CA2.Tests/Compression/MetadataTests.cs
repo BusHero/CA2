@@ -16,35 +16,38 @@ public sealed class MetadataTests
     private static readonly Range ParameterSizesRange = 15..^2;
 
     [Property]
-    public Property MetadataStreamContainsMagicBytes()
-    {
-        return Prop.ForAll(GetMetadataInputParameters(), t =>
+    public Property MetadataStreamContainsMagicBytes() => Prop.ForAll(
+        GetColumnGen(),
+        GetRowsGen(),
+        GetStrengthGen(),
+        (columns, rows, strength) =>
         {
             using var metaStream = new MemoryStream();
 
             _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
+                rows,
+                columns,
+                strength,
                 metaStream);
 
             var magicNumberBytes = metaStream.ToArray()[MagicBytesRange];
 
             return magicNumberBytes.SequenceEqual(" CCA"u8.ToArray());
         });
-    }
 
     [Property]
-    public Property MetadataStreamContainsVersion()
-    {
-        return Prop.ForAll(GetMetadataInputParameters(), t =>
+    public Property MetadataStreamContainsVersion() => Prop.ForAll(
+        GetColumnGen(),
+        GetRowsGen(),
+        GetStrengthGen(),
+        (columns, rows, strength) =>
         {
             using var metaStream = new MemoryStream();
 
             _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
+                rows,
+                columns,
+                strength,
                 metaStream);
 
             var bytes = metaStream.ToArray();
@@ -53,47 +56,48 @@ public sealed class MetadataTests
 
             return version == 2;
         });
-    }
 
     [Property]
-    public Property MetadataStreamContainsNumberOfRows()
-    {
-        return Prop.ForAll(GetMetadataInputParameters(), t =>
+    public Property MetadataStreamContainsNumberOfRows() => Prop.ForAll(
+        GetColumnGen(),
+        GetRowsGen(),
+        GetStrengthGen(),
+        (columns, rows, strength) =>
         {
             using var metaStream = new MemoryStream();
 
             _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
+                rows,
+                columns,
+                strength,
                 metaStream);
 
             var bytes = metaStream.ToArray();
 
             var numberOfRows = BitConverter.ToInt64(bytes[NumberOfRowsRange]);
 
-            return numberOfRows == t.rows;
+            return numberOfRows == rows;
         });
-    }
 
     [Property]
-    public Property MetadataStreamContainsInteractionStrength()
-    {
-        return Prop.ForAll(GetMetadataInputParameters(), t =>
+    public Property MetadataStreamContainsInteractionStrength() => Prop.ForAll(
+        GetColumnGen(),
+        GetRowsGen(),
+        GetStrengthGen(),
+        (columns, rows, strength) =>
         {
             using var metaStream = new MemoryStream();
 
             _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
+                rows,
+                columns,
+                strength,
                 metaStream);
 
             var bytes = metaStream.ToArray();
 
-            return bytes[InteractionStrengthRange][0] == t.strength;
+            return bytes[InteractionStrengthRange][0] == strength;
         });
-    }
 
     [Property]
     public Property MetadataColumnFrom0x01To0x7e()
@@ -103,29 +107,29 @@ public sealed class MetadataTests
 
         var columnsGen = elementsPerColumnGen
             .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray);
+            .Select(Enumerable.ToArray).ToArbitrary();
 
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get);
-        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte);
+        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
+        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
 
-        var arb = columnsGen
-            .Zip(rowsGen, strengthGen, (columns, rows, strength) => (columns, rows, strength))
-            .ToArbitrary();
+        return Prop.ForAll(
+            columnsGen, 
+            rowsGen, 
+            strengthGen, 
+            (columns, rows, strength) =>
+            {
+                using var metaStream = new MemoryStream();
 
-        return Prop.ForAll(arb, t =>
-        {
-            using var metaStream = new MemoryStream();
+                _compressor.Write(
+                    rows,
+                    columns,
+                    strength,
+                    metaStream);
 
-            _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
-                metaStream);
+                var bytes = metaStream.ToArray()[ParameterSizesRange];
 
-            var bytes = metaStream.ToArray()[ParameterSizesRange];
-
-            return Enumerable.Repeat((int)bytes[^1], bytes[0]).SequenceEqual(t.columns);
-        });
+                return Enumerable.Repeat((int)bytes[^1], bytes[0]).SequenceEqual(columns);
+            });
     }
 
     [Property]
@@ -136,32 +140,31 @@ public sealed class MetadataTests
 
         var columnsGen = elementsPerColumnGen
             .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray);
+            .Select(Enumerable.ToArray).ToArbitrary();
 
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get);
-        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte);
+        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
+        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
 
-        var arb = columnsGen
-            .Zip(rowsGen, strengthGen, (columns, rows, strength) => (columns, rows, strength))
-            .ToArbitrary();
+        return Prop.ForAll(
+            columnsGen, 
+            rowsGen, 
+            strengthGen, 
+            (columns, rows, strength) =>
+            {
+                using var metaStream = new MemoryStream();
 
-        return Prop.ForAll(arb, t =>
-        {
-            using var metaStream = new MemoryStream();
-
-            _compressor
-                .Write(
-                    t.rows,
-                    t.columns,
-                    t.strength,
+                _compressor.Write(
+                    rows,
+                    columns,
+                    strength,
                     metaStream);
 
-            var bytes = metaStream.ToArray()[ParameterSizesRange];
-            var bytesForLength = bytes[..2];
-            var length = BinaryPrimitives.ReadInt16BigEndian(bytesForLength) & 0x3fff;
+                var bytes = metaStream.ToArray()[ParameterSizesRange];
+                var bytesForLength = bytes[..2];
+                var length = BinaryPrimitives.ReadInt16BigEndian(bytesForLength) & 0x3fff;
 
-            return Enumerable.Repeat((int)bytes[^1], length).SequenceEqual(t.columns);
-        });
+                return Enumerable.Repeat((int)bytes[^1], length).SequenceEqual(columns);
+            });
     }
 
     [Property]
@@ -171,23 +174,22 @@ public sealed class MetadataTests
         var numberOfColumnsGen = Gen.Choose(0x01, 0x7f);
         var columnsGen = valuesGen
             .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray);
+            .Select(Enumerable.ToArray).ToArbitrary();
 
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get);
-        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte);
+        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
+        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
 
-        var arb = columnsGen
-            .Zip(rowsGen, strengthGen, (columns, rows, strength) => (columns, rows, strength))
-            .ToArbitrary();
-
-        return Prop.ForAll(arb, t =>
-        {
+        return Prop.ForAll(
+            columnsGen,
+            rowsGen,
+            strengthGen,
+            (columns, rows, strength) => {
             using var metaStream = new MemoryStream();
 
             _compressor.Write(
-                t.rows,
-                t.columns,
-                t.strength,
+                rows,
+                columns,
+                strength,
                 metaStream);
 
             var bytes = metaStream.ToArray()[ParameterSizesRange];
@@ -196,18 +198,20 @@ public sealed class MetadataTests
         });
     }
 
-    private static Arbitrary<(ReadOnlyCollection<int> columns, int rows, byte strength)> GetMetadataInputParameters()
-    {
-        var columnGen = Gen.Choose(2, 20000)
-            .NonEmptyListOf()
-            .Select(CollectionExtensions.AsReadOnly);
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get);
-        var strengthGen = Gen.Choose(2, 0xff).Select(Convert.ToByte);
+    private static Arbitrary<ReadOnlyCollection<int>> GetColumnGen() => Gen
+        .Choose(2, 20000)
+        .NonEmptyListOf()
+        .Select(CollectionExtensions.AsReadOnly)
+        .ToArbitrary();
 
-        var arb = columnGen
-            .Zip(rowsGen, strengthGen, (columns, rows, strength) => (columns, rows, strength))
-            .ToArbitrary();
+    private static Arbitrary<int> GetRowsGen() => Arb.Default
+        .PositiveInt()
+        .Generator
+        .Select(x => x.Get)
+        .ToArbitrary();
 
-        return arb;
-    }
+    private static Arbitrary<byte> GetStrengthGen() => Gen
+        .Choose(2, 0xff)
+        .Select(Convert.ToByte)
+        .ToArbitrary();
 }

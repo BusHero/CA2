@@ -191,30 +191,38 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         writer.Write(numberOfRows);
         writer.Write(interactionStrength);
 
-        if (columns.Count <= 0x7f)
-        {
-            writer.Write((byte)columns.Count);
-        }
-        else if (columns.Count <= 0x3fff)
-        {
-            writer.Write((byte)(columns.Count >> 8 | 0x80));
-            writer.Write((byte)(columns.Count & 0xff));
-        }
-        else if (columns.Count <= 0x1fffff)
-        {
-            writer.Write((byte)(columns.Count >> 16 | 0xc0));
-            writer.Write((byte)(columns.Count >> 8 & 0xff));
-            writer.Write((byte)(columns.Count & 0xff));
-        }
-        else
-        {
-            writer.Write((byte)(columns.Count >> 24 | 0xe0));
-            writer.Write((byte)(columns.Count >> 16 & 0xff));
-            writer.Write((byte)(columns.Count >> 8 & 0xff));
-            writer.Write((byte)(columns.Count & 0xff));
-        }
+        var groups = columns
+            .GroupBy(x => x)
+            .OrderByDescending(x => x.Key);
 
-        writer.Write((byte)columns.First());
+        foreach (var group in groups)
+        {
+            var length = group.Count();
+            if (length <= 0x7f)
+            {
+                writer.Write((byte)length);
+            }
+            else if (length <= 0x3fff)
+            {
+                writer.Write((byte)(length >> 8 | 0x80));
+                writer.Write((byte)(length & 0xff));
+            }
+            else if (length <= 0x1fffff)
+            {
+                writer.Write((byte)(length >> 16 | 0xc0));
+                writer.Write((byte)(length >> 8 & 0xff));
+                writer.Write((byte)(length & 0xff));
+            }
+            else
+            {
+                writer.Write((byte)(length >> 24 | 0xe0));
+                writer.Write((byte)(length >> 16 & 0xff));
+                writer.Write((byte)(length >> 8 & 0xff));
+                writer.Write((byte)(length & 0xff));
+            }
+
+            writer.Write((byte)group.Key);
+        }
 
         writer.Write(ushort.MinValue);
     }

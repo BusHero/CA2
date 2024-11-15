@@ -158,13 +158,21 @@ public sealed class MetadataTests
             MetdataContainsRightMasks);
 
 
-    [Property(MaxTest = 10)]
+    [Property]
     public Property MetadataColumnContainsRightMask()
         => Prop.ForAll(
             GetColumnGen(),
             GetRowsGen(),
             GetStrengthGen(),
             MetdataContainsRightMasks);
+
+    [Property]
+    public Property MetadataContainAllColumns2()
+        => Prop.ForAll(
+            GetColumnGen(),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetadataContainAllColumns);
 
     private void MetdataContainsRightMasks(int[] columns, int rows, byte strength)
     {
@@ -184,6 +192,23 @@ public sealed class MetadataTests
             var numberOfBytes = ColumnsExtractor.GetNumberOfBytesFromMask(bytes[initial]);
             initial += numberOfBytes + 1;
         }
+    }
+
+    public void MetadataContainAllColumns(int[] columns, int rows, byte strength)
+    {
+        using var metaStream = new MemoryStream();
+
+        _compressor.Write(
+            rows,
+            columns,
+            strength,
+            metaStream);
+
+        var bytes = metaStream.ToArray()[ParameterSizesRange];
+
+        var actualColumns = ColumnsExtractor.GetColumns(bytes);
+
+        actualColumns.Should().BeEquivalentTo(columns.OrderDescending(), x => x.WithStrictOrdering());
     }
 
     private static Arbitrary<int[]> GetColumnGen() => Gen

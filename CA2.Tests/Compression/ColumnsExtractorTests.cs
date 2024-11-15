@@ -168,7 +168,7 @@ public sealed class ColumnsExtractorTests
                 .OrderBy(x => x.value)
                 .ToArray();
 
-            var columns = ColumnsExtractor.Extract(bytes);
+            var columns = ColumnsExtractor.GetColumns(bytes);
 
             return columns.All(values.Contains);
         });
@@ -186,7 +186,7 @@ public sealed class ColumnsExtractorTests
                 .OrderBy(x => x.value)
                 .ToArray();
 
-            var bytes = ColumnsExtractor.Extract(columns);
+            var bytes = ColumnsExtractor.GetColumns(columns);
 
             return lenghts
                 .Zip(

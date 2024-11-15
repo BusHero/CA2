@@ -1,8 +1,5 @@
 namespace CA2.Tests.Compression;
 
-using System.Buffers.Binary;
-using System.Collections.ObjectModel;
-
 using CA2.Compression;
 
 public sealed class MetadataTests
@@ -100,82 +97,9 @@ public sealed class MetadataTests
         });
 
     [Property]
-    public Property MetadataColumnFrom0x01To0x7e()
+    public Property MetadataColumnFrom0x01To0x7eContainsAllColumns()
     {
-        var elementsPerColumnGen = Gen.Choose(0x02, 0xff);
-        var numberOfColumnsGen = Gen.Choose(0x01, 0x7f);
-
-        var columnsGen = elementsPerColumnGen
-            .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray).ToArbitrary();
-
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
-        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
-
-        return Prop.ForAll(
-            columnsGen, 
-            rowsGen, 
-            strengthGen, 
-            (columns, rows, strength) =>
-            {
-                using var metaStream = new MemoryStream();
-
-                _compressor.Write(
-                    rows,
-                    columns,
-                    strength,
-                    metaStream);
-
-                var bytes = metaStream.ToArray()[ParameterSizesRange];
-
-                return Enumerable.Repeat((int)bytes[^1], bytes[0]).SequenceEqual(columns);
-            });
-    }
-
-    [Property]
-    public Property MetadataColumnFrom0x80To0x3fff()
-    {
-        var elementsPerColumnGen = Gen.Choose(0x02, 0xff);
-        var numberOfColumnsGen = Gen.Choose(0x80, 0x3fff);
-
-        var columnsGen = elementsPerColumnGen
-            .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray).ToArbitrary();
-
-        var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
-        var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
-
-        return Prop.ForAll(
-            columnsGen, 
-            rowsGen, 
-            strengthGen, 
-            (columns, rows, strength) =>
-            {
-                using var metaStream = new MemoryStream();
-
-                _compressor.Write(
-                    rows,
-                    columns,
-                    strength,
-                    metaStream);
-
-                var bytes = metaStream.ToArray()[ParameterSizesRange];
-                var bytesForLength = bytes[..2];
-                var length = BinaryPrimitives.ReadInt16BigEndian(bytesForLength) & 0x3fff;
-
-                return Enumerable.Repeat((int)bytes[^1], length).SequenceEqual(columns);
-            });
-    }
-
-    [Property]
-    public Property MetadataColumnFrom0x01To0x7fContainRightMask()
-    {
-        var valuesGen = Gen.Choose(0x02, 0xff);
-        var numberOfColumnsGen = Gen.Choose(0x01, 0x7f);
-        var columnsGen = valuesGen
-            .Zip(numberOfColumnsGen, Enumerable.Repeat)
-            .Select(Enumerable.ToArray).ToArbitrary();
-
+        var columnsGen = GetColumnsWithSingleValue(0x01, 0x7f);
         var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
         var strengthGen = Gen.Choose(0x02, 0xff).Select(Convert.ToByte).ToArbitrary();
 
@@ -183,25 +107,89 @@ public sealed class MetadataTests
             columnsGen,
             rowsGen,
             strengthGen,
-            (columns, rows, strength) => {
-            using var metaStream = new MemoryStream();
+            (columns, rows, strength) =>
+            {
+                using var metaStream = new MemoryStream();
 
-            _compressor.Write(
-                rows,
-                columns,
-                strength,
-                metaStream);
+                _compressor.Write(
+                    rows,
+                    columns,
+                    strength,
+                    metaStream);
 
-            var bytes = metaStream.ToArray()[ParameterSizesRange];
+                var bytes = metaStream.ToArray()[ParameterSizesRange];
 
-            return (bytes[0] & 0x80) == 0;
-        });
+                var columns2 = ColumnsExtractor.GetColumns(bytes);
+
+                return columns2.Order().SequenceEqual(columns2.Order());
+            });
     }
 
-    private static Arbitrary<ReadOnlyCollection<int>> GetColumnGen() => Gen
-        .Choose(2, 20000)
+    [Property]
+    public Property MetadataColumnFrom0x01To0x7fContainRightMask()
+        => Prop.ForAll(
+            GetColumnsWithSingleValue(0x01, 0x7f),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetdataContainsRightMasks);
+
+    [Property]
+    public Property MetadataColumnFrom0x80To0x3fffContainsRightMask()
+        => Prop.ForAll(
+            GetColumnsWithSingleValue(0x80, 0x3fff),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetdataContainsRightMasks);
+
+    [Property]
+    public Property MetadataColumnFrom0x4fffTo0x1fffffContainsRightMask()
+        => Prop.ForAll(
+            GetColumnsWithSingleValue(0x4fff, 0x1fffff),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetdataContainsRightMasks);
+
+    [Property(MaxTest = 5)]
+    public Property MetadataColumnFrom0x2fffTo0x0fffffffContainsRightMask()
+        => Prop.ForAll(
+            GetColumnsWithSingleValue(0x2fffff, 0x0fffffff),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetdataContainsRightMasks);
+
+
+    [Property(MaxTest = 10)]
+    public Property MetadataColumnContainsRightMask()
+        => Prop.ForAll(
+            GetColumnGen(),
+            GetRowsGen(),
+            GetStrengthGen(),
+            MetdataContainsRightMasks);
+
+    private void MetdataContainsRightMasks(int[] columns, int rows, byte strength)
+    {
+        using var metaStream = new MemoryStream();
+
+        _compressor.Write(
+            rows,
+            columns,
+            strength,
+            metaStream);
+        var bytes = metaStream.ToArray()[ParameterSizesRange];
+
+        var initial = 0;
+        while (initial != bytes.Length)
+        {
+            //GetNumberOfBytesFromMask will fail if a byte does not contain the right mask
+            var numberOfBytes = ColumnsExtractor.GetNumberOfBytesFromMask(bytes[initial]);
+            initial += numberOfBytes + 1;
+        }
+    }
+
+    private static Arbitrary<int[]> GetColumnGen() => Gen
+        .Choose(2, 0xff)
         .NonEmptyListOf()
-        .Select(CollectionExtensions.AsReadOnly)
+        .Select(Enumerable.ToArray)
         .ToArbitrary();
 
     private static Arbitrary<int> GetRowsGen() => Arb.Default
@@ -214,4 +202,15 @@ public sealed class MetadataTests
         .Choose(2, 0xff)
         .Select(Convert.ToByte)
         .ToArbitrary();
+
+    private static Arbitrary<int[]> GetColumnsWithSingleValue(int l, int h)
+    {
+        var elementsPerColumnGen = Gen.Choose(0x02, 0xff);
+        var numberOfColumnsGen = Gen.Choose(l, h);
+
+        var columnsGen = elementsPerColumnGen
+            .Zip(numberOfColumnsGen, Enumerable.Repeat)
+            .Select(Enumerable.ToArray).ToArbitrary();
+        return columnsGen;
+    }
 }

@@ -3,7 +3,7 @@ namespace CA2.Tests.Compression;
 public sealed class ColumnsExtractorTests
 {
     [Property]
-    public Property NumberBetween0x00And0x7fHasLength1()
+    public Property NumberBetween0X00And0X7FHasLength1()
     {
         var arb = Gen.Choose(0x00, 0x7f).ToArbitrary();
 
@@ -16,7 +16,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x00And0x7fHasValue()
+    public Property NumberBetween0X00And0X7FHasValue()
     {
         var arb = Gen.Choose(0x00, 0x7f).ToArbitrary();
 
@@ -31,7 +31,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x80And0x3fffHasLength2()
+    public Property NumberBetween0X80And0X3FffHasLength2()
     {
         var arb = Gen.Choose(0x80, 0x3fff).ToArbitrary();
 
@@ -44,7 +44,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x80And0x3fffFirstByteHasMask10()
+    public Property NumberBetween0X80And0X3FffFirstByteHasMask10()
     {
         var arb = Gen.Choose(0x80, 0x3fff).ToArbitrary();
 
@@ -57,7 +57,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x80And0x3fffFirstByteHasValue()
+    public Property NumberBetween0X80And0X3FffFirstByteHasValue()
     {
         var arb = Gen.Choose(0x80, 0x3fff).ToArbitrary();
 
@@ -73,7 +73,7 @@ public sealed class ColumnsExtractorTests
 
 
     [Property]
-    public Property NumberBetween0x4000And0x1fffffHasLength3()
+    public Property NumberBetween0X4000And0X1FffffHasLength3()
     {
         var arb = Gen.Choose(0x4000, 0x1fffff).ToArbitrary();
 
@@ -86,7 +86,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x4000And0x1fffffHasMask110()
+    public Property NumberBetween0X4000And0X1FffffHasMask110()
     {
         var arb = Gen.Choose(0x4000, 0x1fffff).ToArbitrary();
 
@@ -99,7 +99,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x4000And0x1fffffHasValue()
+    public Property NumberBetween0X4000And0X1FffffHasValue()
     {
         var arb = Gen.Choose(0x4000, 0x1fffff).ToArbitrary();
 
@@ -115,7 +115,7 @@ public sealed class ColumnsExtractorTests
 
 
     [Property]
-    public Property NumberBetween0x2fffffAnd0x0fffffffHasLength4()
+    public Property NumberBetween0X2FffffAnd0X0FffffffHasLength4()
     {
         var arb = Gen.Choose(0x2fffff, 0x0fffffff).ToArbitrary();
 
@@ -128,7 +128,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x2fffffAnd0x0fffffffHasMask110()
+    public Property NumberBetween0X2FffffAnd0X0FffffffHasMask110()
     {
         var arb = Gen.Choose(0x2fffff, 0x0fffffff).ToArbitrary();
 
@@ -141,7 +141,7 @@ public sealed class ColumnsExtractorTests
     }
 
     [Property]
-    public Property NumberBetween0x2fffffAnd0x0fffffffHasValue()
+    public Property NumberBetween0X2FffffAnd0X0FffffffHasValue()
     {
         var arb = Gen.Choose(0x2fffff, 0x0fffffff).ToArbitrary();
 
@@ -163,11 +163,6 @@ public sealed class ColumnsExtractorTests
         {
             var bytes = GetColumns(lengths, values);
 
-            var expected = lengths
-                .Zip(values, (length, value) => (value, length))
-                .OrderBy(x => x.value)
-                .ToArray();
-
             var columns = ColumnsExtractor.GetColumns(bytes);
 
             return columns.All(values.Contains);
@@ -177,18 +172,13 @@ public sealed class ColumnsExtractorTests
     public Property MultiplePairs2(PositiveInt l) => Prop.ForAll(
         GetColumnsCountGen(0x01, 0xff_ff, l.Get),
         GetValuesGen(l.Get),
-        (lenghts, values) =>
+        (lengths, values) =>
         {
-            var columns = GetColumns(lenghts, values);
-
-            var expected = lenghts
-                .Zip(values, (length, value) => (value, length))
-                .OrderBy(x => x.value)
-                .ToArray();
+            var columns = GetColumns(lengths, values);
 
             var bytes = ColumnsExtractor.GetColumns(columns);
 
-            return lenghts
+            return lengths
                 .Zip(
                     values,
                     (length, value) => bytes.Count(x => x == value) == length)
@@ -208,7 +198,7 @@ public sealed class ColumnsExtractorTests
         .ToArbitrary();
 
 
-    private static byte[] GetColumns(int[] lenghts, byte[] values) => lenghts
+    private static byte[] GetColumns(int[] lengths, byte[] values) => lengths
         .Zip(values, (length, value) => ColumnsExtractor.GetBytes(length).Append(value))
         .SelectMany(x => x)
         .ToArray();

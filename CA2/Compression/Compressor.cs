@@ -18,17 +18,17 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
 
         if (row.Length != sizes.Length)
         {
-            throw new InvalidOperationException($"Values and Sizes have different length");
+            throw new InvalidOperationException("Values and Sizes have different length");
         }
 
         if (row.Any(x => x < 0))
         {
-            throw new InvalidOperationException($"Values contain elements smaller than zero");
+            throw new InvalidOperationException("Values contain elements smaller than zero");
         }
 
         if (sizes.Any(x => x < 2))
         {
-            throw new InvalidOperationException($"Sizes contain elements smaller than 2");
+            throw new InvalidOperationException("Sizes contain elements smaller than 2");
         }
 
         if (row
@@ -105,7 +105,7 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         }
     }
 
-    private async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
+    private static async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
     {
         var number = Compress(combinationItem, combinationSizes);
         var size = GetNumberOfBytesForCombination(combinationSizes);
@@ -121,7 +121,7 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         for (var i = sizes.Length - 1; i >= 0; i--)
         {
             result[i] = (int)(intermediateResult % sizes[i]);
-            intermediateResult = intermediateResult / sizes[i];
+            intermediateResult /= sizes[i];
         }
 
         return result;
@@ -149,7 +149,7 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         return [.. result];
     }
 
-    private async Task CompressAsync(int[][] items, int[] sizes, Stream stream)
+    private static async Task CompressAsync(int[][] items, int[] sizes, Stream stream)
     {
         foreach (var item in items)
         {
@@ -198,27 +198,26 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         foreach (var group in groups)
         {
             var length = group.Count();
-            if (length <= 0x7f)
+            switch (length)
             {
-                writer.Write((byte)length);
-            }
-            else if (length <= 0x3fff)
-            {
-                writer.Write((byte)(length >> 8 | 0x80));
-                writer.Write((byte)(length & 0xff));
-            }
-            else if (length <= 0x1fffff)
-            {
-                writer.Write((byte)(length >> 16 | 0xc0));
-                writer.Write((byte)(length >> 8 & 0xff));
-                writer.Write((byte)(length & 0xff));
-            }
-            else
-            {
-                writer.Write((byte)(length >> 24 | 0xe0));
-                writer.Write((byte)(length >> 16 & 0xff));
-                writer.Write((byte)(length >> 8 & 0xff));
-                writer.Write((byte)(length & 0xff));
+                case <= 0x7f:
+                    writer.Write((byte)length);
+                    break;
+                case <= 0x3fff:
+                    writer.Write((byte)(length >> 8 | 0x80));
+                    writer.Write((byte)(length & 0xff));
+                    break;
+                case <= 0x1fffff:
+                    writer.Write((byte)(length >> 16 | 0xc0));
+                    writer.Write((byte)(length >> 8 & 0xff));
+                    writer.Write((byte)(length & 0xff));
+                    break;
+                default:
+                    writer.Write((byte)(length >> 24 | 0xe0));
+                    writer.Write((byte)(length >> 16 & 0xff));
+                    writer.Write((byte)(length >> 8 & 0xff));
+                    writer.Write((byte)(length & 0xff));
+                    break;
             }
 
             writer.Write((byte)group.Key);

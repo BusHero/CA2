@@ -97,7 +97,7 @@ public sealed class MetadataTests
         });
 
     [Property]
-    public Property MetadataColumnFrom0x01To0x7eContainsAllColumns()
+    public Property MetadataColumnFrom0X01To0X7EContainsAllColumns()
     {
         var columnsGen = GetColumnsWithSingleValue(0x01, 0x7f);
         var rowsGen = Arb.Default.PositiveInt().Generator.Select(x => x.Get).ToArbitrary();
@@ -126,36 +126,36 @@ public sealed class MetadataTests
     }
 
     [Property]
-    public Property MetadataColumnFrom0x01To0x7fContainRightMask()
+    public Property MetadataColumnFrom0X01To0X7FContainRightMask()
         => Prop.ForAll(
             GetColumnsWithSingleValue(0x01, 0x7f),
             GetRowsGen(),
             GetStrengthGen(),
-            MetdataContainsRightMasks);
+            MetadataContainsRightMasks);
 
     [Property]
-    public Property MetadataColumnFrom0x80To0x3fffContainsRightMask()
+    public Property MetadataColumnFrom0X80To0X3FffContainsRightMask()
         => Prop.ForAll(
             GetColumnsWithSingleValue(0x80, 0x3fff),
             GetRowsGen(),
             GetStrengthGen(),
-            MetdataContainsRightMasks);
+            MetadataContainsRightMasks);
 
     [Property]
-    public Property MetadataColumnFrom0x4fffTo0x1fffffContainsRightMask()
+    public Property MetadataColumnFrom0X4FffTo0X1FffffContainsRightMask()
         => Prop.ForAll(
             GetColumnsWithSingleValue(0x4fff, 0x1fffff),
             GetRowsGen(),
             GetStrengthGen(),
-            MetdataContainsRightMasks);
+            MetadataContainsRightMasks);
 
     [Property(MaxTest = 5)]
-    public Property MetadataColumnFrom0x2fffTo0x0fffffffContainsRightMask()
+    public Property MetadataColumnFrom0X2FffTo0X0FffffffContainsRightMask()
         => Prop.ForAll(
             GetColumnsWithSingleValue(0x2fffff, 0x0fffffff),
             GetRowsGen(),
             GetStrengthGen(),
-            MetdataContainsRightMasks);
+            MetadataContainsRightMasks);
 
 
     [Property]
@@ -164,7 +164,7 @@ public sealed class MetadataTests
             GetColumnGen(),
             GetRowsGen(),
             GetStrengthGen(),
-            MetdataContainsRightMasks);
+            MetadataContainsRightMasks);
 
     [Property]
     public Property MetadataContainAllColumns2()
@@ -174,7 +174,7 @@ public sealed class MetadataTests
             GetStrengthGen(),
             MetadataContainAllColumns);
 
-    private void MetdataContainsRightMasks(int[] columns, int rows, byte strength)
+    private void MetadataContainsRightMasks(int[] columns, int rows, byte strength)
     {
         using var metaStream = new MemoryStream();
 
@@ -194,7 +194,7 @@ public sealed class MetadataTests
         }
     }
 
-    public void MetadataContainAllColumns(int[] columns, int rows, byte strength)
+    private void MetadataContainAllColumns(int[] columns, int rows, byte strength)
     {
         using var metaStream = new MemoryStream();
 

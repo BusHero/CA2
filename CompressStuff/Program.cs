@@ -13,7 +13,7 @@ internal partial class Program
 
     public static async Task Main()
     {
-        var files = new DirectoryInfo(Path).GetFiles("*.csv");
+        var files = new DirectoryInfo(Path).GetFiles("*.txt");
 
         var command = new CompressCommand(
             new FileSystem(),

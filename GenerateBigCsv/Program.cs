@@ -7,7 +7,7 @@ public partial class Program
     private const string OriginalFileFolder = """C:\Users\Petru\projects\csharp\CA2\result-unarchive""";
     private const string ZipFileFolder = """C:\Users\Petru\projects\csharp\CA2\result""";
     private const string FilesThatMyProgramGenerated = """C:\Users\Petru\projects\csharp\CA2\result-ca2""";
-    private const string OriginalProgram = """C:\Users\Petru\projects\csharp\CA2\result-original""";
+    // private const string OriginalProgram = """C:\Users\Petru\projects\csharp\CA2\result-original""";
 
     public static async Task Main()
     {
@@ -16,22 +16,22 @@ public partial class Program
 
         await using var writer = File.CreateText("""C:\Users\Petru\projects\csharp\CA2\result.csv""");
         
-        await writer.WriteLineAsync("Filename,T,V,K,original-file-length,zip,cca-new,ccmeta-new,cca-old,ccmeta-old");
+        await writer.WriteLineAsync("Filename,T,V,K,original-file-length,zip,cca-new,ccmeta-new");
         
         foreach (var file in files)
         {
             var zipFile = new FileInfo(GetZipFilePath(ZipFileFolder, file.FullName, ".txt.zip"));
             var myCcaFile = new FileInfo(GetZipFilePath(FilesThatMyProgramGenerated, file.FullName, ".cca"));
             var myMetaFile = new FileInfo(GetZipFilePath(FilesThatMyProgramGenerated, file.FullName, ".ccmeta"));
-            var originalCcaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".cca"));
-            var originalMetaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".ccmeta"));
+            // var originalCcaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".cca"));
+            // var originalMetaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".ccmeta"));
 
             var match = Filename().Match(file.Name);
             var t = byte.Parse(match.Groups["t"].Value);
             var k = int.Parse(match.Groups["k"].Value);
             var v = int.Parse(match.Groups["v"].Value);
             await writer.WriteLineAsync(
-                $"{file.Name},{t},{v},{k},{file.Length},{zipFile.Length},{myCcaFile.Length},{myMetaFile.Length},{originalCcaFile.Length},{originalMetaFile.Length}");
+                $"{file.Name},{t},{v},{k},{file.Length},{zipFile.Length},{myCcaFile.Length},{myMetaFile.Length}");
             await writer.FlushAsync();
         }
     }

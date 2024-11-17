@@ -12,52 +12,22 @@ public sealed class CsvExtractorTests
     public Property OptimizedCsvContainsColumnSizeOfDistinctNumbers(
         NonEmptyArray<PositiveInt> columnSizes)
     {
-        using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
+        using var stream = GetStreamWithCsv(columnSizes).Result;
 
-        WriteCsv(columnSizes, writer);
-
-        stream.Position = 0;
-        using var reader = new StreamReader(stream);
-        var csv = new CsvExtractor()
-            .ExtractAsync(reader)
-            .Result;
-        var pivot = csv.Pivot();
+        var pivot = GetCsv(stream).Pivot();
 
         return pivot.Zip(columnSizes.Get)
             .All(t => t.First.Distinct().Count() == t.Second.Get)
             .ToProperty();
     }
 
-    private static void WriteCsv(NonEmptyArray<PositiveInt> columnSizes, StreamWriter writer)
-    {
-        var realColumn = columnSizes.Get
-            .Select(x => x.Get)
-            .ToArray();
-
-        new DefaultRandomCsvGeneratorFactory()
-            .Create()
-            .WithColumns(realColumn)
-            .WithRowsCount(1_000)
-            .GenerateAsync(writer)
-            .Wait();
-    }
-
     [Property]
     public Property MinimumValueIsZero(
         NonEmptyArray<PositiveInt> columnSizes)
     {
-        using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
+        using var stream = GetStreamWithCsv(columnSizes).Result;
 
-        WriteCsv(columnSizes, writer);
-
-        stream.Position = 0;
-        using var reader = new StreamReader(stream);
-        var csv = new CsvExtractor()
-            .ExtractAsync(reader)
-            .Result;
-        var pivot = csv.Pivot();
+        var pivot = GetCsv(stream).Pivot();
 
         return pivot.All(row => row.Min() == 0)
             .ToProperty();
@@ -67,17 +37,9 @@ public sealed class CsvExtractorTests
     public Property MaximumValueIsColumnSizeMinus1(
         NonEmptyArray<PositiveInt> columnSizes)
     {
-        using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
+        using var stream = GetStreamWithCsv(columnSizes).Result;
 
-        WriteCsv(columnSizes, writer);
-
-        stream.Position = 0;
-        using var reader = new StreamReader(stream);
-        var csv = new CsvExtractor()
-            .ExtractAsync(reader)
-            .Result;
-        var pivot = csv.Pivot();
+        var pivot = GetCsv(stream).Pivot();
 
         return pivot
             .Zip(columnSizes.Get)
@@ -89,18 +51,38 @@ public sealed class CsvExtractorTests
     public Property OptimizedCsvHasSameSizeAsOriginalCsv(
         NonEmptyArray<PositiveInt> columnSizes)
     {
-        using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
+        using var stream = GetStreamWithCsv(columnSizes).Result;
 
-        WriteCsv(columnSizes, writer);
+        var pivot = GetCsv(stream).Pivot();
 
+        return (pivot.Length == columnSizes.Get.Length).ToProperty();
+    }
+
+    private static async Task<MemoryStream> GetStreamWithCsv(NonEmptyArray<PositiveInt> columnSizes)
+    {
+        var stream = new MemoryStream();
+        var realColumn = columnSizes.Get
+            .Select(x => x.Get)
+            .ToArray();
+
+        await new DefaultRandomCsvGeneratorFactory()
+            .Create()
+            .WithColumns(realColumn)
+            .WithRowsCount(1_000)
+            .GenerateAsync(stream);
         stream.Position = 0;
-        using var reader = new StreamReader(stream);
+        
+        return stream;
+    }
+
+    private static int[][] GetCsv(MemoryStream stream)
+    {
+        var reader = new StreamReader(stream);
+        
         var csv = new CsvExtractor()
             .ExtractAsync(reader)
             .Result;
-        var pivot = csv.Pivot();
-
-        return (pivot.Length == columnSizes.Get.Length).ToProperty();
+        
+        return csv;
     }
 }

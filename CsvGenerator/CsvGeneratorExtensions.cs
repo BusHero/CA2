@@ -14,7 +14,7 @@ public static class CsvGeneratorExtensions
         return generator.WithColumn(column);
     }
 
-    public static ICsvGenerator WithColumns(this ICsvGenerator generator, int[] columns)
+    public static ICsvGenerator WithColumns(this ICsvGenerator generator, IReadOnlyCollection<int> columns)
         => columns
             .Aggregate(
                 generator,
@@ -31,6 +31,22 @@ public static class CsvGeneratorExtensions
         TextWriter writer,
         CancellationToken token = default)
     {
+        var csv = generator
+            .Generate()
+            .Select(row => string.Join(',', row));
+
+        var content = string.Join(Environment.NewLine, csv);
+        await writer.WriteAsync(content);
+        await writer.FlushAsync(token);
+    }
+
+    public static async Task GenerateAsync(
+        this ICsvGenerator generator, 
+        Stream stream,
+        CancellationToken token = default)
+    {
+        var writer = new StreamWriter(stream);
+        
         var csv = generator
             .Generate()
             .Select(row => string.Join(',', row));

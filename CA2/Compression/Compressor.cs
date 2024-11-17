@@ -149,7 +149,10 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         return [.. result];
     }
 
-    private static async Task CompressAsync(int[][] items, int[] sizes, Stream stream)
+    public async Task CompressAsync(
+        int[][] items,
+        int[] sizes,
+        Stream stream)
     {
         foreach (var item in items)
         {
@@ -198,6 +201,7 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         foreach (var group in groups)
         {
             var length = group.Count();
+
             switch (length)
             {
                 case <= 0x7f:
@@ -224,5 +228,27 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
         }
 
         writer.Write(ushort.MinValue);
+    }
+}
+
+public class Compressor2
+{
+    public async Task CompressAsync(
+        int[][] items,
+        IReadOnlyCollection<int> sizes,
+        Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(sizes);
+
+        BigInteger result = items[0][^1];
+        var power = BigInteger.One;
+        
+        foreach (var (value, size) in items[0].Zip(sizes.Skip(1)).Reverse())
+        {
+            power *= size;
+            result += value * power;
+        }
+        await stream.WriteAsync(result.ToByteArray());
     }
 }

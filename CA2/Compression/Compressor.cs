@@ -245,18 +245,19 @@ public class Compressor2
             .Zip(sizes, (item, size) => (item, size))
             .OrderByDescending(x => x.size)
             .ToArray();
-        
-        var items2 = stuff.Select(x => x.item).ToArray();
-        var sizes2 = stuff.Select(x => x.size).ToArray();
-        
-        BigInteger result = items2[^1];
+
+        var sortedItems = stuff.Select(x => x.item).ToArray();
+        var sortedSizes = stuff.Select(x => x.size).ToArray();
+
+        BigInteger result = sortedItems[^1];
         var power = BigInteger.One;
-        
-        foreach (var (value, size) in items2.Zip(sizes2.Skip(1)).Reverse())
+
+        for (var i = sortedItems.Length - 2; i >= 0; i--)
         {
-            power *= size;
-            result += value * power;
+            power *= sortedSizes[i + 1];
+            result += sortedItems[i] * power;
         }
+
         await stream.WriteAsync(result.ToByteArray());
     }
 }

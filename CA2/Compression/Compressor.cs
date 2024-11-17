@@ -241,23 +241,41 @@ public class Compressor2
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(sizes);
 
-        var stuff = items[0]
-            .Zip(sizes, (item, size) => (item, size))
-            .OrderByDescending(x => x.size)
+        var bytesPerCombination = sizes.Product().GetByteCount();
+
+        var bytes = new byte[bytesPerCombination];
+
+        var sortedSizes = sizes
+            .OrderDescending()
             .ToArray();
-
-        var sortedItems = stuff.Select(x => x.item).ToArray();
-        var sortedSizes = stuff.Select(x => x.size).ToArray();
-
-        BigInteger result = sortedItems[^1];
-        var power = BigInteger.One;
-
-        for (var i = sortedItems.Length - 2; i >= 0; i--)
+        
+        foreach (var item in items)
         {
-            power *= sortedSizes[i + 1];
-            result += sortedItems[i] * power;
-        }
+            var stuff = item
+                .Zip(sizes, (i, size) => (item: i, size))
+                .OrderByDescending(x => x.size)
+                .ToArray();
 
-        await stream.WriteAsync(result.ToByteArray());
+            var sortedItems = stuff.Select(x => x.item).ToArray();
+
+            BigInteger result = sortedItems[^1];
+            var power = BigInteger.One;
+            
+            for (var i = sortedItems.Length - 2; i >= 0; i--)
+            {
+                power *= sortedSizes[i + 1];
+                result += sortedItems[i] * power;
+            }
+
+            result.TryWriteBytes(bytes, out _);
+
+            await stream.WriteAsync(bytes);
+        }
     }
+}
+
+public static class MyEnumerableExtensions
+{
+    public static BigInteger Product(this IEnumerable<int> numbers)
+        => numbers.Aggregate(BigInteger.One, (x, y) => x * y);
 }

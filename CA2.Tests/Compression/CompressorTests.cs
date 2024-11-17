@@ -174,6 +174,21 @@ public sealed class CompressorTests2
             return biggerResult <= smallerResult;
         });
 
+    [Property]
+    public Property CompressingMultipleRowsUseMoreBytesThanCompressingASingleRow() => Prop.ForAll(
+        RandomCsv.Where(csv => csv is { Values.Length: >= 2 }).ToArbitrary(),
+        csv =>
+        {
+            csv = csv with { Values = csv.Values[0..2] };
+            var csvWithSingleLine = csv with { Values = [csv.Values[0]] };
+
+            using var singleRowStream = CompressAsync(csvWithSingleLine.Values, csvWithSingleLine.Columns).Result;
+            using var multiRowStream = CompressAsync(csv.Values, csv.Columns).Result;
+
+            return (multiRowStream.Length == singleRowStream.Length * csv.Values.Length).Label(
+                $"{multiRowStream.Length} = {csv.Values.Length} * {singleRowStream.Length}");
+        });
+
     private static Gen<SmallerAndBiggerCsv> CsvWithOneColumnBiggerThanAnother => RandomCsv
         .Where(csv => csv is { Columns.Count: >= 2 })
         .Where(csv => csv.Values[0].Sum() != 0)

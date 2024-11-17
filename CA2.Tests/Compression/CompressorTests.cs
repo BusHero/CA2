@@ -67,98 +67,64 @@ public sealed class CompressorTests2
         int[] sizes,
         int expectedResult)
     {
-        using var stream = new MemoryStream();
+        using var stream = await CompressAsync(item, sizes);
 
-        await _compressor.CompressAsync(
-            item,
-            sizes,
-            stream);
-
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var bytes = stream.ToArray();
-
-        new BigInteger(bytes)
+        GetBigNumber(stream)
             .Should()
             .Be(expectedResult);
     }
 
     [Property]
-    public Property ResultShouldBeBetweenZeroAndMaxValue() => Prop
-        .ForAll(
-            Gen.OneOf(
-                    RandomCsv,
-                    RandomCsvWithZeros,
-                    RandomCsvWithMaxValuesPerColumn)
-                .Select(x => x with { Values = [x.Values[0]] })
-                .ToArbitrary(),
-            csv =>
-            {
-                using var stream = new MemoryStream();
+    public Property ResultShouldBeBetweenZeroAndMaxValue() => Prop.ForAll(
+        Gen.OneOf(RandomCsv, RandomCsvWithZeros, RandomCsvWithMaxValuesPerColumn)
+            .Select(x => x with { Values = [x.Values[0]] })
+            .ToArbitrary(),
+        csv =>
+        {
+            using var stream = CompressAsync(csv.Values, csv.Columns).Result;
 
-                _compressor
-                    .CompressAsync(csv.Values, csv.Columns, stream)
-                    .Wait();
+            var result = GetBigNumber(stream);
 
-                var result = GetBigNumber(stream);
-
-                return 0 <= result && result < GetMaxPossibleNumber(csv);
-            });
+            return 0 <= result && result < GetMaxPossibleNumber(csv);
+        });
 
     [Property]
-    public Property DifferentRowsGenerateDifferentValues() => Prop
-        .ForAll(
-            RandomCsv
-                .Where(csv => csv is { Values.Length: > 2 })
-                .Where(x => !x.Values[0].SequenceEqual(x.Values[1]))
-                .Select(csv => (
-                    csv with { Values = [csv.Values[0]] },
-                    csv with { Values = [csv.Values[1]] }))
-                .ToArbitrary(),
-            t =>
-            {
-                using var stream1 = new MemoryStream();
-                using var stream2 = new MemoryStream();
+    public Property DifferentRowsGenerateDifferentValues() => Prop.ForAll(
+        RandomCsv
+            .Where(csv => csv is { Values.Length: > 2 })
+            .Where(x => !x.Values[0].SequenceEqual(x.Values[1]))
+            .Select(csv => (
+                csv with { Values = [csv.Values[0]] },
+                csv with { Values = [csv.Values[1]] }))
+            .ToArbitrary(),
+        t =>
+        {
+            using var stream1 = CompressAsync(t.Item1.Values, t.Item1.Columns).Result;
+            using var stream2 = CompressAsync(t.Item2.Values, t.Item2.Columns).Result;
 
-                _compressor
-                    .CompressAsync(t.Item1.Values, t.Item1.Columns, stream1)
-                    .Wait();
-                _compressor
-                    .CompressAsync(t.Item2.Values, t.Item2.Columns, stream2)
-                    .Wait();
-
-                return GetBigNumber(stream1) != GetBigNumber(stream2);
-            });
+            return GetBigNumber(stream1) != GetBigNumber(stream2);
+        });
 
     [Property]
-    public Property SmallerCsvGeneratesSmallerNumberThanBiggerCsv() => Prop
-        .ForAll(
-            Gen.OneOf(
-                    CsvWithOneValueSmallerThanOther,
-                    CsvWithOneColumnBiggerThanAnother)
-                .ToArbitrary(),
-            t =>
-            {
-                using var smallerStream = new MemoryStream();
-                using var biggerStream = new MemoryStream();
+    public Property SmallerCsvGeneratesSmallerNumberThanBiggerCsv() => Prop.ForAll(
+        Gen.OneOf(CsvWithOneValueSmallerThanOther, CsvWithOneColumnBiggerThanAnother)
+            .ToArbitrary(),
+        t =>
+        {
+            using var smallerStream = CompressAsync(t.Smaller.Values, t.Smaller.Columns).Result;
+            using var biggerStream = CompressAsync(t.Bigger.Values, t.Bigger.Columns).Result;
 
-                _compressor
-                    .CompressAsync(t.Smaller.Values, t.Smaller.Columns, smallerStream)
-                    .Wait();
-                _compressor
-                    .CompressAsync(t.Bigger.Values, t.Bigger.Columns, biggerStream)
-                    .Wait();
+            var smaller = GetBigNumber(smallerStream);
+            var bigger = GetBigNumber(biggerStream);
 
-                var smaller = GetBigNumber(smallerStream);
-                var bigger = GetBigNumber(biggerStream);
-
-                return smaller <= bigger;
-            });
+            return smaller <= bigger;
+        });
 
     [Property]
     public Property KindOfIgnoresTheOrder() => Prop.ForAll(
         RandomCsv
-            .Select(csv => csv with { Values = [csv.Values[0]] }).ToArbitrary(),
+            .Select(csv => csv with { Values = [csv.Values[0]] })
+            .ToArbitrary(),
         csv =>
         {
             var stuff = csv
@@ -171,15 +137,8 @@ public sealed class CompressorTests2
                 Values: [[..stuff.Select(x => x.value)]],
                 Columns: [..stuff.Select(x => x.column)]);
 
-            using var sortedStream = new MemoryStream();
-            using var originalStream = new MemoryStream();
-
-            _compressor
-                .CompressAsync(csv.Values, csv.Columns, sortedStream)
-                .Wait();
-            _compressor
-                .CompressAsync(sortedCsv.Values, sortedCsv.Columns, originalStream)
-                .Wait();
+            using var sortedStream = CompressAsync(csv.Values, csv.Columns).Result;
+            using var originalStream = CompressAsync(sortedCsv.Values, sortedCsv.Columns).Result;
 
             var sortedResult = GetBigNumber(sortedStream);
             var originalResult = GetBigNumber(originalStream);
@@ -206,23 +165,14 @@ public sealed class CompressorTests2
             var smallerCsvValues = csv.Values[0].ToArray();
             smallerCsvValues[minIndex]--;
 
-            using var biggerStream = new MemoryStream();
-            using var smallerStream = new MemoryStream();
-
-            _compressor
-                .CompressAsync([biggerCsvValues], csv.Columns, biggerStream)
-                .Wait();
-            _compressor
-                .CompressAsync([smallerCsvValues], csv.Columns, smallerStream)
-                .Wait();
+            using var biggerStream = CompressAsync([biggerCsvValues], csv.Columns).Result;
+            using var smallerStream = CompressAsync([smallerCsvValues], csv.Columns).Result;
 
             var biggerResult = GetBigNumber(biggerStream);
             var smallerResult = GetBigNumber(smallerStream);
 
             return biggerResult <= smallerResult;
-        }
-    );
-
+        });
 
     private static Gen<SmallerAndBiggerCsv> CsvWithOneColumnBiggerThanAnother => RandomCsv
         .Where(csv => csv is { Columns.Count: >= 2 })
@@ -232,11 +182,6 @@ public sealed class CompressorTests2
                 Values: [csv.Values[0][..^1]],
                 Columns: csv.Columns.ToArray()[..^1]),
             Bigger: csv));
-
-
-    private record SmallerAndBiggerCsv(
-        Csv Smaller,
-        Csv Bigger);
 
     private static Gen<SmallerAndBiggerCsv> CsvWithOneValueSmallerThanOther => RandomCsv
         .Select(csv => csv with { Values = [csv.Values[0]] })
@@ -255,13 +200,21 @@ public sealed class CompressorTests2
             }));
 
 
-    private static BigInteger GetMaxPossibleNumber(Csv csv)
+    private async Task<MemoryStream> CompressAsync(
+        int[][] csv,
+        IReadOnlyCollection<int> columns)
     {
-        var maxNumber = csv
-            .Columns
-            .Aggregate(BigInteger.One, (current, column) => current * column);
-        return maxNumber;
+        var stream = new MemoryStream();
+
+        await _compressor
+            .CompressAsync(csv, columns, stream);
+
+        return stream;
     }
+
+    private static BigInteger GetMaxPossibleNumber(Csv csv) => csv
+        .Columns
+        .Aggregate(BigInteger.One, (current, column) => current * column);
 
     private static Gen<Csv> RandomCsvWithMaxValuesPerColumn => ColumnsGenerator
         .Zip(RowsGenerator, (columns, rows) =>
@@ -287,8 +240,9 @@ public sealed class CompressorTests2
             return new Csv(values, columns);
         });
 
-    private static Gen<Csv> RandomCsv => ColumnsGenerator
-        .Zip(RowsGenerator, (columns, row) => new Csv(GetCsv(row, columns), columns));
+    private static Gen<Csv> RandomCsv => ColumnsGenerator.Zip(
+        RowsGenerator,
+        (columns, row) => new Csv(GetCsv(row, columns), columns));
 
     private static BigInteger GetBigNumber(MemoryStream stream)
     {
@@ -318,14 +272,17 @@ public sealed class CompressorTests2
 
     private static int[][] GetCsv(
         int rows,
-        IReadOnlyCollection<int> realSizes)
-        => new DefaultRandomCsvGeneratorFactory()
-            .Create()
-            .WithColumns(realSizes)
-            .WithRowsCount(rows)
-            .Generate()
-            .Select(row => row.Select(int.Parse).ToArray())
-            .ToArray();
+        IReadOnlyCollection<int> realSizes) => new DefaultRandomCsvGeneratorFactory()
+        .Create()
+        .WithColumns(realSizes)
+        .WithRowsCount(rows)
+        .Generate()
+        .Select(row => row.Select(int.Parse).ToArray())
+        .ToArray();
+
+    private sealed record SmallerAndBiggerCsv(
+        Csv Smaller,
+        Csv Bigger);
 
     private sealed record Csv(
         int[][] Values,

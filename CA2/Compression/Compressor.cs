@@ -241,10 +241,18 @@ public class Compressor2
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(sizes);
 
-        BigInteger result = items[0][^1];
+        var stuff = items[0]
+            .Zip(sizes, (item, size) => (item, size))
+            .OrderByDescending(x => x.size)
+            .ToArray();
+        
+        var items2 = stuff.Select(x => x.item).ToArray();
+        var sizes2 = stuff.Select(x => x.size).ToArray();
+        
+        BigInteger result = items2[^1];
         var power = BigInteger.One;
         
-        foreach (var (value, size) in items[0].Zip(sizes.Skip(1)).Reverse())
+        foreach (var (value, size) in items2.Zip(sizes2.Skip(1)).Reverse())
         {
             power *= size;
             result += value * power;

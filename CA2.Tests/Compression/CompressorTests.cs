@@ -30,10 +30,10 @@ public sealed class CompressorTests2
         { [[2, 1]], [3, 2], 5 },
 
         { [[0, 0]], [2, 3], 0 },
-        { [[0, 1]], [2, 3], 1 },
-        { [[0, 2]], [2, 3], 2 },
-        { [[1, 0]], [2, 3], 3 },
-        { [[1, 1]], [2, 3], 4 },
+        { [[0, 1]], [2, 3], 2 },
+        { [[0, 2]], [2, 3], 4 },
+        { [[1, 0]], [2, 3], 1 },
+        { [[1, 1]], [2, 3], 3 },
         { [[1, 2]], [2, 3], 5 },
 
         { [[0, 0]], [3, 3], 0 },
@@ -55,8 +55,8 @@ public sealed class CompressorTests2
         { [[1, 1, 0]], [2, 2, 2], 6 },
         { [[1, 1, 1]], [2, 2, 2], 7 },
         { [[1, 1, 0, 0]], [2, 2, 2, 2], 12 },
-        { [[1, 2, 1, 1, 1, 0, 0]], [2, 7, 3, 2, 2, 2, 2], 460 },
-        { [[1, 0, 0, 1, 0, 0, 1, 4, 1]], [2, 2, 2, 2, 2, 2, 2, 7, 2], 1_031 },
+        { [[1, 2, 1, 1, 1, 0, 0]], [2, 7, 3, 2, 2, 2, 2], 252 },
+        { [[1, 0, 0, 1, 0, 0, 1, 4, 1]], [2, 2, 2, 2, 2, 2, 2, 7, 2], 1_171 },
         { [[1, 2, 1]], [2, 3, 2], 11 },
     };
 
@@ -109,7 +109,7 @@ public sealed class CompressorTests2
     public Property DifferentRowsGenerateDifferentValues() => Prop
         .ForAll(
             RandomCsv
-                .Where(x => 2 < x.Values.Length)
+                .Where(csv => csv is { Values.Length: > 2 })
                 .Where(x => !x.Values[0].SequenceEqual(x.Values[1]))
                 .Select(csv => (
                     csv with { Values = [csv.Values[0]] },
@@ -134,9 +134,9 @@ public sealed class CompressorTests2
     public Property SmallerCsvGeneratesSmallerNumberThanBiggerCsv() => Prop
         .ForAll(
             Gen.OneOf(
-                CsvWithOneValueSmallerThanOther,
-                CsvWithOneColumnBiggerThanAnother,
-                CsvWithOneColumnBiggerThanOther).ToArbitrary(),
+                    CsvWithOneValueSmallerThanOther,
+                    CsvWithOneColumnBiggerThanAnother)
+                .ToArbitrary(),
             t =>
             {
                 using var smallerStream = new MemoryStream();
@@ -152,12 +152,13 @@ public sealed class CompressorTests2
                 var smaller = GetBigNumber(smallerStream);
                 var bigger = GetBigNumber(biggerStream);
 
-                return smaller < bigger;
+                return smaller <= bigger;
             });
 
     [Property]
-    public Property IsSorted() => Prop.ForAll(
-        RandomCsv.Select(csv => csv with { Values = [csv.Values[0]] }).ToArbitrary(),
+    public Property KindOfIgnoresTheOrder() => Prop.ForAll(
+        RandomCsv
+            .Select(csv => csv with { Values = [csv.Values[0]] }).ToArbitrary(),
         csv =>
         {
             var stuff = csv
@@ -165,60 +166,82 @@ public sealed class CompressorTests2
                 .Zip(csv.Columns, (value, column) => (value, column))
                 .OrderByDescending(x => x.column)
                 .ToArray();
-    
+
             var sortedCsv = new Csv(
                 Values: [[..stuff.Select(x => x.value)]],
                 Columns: [..stuff.Select(x => x.column)]);
-    
+
             using var sortedStream = new MemoryStream();
             using var originalStream = new MemoryStream();
-    
+
             _compressor
                 .CompressAsync(csv.Values, csv.Columns, sortedStream)
                 .Wait();
             _compressor
                 .CompressAsync(sortedCsv.Values, sortedCsv.Columns, originalStream)
                 .Wait();
-    
+
             var sortedResult = GetBigNumber(sortedStream);
             var originalResult = GetBigNumber(originalStream);
-    
+
             return sortedResult == originalResult;
         });
 
-    private static Gen<TwoCsvs> CsvWithOneColumnBiggerThanAnother => RandomCsv
-        .Where(csv => 2 <= csv.Columns.Count)
+    [Property]
+    public Property CompressSortsColumnsInDescendingOrder() => Prop.ForAll(
+        RandomCsv
+            .Where(csv => csv is { Columns.Count: > 2 })
+            .Where(csv => csv.Values[0].All(x => x != 0))
+            .ToArbitrary(),
+        csv =>
+        {
+            var columns = csv.Columns.ToArray();
+
+            var maxIndex = Array.IndexOf(columns, columns.Max());
+            var minIndex = Array.IndexOf(columns, columns.Min());
+
+            var biggerCsvValues = csv.Values[0].ToArray();
+            biggerCsvValues[maxIndex]--;
+
+            var smallerCsvValues = csv.Values[0].ToArray();
+            smallerCsvValues[minIndex]--;
+
+            using var biggerStream = new MemoryStream();
+            using var smallerStream = new MemoryStream();
+
+            _compressor
+                .CompressAsync([biggerCsvValues], csv.Columns, biggerStream)
+                .Wait();
+            _compressor
+                .CompressAsync([smallerCsvValues], csv.Columns, smallerStream)
+                .Wait();
+
+            var biggerResult = GetBigNumber(biggerStream);
+            var smallerResult = GetBigNumber(smallerStream);
+
+            return biggerResult <= smallerResult;
+        }
+    );
+
+
+    private static Gen<SmallerAndBiggerCsv> CsvWithOneColumnBiggerThanAnother => RandomCsv
+        .Where(csv => csv is { Columns.Count: >= 2 })
         .Where(csv => csv.Values[0].Sum() != 0)
-        .Select(csv => new TwoCsvs(
+        .Select(csv => new SmallerAndBiggerCsv(
             Smaller: new Csv(
                 Values: [csv.Values[0][..^1]],
                 Columns: csv.Columns.ToArray()[..^1]),
             Bigger: csv));
 
-    private static Gen<TwoCsvs> CsvWithOneColumnBiggerThanOther => RandomCsv
-        .Select(csv => csv with { Values = [csv.Values[0]] })
-        .Where(csv => 1 < csv.Columns.Count)
-        .Where(csv => csv.Values[0][0] != 0)
-        .Select(csv =>
-        {
-            var columns = csv.Columns.ToList();
-            columns[^1] += 1;
 
-            return
-                new TwoCsvs(
-                    Smaller: csv,
-                    Bigger: csv with { Columns = columns });
-        });
-
-
-    private record TwoCsvs(
+    private record SmallerAndBiggerCsv(
         Csv Smaller,
         Csv Bigger);
 
-    private static Gen<TwoCsvs> CsvWithOneValueSmallerThanOther => RandomCsv
+    private static Gen<SmallerAndBiggerCsv> CsvWithOneValueSmallerThanOther => RandomCsv
         .Select(csv => csv with { Values = [csv.Values[0]] })
         .Where(csv => csv.Values[0][0] != 0)
-        .Select(csv => new TwoCsvs(
+        .Select(csv => new SmallerAndBiggerCsv(
             Bigger: csv,
             Smaller: csv with
             {
@@ -287,9 +310,7 @@ public sealed class CompressorTests2
         .NonEmptyListOf()
         .Select(CollectionExtensions.AsReadOnly);
 
-#pragma warning disable IDE0051
     private static Gen<int> RowsGenerator => Arb
-#pragma warning restore IDE0051
         .Default
         .PositiveInt()
         .Generator

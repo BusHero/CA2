@@ -239,19 +239,25 @@ public sealed class CompressCommandTests
         public void WithCompressionResult(byte[] result)
             => _result = result;
 
-        public Task CompressAsync(
+        public Task WriteCsvAsync(
             int[][] csv,
-            int[] sizes,
-            byte interactionStrength,
-            Stream ccaStream,
-            Stream metaStream)
+            IReadOnlyCollection<int> sizes,
+            Stream stream, 
+            CancellationToken token = default)
         {
             CompressedCsvFiles.Add(csv);
-            Sizes.Add(sizes);
+            Sizes.Add(sizes.ToArray());
 
-            ccaStream.Write(_result);
+            stream.Write(_result);
 
             return Task.CompletedTask;
+        }
+
+        public void WriteMetadata(long numberOfRows,
+            IReadOnlyCollection<int> sizes,
+            byte interactionStrength,
+            Stream stream)
+        {
         }
     }
 }

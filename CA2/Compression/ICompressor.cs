@@ -4,10 +4,15 @@ using System.IO;
 
 public interface ICompressor
 {
-    Task CompressAsync(
+    Task WriteCsvAsync(
         int[][] csv,
-        int[] sizes,
+        IReadOnlyCollection<int> sizes,
+        Stream stream,
+        CancellationToken cancellationToken = default);
+    
+    public void WriteMetadata(
+        long numberOfRows,
+        IReadOnlyCollection<int> sizes,
         byte interactionStrength,
-        Stream ccaStream,
-        Stream metaStream);
+        Stream stream);
 }

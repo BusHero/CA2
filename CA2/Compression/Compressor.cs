@@ -4,184 +4,57 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
+public class Compressor : ICompressor
 {
     private const string CcaMagicSequence = " CCA";
     private static readonly byte[] CcaMagicSequenceBytes = Encoding.ASCII.GetBytes(CcaMagicSequence);
-
-    public static BigInteger Compress(
-        int[] row,
-        int[] sizes)
+    
+    public async Task WriteCsvAsync(
+        int[][] items,
+        IReadOnlyCollection<int> sizes,
+        Stream stream,
+        CancellationToken token = default)
     {
-        ArgumentNullException.ThrowIfNull(row);
+        ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(sizes);
 
-        if (row.Length != sizes.Length)
-        {
-            throw new InvalidOperationException("Values and Sizes have different length");
-        }
-
-        if (row.Any(x => x < 0))
-        {
-            throw new InvalidOperationException("Values contain elements smaller than zero");
-        }
-
-        if (sizes.Any(x => x < 2))
-        {
-            throw new InvalidOperationException("Sizes contain elements smaller than 2");
-        }
-
-        if (row
-            .Zip(sizes, (value, size) => size <= value)
-            .Any(x => x))
-        {
-            throw new InvalidOperationException("value is bigger than size");
-        }
-
-        if (row.Length == 0)
-        {
-            return 0;
-        }
-
-        return row
-            .Zip(sizes.Skip(1))
-            .Reverse()
-            .Aggregate(
-                (result: (BigInteger)row[^1], power: BigInteger.One),
-                (r, t) =>
-                {
-                    var (result, power) = r;
-                    var (value, size) = t;
-
-                    power *= size;
-                    result += value * power;
-
-                    return (result, power);
-                })
-            .result;
-    }
-
-    public static long GetNumberOfBitsForCombination(int[] sizes)
-        => sizes
-            .Aggregate(
-                BigInteger.One,
-                (x, y) => x * y)
-            .GetBitLength();
-
-    private static int GetNumberOfBytesForCombination(int[] sizes)
-        => sizes
-            .Aggregate(
-                BigInteger.One,
-                (x, y) => x * y)
+        var bytesPerCombination = sizes
+            .Product()
             .GetByteCount();
 
-    private static async Task TryWriteToBufferAsync(
-        Stream stream,
-        BigInteger[] numbers,
-        int sizeItem)
-    {
-        if (numbers is [])
-        {
-            return;
-        }
+        var bytes = new byte[bytesPerCombination];
 
-        var byteCount = numbers
-            .Max(BigInteger.Abs)
-            .GetByteCount();
+        var sortedSizes = sizes
+            .OrderDescending()
+            .ToArray();
 
-        if (sizeItem < byteCount)
-        {
-            return;
-        }
-
-        foreach (var number in numbers)
-        {
-            var bytes = new byte[sizeItem];
-
-            number.TryWriteBytes(
-                bytes,
-                out _);
-            await stream.WriteAsync(bytes);
-        }
-    }
-
-    private static async Task CompressAsync(int[] combinationItem, int[] combinationSizes, Stream stream)
-    {
-        var number = Compress(combinationItem, combinationSizes);
-        var size = GetNumberOfBytesForCombination(combinationSizes);
-
-        await TryWriteToBufferAsync(stream, [number], size);
-    }
-
-    public int[] Decompress(BigInteger compressedValue, int[] sizes)
-    {
-        var result = new int[sizes.Length];
-        var intermediateResult = compressedValue;
-
-        for (var i = sizes.Length - 1; i >= 0; i--)
-        {
-            result[i] = (int)(intermediateResult % sizes[i]);
-            intermediateResult /= sizes[i];
-        }
-
-        return result;
-    }
-
-    public int[] Decompress(byte[] bytes, int[] sizes)
-    {
-        var number = new BigInteger(bytes, isUnsigned: true);
-
-        return Decompress(number, sizes);
-    }
-
-    public int[][] Decompress(int[] sizes, Stream stream)
-    {
-        var count = GetNumberOfBytesForCombination(sizes);
-
-        var bytes = new byte[count];
-        var result = new List<int[]>();
-
-        while (stream.Read(bytes, 0, bytes.Length) > 0)
-        {
-            result.Add(Decompress(bytes, sizes));
-        }
-
-        return [.. result];
-    }
-
-    public async Task CompressAsync(
-        int[][] items,
-        int[] sizes,
-        Stream stream)
-    {
         foreach (var item in items)
         {
-            await CompressAsync(item, sizes, stream);
+            var stuff = item
+                .Zip(sizes, (i, size) => (item: i, size))
+                .OrderByDescending(x => x.size)
+                .ToArray();
+
+            var sortedItems = stuff
+                .Select(x => x.item)
+                .ToArray();
+
+            BigInteger result = sortedItems[^1];
+            var power = BigInteger.One;
+
+            for (var i = sortedItems.Length - 2; i >= 0; i--)
+            {
+                power *= sortedSizes[i + 1];
+                result += sortedItems[i] * power;
+            }
+
+            result.TryWriteBytes(bytes, out _);
+
+            await stream.WriteAsync(bytes, token);
         }
     }
-
-    public async Task CompressAsync(
-        int[][] csv,
-        int[] sizes,
-        byte interactionStrength,
-        Stream ccaStream,
-        Stream metaStream)
-    {
-        await CompressAsync(
-            csv,
-            sizes,
-            ccaStream);
-
-        Write(
-            csv.Length,
-            sizes,
-            interactionStrength,
-            metaStream);
-
-        await Task.CompletedTask;
-    }
-
-    public void Write(
+    
+    public void WriteMetadata(
         long numberOfRows,
         IReadOnlyCollection<int> columns,
         byte interactionStrength,
@@ -229,49 +102,7 @@ public sealed class Compressor : IDecompressor, ICompressor, IMetadataWriter
 
         writer.Write(ushort.MinValue);
     }
-}
 
-public class Compressor2
-{
-    public async Task CompressAsync(
-        int[][] items,
-        IReadOnlyCollection<int> sizes,
-        Stream stream)
-    {
-        ArgumentNullException.ThrowIfNull(items);
-        ArgumentNullException.ThrowIfNull(sizes);
-
-        var bytesPerCombination = sizes.Product().GetByteCount();
-
-        var bytes = new byte[bytesPerCombination];
-
-        var sortedSizes = sizes
-            .OrderDescending()
-            .ToArray();
-        
-        foreach (var item in items)
-        {
-            var stuff = item
-                .Zip(sizes, (i, size) => (item: i, size))
-                .OrderByDescending(x => x.size)
-                .ToArray();
-
-            var sortedItems = stuff.Select(x => x.item).ToArray();
-
-            BigInteger result = sortedItems[^1];
-            var power = BigInteger.One;
-            
-            for (var i = sortedItems.Length - 2; i >= 0; i--)
-            {
-                power *= sortedSizes[i + 1];
-                result += sortedItems[i] * power;
-            }
-
-            result.TryWriteBytes(bytes, out _);
-
-            await stream.WriteAsync(bytes);
-        }
-    }
 }
 
 public static class MyEnumerableExtensions

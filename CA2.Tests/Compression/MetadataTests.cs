@@ -21,7 +21,7 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor.Write(
+            _compressor.WriteMetadata(
                 rows,
                 columns,
                 strength,
@@ -41,7 +41,7 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor.Write(
+            _compressor.WriteMetadata(
                 rows,
                 columns,
                 strength,
@@ -63,7 +63,7 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor.Write(
+            _compressor.WriteMetadata(
                 rows,
                 columns,
                 strength,
@@ -85,7 +85,7 @@ public sealed class MetadataTests
         {
             using var metaStream = new MemoryStream();
 
-            _compressor.Write(
+            _compressor.WriteMetadata(
                 rows,
                 columns,
                 strength,
@@ -111,7 +111,7 @@ public sealed class MetadataTests
             {
                 using var metaStream = new MemoryStream();
 
-                _compressor.Write(
+                _compressor.WriteMetadata(
                     rows,
                     columns,
                     strength,
@@ -178,7 +178,7 @@ public sealed class MetadataTests
     {
         using var metaStream = new MemoryStream();
 
-        _compressor.Write(
+        _compressor.WriteMetadata(
             rows,
             columns,
             strength,
@@ -198,7 +198,7 @@ public sealed class MetadataTests
     {
         using var metaStream = new MemoryStream();
 
-        _compressor.Write(
+        _compressor.WriteMetadata(
             rows,
             columns,
             strength,

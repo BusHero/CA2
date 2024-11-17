@@ -17,9 +17,7 @@ internal partial class Program
 
         var command = new CompressCommand(
             new FileSystem(),
-            [
-                new ActsExtractor(),
-            ],
+            [new ActsExtractor(),],
             new Compressor());
 
         await Parallel.ForEachAsync(files, async (file, _) =>

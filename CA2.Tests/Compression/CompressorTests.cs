@@ -217,7 +217,7 @@ public sealed class CompressorTests
         var stream = new MemoryStream();
 
         await _compressor
-            .WriteCsvAsync(csv, columns, stream);
+            .WriteCcaAsync(csv, columns, stream);
 
         return stream;
     }

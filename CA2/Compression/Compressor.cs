@@ -9,7 +9,7 @@ public class Compressor : ICompressor
     private const string CcaMagicSequence = " CCA";
     private static readonly byte[] CcaMagicSequenceBytes = Encoding.ASCII.GetBytes(CcaMagicSequence);
     
-    public async Task WriteCsvAsync(
+    public async Task WriteCcaAsync(
         int[][] items,
         IReadOnlyCollection<int> sizes,
         Stream stream,
@@ -103,10 +103,4 @@ public class Compressor : ICompressor
         writer.Write(ushort.MinValue);
     }
 
-}
-
-public static class MyEnumerableExtensions
-{
-    public static BigInteger Product(this IEnumerable<int> numbers)
-        => numbers.Aggregate(BigInteger.One, (x, y) => x * y);
 }

@@ -239,7 +239,7 @@ public sealed class CompressCommandTests
         public void WithCompressionResult(byte[] result)
             => _result = result;
 
-        public Task WriteCsvAsync(
+        public Task WriteCcaAsync(
             int[][] csv,
             IReadOnlyCollection<int> sizes,
             Stream stream, 

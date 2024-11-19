@@ -32,7 +32,7 @@ public sealed class CompressCommand(
         await using var ccaFile = fileSystem.File.Create(ccaFullFilename);
         await using var metaFile = fileSystem.File.Create(ccaMetaFilename);
 
-        await csvCompressor.WriteCsvAsync(
+        await csvCompressor.WriteCcaAsync(
             csv,
             columns,
             ccaFile);

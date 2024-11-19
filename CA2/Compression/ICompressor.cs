@@ -4,7 +4,7 @@ using System.IO;
 
 public interface ICompressor
 {
-    Task WriteCsvAsync(
+    Task WriteCcaAsync(
         int[][] csv,
         IReadOnlyCollection<int> sizes,
         Stream stream,

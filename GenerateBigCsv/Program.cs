@@ -1,4 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
 
 namespace GenerateBigCsv;
 
@@ -14,44 +20,87 @@ public partial class Program
         var directory = new DirectoryInfo(OriginalFileFolder);
 
         await using var writer = File.CreateText("""C:\Users\Petru\projects\csharp\CA2\result.csv""");
+        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-        await writer.WriteLineAsync(
-            "Filename,T,V,K,rows,original-file-length,zip,cca-new,ccmeta-new,cca-original,ccmeta-original");
+        csv.WriteHeader<Record>();
+        await csv.NextRecordAsync();
 
         foreach (var file in directory.EnumerateFiles("*.txt"))
         {
             var rows = await GetRows(file);
-            var zipFile = new FileInfo(GetZipFilePath(ZipFileFolder, file.FullName, ".txt.zip"));
-            var myCcaFile = new FileInfo(GetZipFilePath(FilesThatMyProgramGenerated, file.FullName, ".cca"));
-            var myMetaFile = new FileInfo(GetZipFilePath(FilesThatMyProgramGenerated, file.FullName, ".ccmeta"));
-            var originalCcaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".cca"));
-            var originalMetaFile = new FileInfo(GetZipFilePath(OriginalProgram, file.FullName, ".ccmeta"));
+            var zipFile = new FileInfo(GetFilePath(ZipFileFolder, file.Name, ".txt.zip"));
+            var myCcaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".cca"));
+            var myMetaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".ccmeta"));
+            var originalCcaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".cca"));
+            var originalMetaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".ccmeta"));
 
-            var match = Filename().Match(file.Name);
-            var t = match.Groups["t"].Value;
-            var k = match.Groups["k"].Value;
-            var v = match.Groups["v"].Value;
-            await writer.WriteLineAsync(
-                $"{file.Name},{t},{v},{k},{rows},{file.Length},{zipFile.Length},{myCcaFile.Length},{myMetaFile.Length},{originalCcaFile.Length},{originalMetaFile.Length}");
-            await writer.FlushAsync();
+            var match = FilenameRegex().Match(file.Name);
+            var record = new Record
+            {
+                Filename = file.Name,
+                Strength = match.Groups["t"].Value,
+                ValuesPerColumn = match.Groups["v"].Value,
+                NumberOfColumns = match.Groups["k"].Value,
+                Rows = rows,
+                OriginalFileLength = file.Length,
+                ZipFileLength = zipFile.Length,
+                CcaFileLength = myCcaFile.Length,
+                MetafileLength = myMetaFile.Length,
+                OriginalCcaFileLength = originalCcaFile.Length,
+                OriginalMetafileLength = originalMetaFile.Length,
+            };
+            
+            csv.WriteRecord(record);
+            await csv.NextRecordAsync();
+            await csv.FlushAsync();
         }
     }
 
-    private static async Task<int> GetRows(FileInfo file)
+    private readonly static byte[] Buffer = new byte[10];
+
+    private static async ValueTask<string> GetRows(FileInfo file)
     {
         await using var stream = file.OpenRead();
-        using var reader = new StreamReader(stream);
+        var memory = new Memory<byte>(Buffer);
+        _ = await stream.ReadAsync(memory);
 
-        var line = await reader.ReadLineAsync();
+        var index = memory.Span.IndexOf((byte)'\n');
 
-        return int.Parse(line!);
+        return Encoding.ASCII.GetString(memory[..index].Span);
     }
 
-    private static string GetZipFilePath(string directory, string originalFileName, string extension)
+    private static string GetFilePath(string directory, string originalFileName, string extension)
         => Path.Combine(
             directory,
             Path.ChangeExtension(originalFileName, extension));
 
     [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.txt""", RegexOptions.Compiled)]
-    private static partial Regex Filename();
+    private static partial Regex FilenameRegex();
+
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+    public record struct Record
+    {
+        [Name("Filename"), Index(0)] public required string Filename { get; init; }
+
+        [Name("T"), Index(1)] public required string Strength { get; init; }
+
+        [Name("V"), Index(2)] public required string ValuesPerColumn { get; init; }
+
+        [Name("K"), Index(3)] public required string NumberOfColumns { get; init; }
+
+        [Name("Rows"), Index(4)] public required string? Rows { get; init; }
+
+        [Name("original-file-length"), Index(5)]
+        public required long OriginalFileLength { get; init; }
+
+        [Name("zip"), Index(6)] public required long ZipFileLength { get; init; }
+
+        [Name("cca-new"), Index(7)] public required long CcaFileLength { get; init; }
+
+        [Name("ccmeta-new"), Index(8)] public required long MetafileLength { get; init; }
+
+        [Name("cca-original"), Index(9)] public required long OriginalCcaFileLength { get; init; }
+
+        [Name("ccmeta-original"), Index(10)] public required long OriginalMetafileLength { get; init; }
+    }
 }

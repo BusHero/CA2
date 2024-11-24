@@ -11,7 +11,7 @@ namespace GenerateBigCsv;
 public partial class Program
 {
     private const string OriginalFileFolder = """C:\Users\Petru\projects\csharp\CA2\result-unarchive""";
-    private const string ZipFileFolder = """C:\Users\Petru\projects\csharp\CA2\result""";
+    private const string ZipFileFolder = """C:\Users\Petru\projects\csharp\CA2\result-zip""";
     private const string FilesThatMyProgramGenerated = """C:\Users\Petru\projects\csharp\CA2\result-ca2""";
     private const string OriginalProgram = """C:\Users\Petru\projects\csharp\CA2\result-origin""";
 
@@ -34,7 +34,7 @@ public partial class Program
     private static async Task WriteRecord(FileInfo file, CsvWriter csv)
     {
         var rows = await GetRows(file);
-        var zipFile = new FileInfo(GetFilePath(ZipFileFolder, file.Name, ".txt.zip"));
+        var zipFile = new FileInfo(GetFilePath(ZipFileFolder, file.Name, ".zip"));
         var myCcaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".cca"));
         var myMetaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".ccmeta"));
         var originalCcaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".cca"));

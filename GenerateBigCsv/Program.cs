@@ -14,6 +14,7 @@ public partial class Program
     private const string ZipFileFolder = """C:\Users\Petru\projects\csharp\CA2\result-zip""";
     private const string FilesThatMyProgramGenerated = """C:\Users\Petru\projects\csharp\CA2\result-ca2""";
     private const string OriginalProgram = """C:\Users\Petru\projects\csharp\CA2\result-origin""";
+    private const string BZip2 = """C:\Users\Petru\projects\csharp\CA2\result-bzip2""";
 
     public static async Task Main()
     {
@@ -39,9 +40,11 @@ public partial class Program
         var myMetaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".ccmeta"));
         var originalCcaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".cca"));
         var originalMetaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".ccmeta"));
+        var bzip = new FileInfo(GetFilePath(BZip2, file.Name, ".txt.bz2"));
 
         var match = FilenameRegex().Match(file.Name);
-        var record = new Record
+
+        csv.WriteRecord(new Record
         {
             Filename = file.Name,
             Strength = match.Groups["t"].Value,
@@ -54,9 +57,9 @@ public partial class Program
             MetafileLength = myMetaFile.Length,
             OriginalCcaFileLength = originalCcaFile.Length,
             OriginalMetafileLength = originalMetaFile.Length,
-        };
-            
-        csv.WriteRecord(record);
+            BZip = bzip.Length,
+        });
+        
         await csv.NextRecordAsync();
         await csv.FlushAsync();
     }
@@ -107,5 +110,7 @@ public partial class Program
         [Name("cca-original"), Index(9)] public required long OriginalCcaFileLength { get; init; }
 
         [Name("ccmeta-original"), Index(10)] public required long OriginalMetafileLength { get; init; }
+
+        [Name("bzip2"), Index(10)] public required long BZip { get; init; }
     }
 }

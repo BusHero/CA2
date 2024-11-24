@@ -480,3 +480,4 @@ bins/
 result/
 result-unarchive/
 !result.csv
+result-bzip2/

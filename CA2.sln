@@ -70,6 +70,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{0045A840
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressZip", "CompressZip\CompressZip.csproj", "{F7A87C56-1AE7-4209-B5CA-735CDFB07A69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressBzip2", "CompressBzip2\CompressBzip2.csproj", "{64AF1B70-D575-4270-955B-BF596D3BE0A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +164,10 @@ Global
 		{F7A87C56-1AE7-4209-B5CA-735CDFB07A69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7A87C56-1AE7-4209-B5CA-735CDFB07A69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7A87C56-1AE7-4209-B5CA-735CDFB07A69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64AF1B70-D575-4270-955B-BF596D3BE0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64AF1B70-D575-4270-955B-BF596D3BE0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64AF1B70-D575-4270-955B-BF596D3BE0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64AF1B70-D575-4270-955B-BF596D3BE0A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +194,7 @@ Global
 		{8B0FE2B2-F06D-4508-889E-C9B7FFC9D685} = {0045A840-E4E3-4603-92F0-9D57BF692078}
 		{8F84BAEC-9584-4B44-9346-E199011B6692} = {0045A840-E4E3-4603-92F0-9D57BF692078}
 		{F7A87C56-1AE7-4209-B5CA-735CDFB07A69} = {0045A840-E4E3-4603-92F0-9D57BF692078}
+		{64AF1B70-D575-4270-955B-BF596D3BE0A0} = {0045A840-E4E3-4603-92F0-9D57BF692078}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7D2D18-DD95-4EA3-B6C5-0937F17F78EE}

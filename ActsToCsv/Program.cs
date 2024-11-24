@@ -1,9 +1,8 @@
 ﻿using CA2.Extractors;
 
-
 var directory = new DirectoryInfo("""C:\Users\Petru\projects\csharp\CA2\result-unarchive""");
 
-var files = directory.GetFiles("*.txt");
+var files = directory.EnumerateFiles("*.txt");
 
 await Parallel.ForEachAsync(files, async (file, token) =>
 {
@@ -15,7 +14,7 @@ await Parallel.ForEachAsync(files, async (file, token) =>
 
     var outputFilename = Path.Combine(
         directory.FullName,
-        $"{Path.GetFileNameWithoutExtension(file.FullName)}.csv");
+        Path.ChangeExtension(file.Name, "csv"));
     await File.WriteAllLinesAsync(outputFilename, lines, token);
 
     Console.WriteLine($@"✓ {outputFilename}");

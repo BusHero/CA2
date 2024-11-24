@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Web;
+﻿using System.Web;
 
 const string directory = """..\..\..\result""";
 Directory.CreateDirectory(directory);
@@ -76,12 +75,9 @@ static async Task SaveFile(
 }
 
 static string GetFilename(int t, int v, int k)
-{
-    return $"ca.{t}.{v}^{k}.txt.zip";
-}
+    => $"ca.{t}.{v}^{k}.txt.zip";
 
-[SuppressMessage("ReSharper", "UnusedType.Global")]
-public record Combination(
+internal sealed record Combination(
     int T,
     int V,
     int MinK,

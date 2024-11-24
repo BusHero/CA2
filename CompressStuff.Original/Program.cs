@@ -6,23 +6,27 @@ namespace CompressStuff.Original;
 
 internal partial class Program
 {
-    private const string Path = """C:\Users\Petru\projects\csharp\CA2\result-unarchive""";
+    private const string OriginalPath = """C:\Users\Petru\projects\csharp\CA2\result-unarchive""";
+    private const string PathToMoveTo = """C:\Users\Petru\projects\csharp\CA2\result-origin""";
 
     public static async Task Main()
     {
-        var files = new DirectoryInfo(Path).GetFiles("*.csv");
-
+        var files = new DirectoryInfo(OriginalPath)
+            .EnumerateFiles("*.csv");
+        
         await Parallel.ForEachAsync(files, async (file, token) =>
         {
             var match = Filename().Match(file.Name);
-            var t = byte.Parse(match.Groups["t"].Value);
+            var t = match.Groups["t"].Value;
             var k = int.Parse(match.Groups["k"].Value);
-            var v = int.Parse(match.Groups["v"].Value);
+            var v = match.Groups["v"].Value;
 
-            var columns = Enumerable
-                .Range(0, k)
-                .SelectMany(_ => new[] { "-v", v.ToString() })
-                .ToArray();
+            var columns = new List<string>(k * 2);
+            for (var i = 0; i < k; i++)
+            {
+                columns.Add("-v");
+                columns.Add(v);
+            }
 
             try
             {
@@ -35,7 +39,17 @@ internal partial class Program
                     .WithStandardOutputPipe(PipeTarget.ToDelegate(Console.WriteLine))
                     .WithStandardErrorPipe(PipeTarget.ToDelegate(Console.WriteLine))
                     .ExecuteAsync(token);
-
+                
+                var ccaFilename = Path.ChangeExtension(file.Name, "cca");
+                File.Move(
+                    Path.Combine(OriginalPath, ccaFilename),
+                    Path.Combine(PathToMoveTo, ccaFilename));
+                
+                var ccmetaFilename = Path.ChangeExtension(file.Name, "ccmeta");
+                File.Move(
+                    Path.Combine(OriginalPath, ccmetaFilename),
+                    Path.Combine(PathToMoveTo, ccmetaFilename));
+                
                 Console.WriteLine($@"✓ {file.Name}");
             }
             catch
@@ -45,6 +59,6 @@ internal partial class Program
         });
     }
 
-    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.csv""")]
+    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.csv""", RegexOptions.Compiled)]
     private static partial Regex Filename();
 }

@@ -13,7 +13,8 @@ internal partial class Program
 
     public static async Task Main()
     {
-        var files = new DirectoryInfo(Path).GetFiles("*.txt");
+        var files = new DirectoryInfo(Path)
+            .EnumerateFiles("*.txt");
 
         var command = new CompressCommand(
             new FileSystem(),
@@ -43,6 +44,6 @@ internal partial class Program
         });
     }
 
-    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.txt""")]
+    [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.txt""", RegexOptions.Compiled)]
     private static partial Regex Filename();
 }

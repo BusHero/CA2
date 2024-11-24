@@ -19,7 +19,7 @@ public class Compressor : ICompressor
         ArgumentNullException.ThrowIfNull(sizes);
 
         var bytesPerCombination = sizes
-            .Product()
+            .Aggregate(BigInteger.One, (x, y) => x * y)
             .GetByteCount();
 
         var bytes = new byte[bytesPerCombination];
@@ -69,35 +69,34 @@ public class Compressor : ICompressor
 
         var groups = columns
             .GroupBy(x => x)
-            .OrderByDescending(x => x.Key);
+            .OrderByDescending(x => x.Key)
+            .Select(x => (count: x.Count(), (byte)x.Key));
 
-        foreach (var group in groups)
+        foreach (var (count, key) in groups)
         {
-            var length = group.Count();
-
-            switch (length)
+            switch (count)
             {
                 case <= 0x7f:
-                    writer.Write((byte)length);
+                    writer.Write((byte)count);
                     break;
                 case <= 0x3fff:
-                    writer.Write((byte)(length >> 8 | 0x80));
-                    writer.Write((byte)(length & 0xff));
+                    writer.Write((byte)(count >> 8 | 0x80));
+                    writer.Write((byte)(count & 0xff));
                     break;
                 case <= 0x1fffff:
-                    writer.Write((byte)(length >> 16 | 0xc0));
-                    writer.Write((byte)(length >> 8 & 0xff));
-                    writer.Write((byte)(length & 0xff));
+                    writer.Write((byte)(count >> 16 | 0xc0));
+                    writer.Write((byte)(count >> 8 & 0xff));
+                    writer.Write((byte)(count & 0xff));
                     break;
                 default:
-                    writer.Write((byte)(length >> 24 | 0xe0));
-                    writer.Write((byte)(length >> 16 & 0xff));
-                    writer.Write((byte)(length >> 8 & 0xff));
-                    writer.Write((byte)(length & 0xff));
+                    writer.Write((byte)(count >> 24 | 0xe0));
+                    writer.Write((byte)(count >> 16 & 0xff));
+                    writer.Write((byte)(count >> 8 & 0xff));
+                    writer.Write((byte)(count & 0xff));
                     break;
             }
 
-            writer.Write((byte)group.Key);
+            writer.Write(key);
         }
 
         writer.Write(ushort.MinValue);

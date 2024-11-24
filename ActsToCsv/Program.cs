@@ -4,7 +4,11 @@ var directory = new DirectoryInfo("""C:\Users\Petru\projects\csharp\CA2\result-u
 
 var files = directory.EnumerateFiles("*.txt");
 
-await Parallel.ForEachAsync(files, async (file, token) =>
+await Parallel.ForEachAsync(files, Body);
+
+return;
+
+async ValueTask Body(FileInfo file, CancellationToken token)
 {
     var extractor = new ActsExtractor();
     using var stream = file.OpenText();
@@ -12,10 +16,8 @@ await Parallel.ForEachAsync(files, async (file, token) =>
     var result = await extractor.ExtractAsync(stream);
     var lines = result.Select(x => string.Join(',', x));
 
-    var outputFilename = Path.Combine(
-        directory.FullName,
-        Path.ChangeExtension(file.Name, "csv"));
+    var outputFilename = Path.Combine(directory.FullName, Path.ChangeExtension(file.Name, "csv"));
     await File.WriteAllLinesAsync(outputFilename, lines, token);
 
     Console.WriteLine($@"✓ {outputFilename}");
-});
+}

@@ -14,20 +14,22 @@ public sealed class CompressCommand(
 {
     private readonly IReadOnlyCollection<IExtractor> _extractors = extractors.ToList();
 
-    public async Task Command(string format,
+    public async Task Command(
+        string format,
         [Option('i')] string? input,
         [Option('o')] string? output,
         [Option("column", ['c'])] int[] columns,
-        [Option('t')] byte strength)
+        [Option('t')] byte strength,
+        CancellationToken token = default)
     {
         var csv = await GetCsv(format, input);
 
         output ??= input ?? "test";
 
-        var parent = Path.GetDirectoryName(input)!;
+        var parent = fileSystem.Path.GetDirectoryName(input)!;
 
-        var ccaFullFilename = Path.Combine(parent, GetCcaFilename(output));
-        var ccaMetaFilename = Path.Combine(parent, GetCcaMetaFilename(output));
+        var ccaFullFilename = fileSystem.Path.Combine(parent, fileSystem.Path.ChangeExtension(output, "cca"));
+        var ccaMetaFilename = fileSystem.Path.Combine(parent, fileSystem.Path.ChangeExtension(output, "ccmeta"));
 
         await using var ccaFile = fileSystem.File.Create(ccaFullFilename);
         await using var metaFile = fileSystem.File.Create(ccaMetaFilename);
@@ -35,7 +37,8 @@ public sealed class CompressCommand(
         await csvCompressor.WriteCcaAsync(
             csv,
             columns,
-            ccaFile);
+            ccaFile,
+            token);
         csvCompressor.WriteMetadata(
             csv.Length,
             columns,
@@ -57,19 +60,5 @@ public sealed class CompressCommand(
         using var inputStream = fileSystem.File.OpenText(inputFile);
 
         return await extractor.ExtractAsync(inputStream);
-    }
-
-    private string GetCcaFilename(string inputFile)
-    {
-        var fileWithoutExtension = fileSystem.Path.GetFileNameWithoutExtension(inputFile);
-
-        return $"{fileWithoutExtension}.cca";
-    }
-
-    private string GetCcaMetaFilename(string inputFile)
-    {
-        var fileWithoutExtension = fileSystem.Path.GetFileNameWithoutExtension(inputFile);
-
-        return $"{fileWithoutExtension}.ccmeta";
     }
 }

@@ -21,15 +21,18 @@ internal partial class Program
             [new ActsExtractor(),],
             new Compressor());
 
-        await Parallel.ForEachAsync(files, async (file, _) =>
+        await Parallel.ForEachAsync(files, Body);
+        
+        return;
+
+        async ValueTask Body(FileInfo file, CancellationToken _)
         {
             var match = Filename().Match(file.Name);
             var t = byte.Parse(match.Groups["t"].Value);
             var k = int.Parse(match.Groups["k"].Value);
             var v = int.Parse(match.Groups["v"].Value);
 
-            var columns = Enumerable
-                .Repeat(v, k)
+            var columns = Enumerable.Repeat(v, k)
                 .ToArray();
 
             try
@@ -41,7 +44,7 @@ internal partial class Program
             {
                 Console.WriteLine($"X - {file.Name}");
             }
-        });
+        }
     }
 
     [GeneratedRegex("""ca\.(?<t>\d)\.(?<v>\d)\^(?<k>\d+)\.txt""", RegexOptions.Compiled)]

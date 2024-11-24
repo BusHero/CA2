@@ -27,33 +27,38 @@ public partial class Program
 
         foreach (var file in directory.EnumerateFiles("*.txt"))
         {
-            var rows = await GetRows(file);
-            var zipFile = new FileInfo(GetFilePath(ZipFileFolder, file.Name, ".txt.zip"));
-            var myCcaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".cca"));
-            var myMetaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".ccmeta"));
-            var originalCcaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".cca"));
-            var originalMetaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".ccmeta"));
-
-            var match = FilenameRegex().Match(file.Name);
-            var record = new Record
-            {
-                Filename = file.Name,
-                Strength = match.Groups["t"].Value,
-                ValuesPerColumn = match.Groups["v"].Value,
-                NumberOfColumns = match.Groups["k"].Value,
-                Rows = rows,
-                OriginalFileLength = file.Length,
-                ZipFileLength = zipFile.Length,
-                CcaFileLength = myCcaFile.Length,
-                MetafileLength = myMetaFile.Length,
-                OriginalCcaFileLength = originalCcaFile.Length,
-                OriginalMetafileLength = originalMetaFile.Length,
-            };
-            
-            csv.WriteRecord(record);
-            await csv.NextRecordAsync();
-            await csv.FlushAsync();
+            await WriteRecord(file, csv);
         }
+    }
+
+    private static async Task WriteRecord(FileInfo file, CsvWriter csv)
+    {
+        var rows = await GetRows(file);
+        var zipFile = new FileInfo(GetFilePath(ZipFileFolder, file.Name, ".txt.zip"));
+        var myCcaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".cca"));
+        var myMetaFile = new FileInfo(GetFilePath(FilesThatMyProgramGenerated, file.Name, ".ccmeta"));
+        var originalCcaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".cca"));
+        var originalMetaFile = new FileInfo(GetFilePath(OriginalProgram, file.Name, ".ccmeta"));
+
+        var match = FilenameRegex().Match(file.Name);
+        var record = new Record
+        {
+            Filename = file.Name,
+            Strength = match.Groups["t"].Value,
+            ValuesPerColumn = match.Groups["v"].Value,
+            NumberOfColumns = match.Groups["k"].Value,
+            Rows = rows,
+            OriginalFileLength = file.Length,
+            ZipFileLength = zipFile.Length,
+            CcaFileLength = myCcaFile.Length,
+            MetafileLength = myMetaFile.Length,
+            OriginalCcaFileLength = originalCcaFile.Length,
+            OriginalMetafileLength = originalMetaFile.Length,
+        };
+            
+        csv.WriteRecord(record);
+        await csv.NextRecordAsync();
+        await csv.FlushAsync();
     }
 
     private readonly static byte[] Buffer = new byte[10];
